@@ -565,7 +565,7 @@ func (s) TestBalancerExitIdleOne(t *testing.T) {
 	// Call ExitIdleOne on the child policy.
 	bg.ExitIdleOne(testBalancerIDs[0])
 	select {
-	case <-time.After(time.Second):
+	case <-time.After(defaultTestTimeout):
 		t.Fatal("Timeout when waiting for ExitIdle to be invoked on child policy")
 	case <-exitIdleCh:
 	}
@@ -593,7 +593,7 @@ func (s) TestBalancerGroup_ExitIdleOne_AfterClose(t *testing.T) {
 	bg.ExitIdleOne(testBalancerIDs[0])
 
 	select {
-	case <-time.After(time.Second):
+	case <-time.After(defaultTestShortTimeout):
 	case <-exitIdleCh:
 		t.Fatalf("ExitIdleOne called ExitIdle on sub-balancer after BalancerGroup was closed")
 	}
@@ -793,7 +793,7 @@ func (s) TestBalancerExitIdle_All(t *testing.T) {
 				t.Fatalf("ExitIdle was called multiple times for sub-balancer %q", name)
 			}
 			called[name] = true
-		case <-time.After(time.Second):
+		case <-time.After(defaultTestTimeout):
 			t.Fatalf("Timeout: ExitIdle not called for all sub-balancers, got %d/%d", len(called), len(balancerNames))
 		}
 	}
@@ -823,6 +823,6 @@ func (s) TestBalancerGroup_ExitIdle_AfterClose(t *testing.T) {
 	select {
 	case <-exitIdleCh:
 		t.Fatalf("ExitIdle was called on sub-balancer even after BalancerGroup was closed")
-	case <-time.After(defaultTestTimeout):
+	case <-time.After(defaultTestShortTimeout):
 	}
 }
