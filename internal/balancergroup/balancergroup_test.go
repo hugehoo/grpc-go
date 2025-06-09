@@ -489,7 +489,7 @@ func (s) TestBalancerGroup_UpdateClientConnState_AfterClose(t *testing.T) {
 	exitIdleCh := make(chan struct{})
 	stub.Register(balancerName, stub.BalancerFuncs{
 		UpdateClientConnState: func(_ *stub.BalancerData, _ balancer.ClientConnState) error {
-			exitIdleCh <- struct{}{}
+			close(exitIdleCh)
 			return nil
 		},
 	})
@@ -522,7 +522,7 @@ func (s) TestBalancerGroup_ResolverError_AfterClose(t *testing.T) {
 
 	stub.Register(balancerName, stub.BalancerFuncs{
 		ResolverError: func(_ *stub.BalancerData, _ error) {
-			exitIdleCh <- struct{}{}
+			close(exitIdleCh)
 		},
 	})
 
