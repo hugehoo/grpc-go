@@ -510,7 +510,7 @@ func (s) TestBalancerGroup_UpdateClientConnState_AfterClose(t *testing.T) {
 	}
 
 	select {
-	case <-time.After(defaultTestShortTimeout):
+	case <-time.After(defaultTestTimeout):
 		t.Fatalf("UpdateClientConnState was called after BalancerGroup was closed")
 	case <-exitIdleCh:
 	}
@@ -539,7 +539,7 @@ func (s) TestBalancerGroup_ResolverError_AfterClose(t *testing.T) {
 	bg.ResolverError(errors.New("test error"))
 
 	select {
-	case <-time.After(defaultTestShortTimeout):
+	case <-time.After(defaultTestTimeout):
 		t.Fatalf("ResolverError was called after BalancerGroup was closed")
 	case <-exitIdleCh:
 	}
