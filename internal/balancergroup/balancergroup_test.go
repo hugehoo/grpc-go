@@ -450,7 +450,7 @@ func (s) TestBalancerGroupBuildOptions(t *testing.T) {
 		userAgent    = "ua"
 	)
 
-	// Setup the stub balancer such that we can read the build options passed to
+	// Set up the stub balancer such that we can read the build options passed to
 	// it in the UpdateClientConnState method.
 	bOpts := balancer.BuildOptions{
 		DialCreds:       insecure.NewCredentials(),
@@ -486,11 +486,10 @@ func (s) TestBalancerGroupBuildOptions(t *testing.T) {
 
 func (s) TestBalancerGroup_UpdateClientConnState_AfterClose(t *testing.T) {
 	balancerName := "stub-balancer-test-update-client-state-after-close"
-	called := false
-
+	exitIdleCh := make(chan struct{})
 	stub.Register(balancerName, stub.BalancerFuncs{
 		UpdateClientConnState: func(_ *stub.BalancerData, _ balancer.ClientConnState) error {
-			called = true
+			exitIdleCh <- struct{}{}
 			return nil
 		},
 	})
@@ -509,18 +508,21 @@ func (s) TestBalancerGroup_UpdateClientConnState_AfterClose(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Expected nil error, got %v", err)
 	}
-	if called {
+
+	select {
+	case <-time.After(defaultTestShortTimeout):
 		t.Fatalf("UpdateClientConnState was called after BalancerGroup was closed")
+	case <-exitIdleCh:
 	}
 }
 
 func (s) TestBalancerGroup_ResolverError_AfterClose(t *testing.T) {
 	balancerName := "stub-balancer-test-resolver-error-after-close"
-	called := false
+	exitIdleCh := make(chan struct{})
 
 	stub.Register(balancerName, stub.BalancerFuncs{
 		ResolverError: func(_ *stub.BalancerData, _ error) {
-			called = true
+			exitIdleCh <- struct{}{}
 		},
 	})
 
@@ -536,8 +538,10 @@ func (s) TestBalancerGroup_ResolverError_AfterClose(t *testing.T) {
 
 	bg.ResolverError(errors.New("test error"))
 
-	if called {
-		t.Fatalf("ResolverError was called on sub-balancer after BalancerGroup was closed")
+	select {
+	case <-time.After(defaultTestShortTimeout):
+		t.Fatalf("ResolverError was called after BalancerGroup was closed")
+	case <-exitIdleCh:
 	}
 }
 
