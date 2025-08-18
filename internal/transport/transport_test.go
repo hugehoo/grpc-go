@@ -39,6 +39,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/hpack"
+
 	"google.golang.org/grpc/attributes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -2617,7 +2618,8 @@ func (s) TestClientDecodeHeaderStatusErr(t *testing.T) {
 		// input
 		metaHeaderFrame *http2.MetaHeadersFrame
 		// output
-		wantStatus *status.Status
+		wantStatus          *status.Status
+		wantStatusEndStream *status.Status
 	}{
 		{
 			name: "valid header",
@@ -2628,8 +2630,10 @@ func (s) TestClientDecodeHeaderStatusErr(t *testing.T) {
 					{Name: ":status", Value: "200"},
 				},
 			},
-			// no error
-			wantStatus: status.New(codes.OK, ""),
+			// For non-end_stream, no status is set (stream continues)
+			wantStatus: nil,
+			// For end_stream, status is set from grpc-status
+			wantStatusEndStream: status.New(codes.OK, ""),
 		},
 		{
 			name: "missing content-type header",
@@ -2703,10 +2707,11 @@ func (s) TestClientDecodeHeaderStatusErr(t *testing.T) {
 					{Name: ":status", Value: "504"},
 				},
 			},
-			wantStatus: status.New(
-				codes.Unavailable,
-				"unexpected HTTP status code received from server: 504 (Gateway Timeout)",
-			),
+			// HTTP status is ignored when content-type is application/grpc
+			// For non-end_stream, no status is set (stream continues)
+			wantStatus: nil,
+			// For end_stream, status is set from grpc-status
+			wantStatusEndStream: status.New(codes.OK, ""),
 		},
 		{
 			name: "missing http status",
@@ -2715,9 +2720,23 @@ func (s) TestClientDecodeHeaderStatusErr(t *testing.T) {
 					{Name: "content-type", Value: "application/grpc"},
 				},
 			},
+			// HTTP status is ignored when content-type is application/grpc
+			// For non-end_stream, no status is set (stream continues normally)
+			wantStatus: nil,
+			// For end_stream, status defaults to Unknown (no grpc-status header)
+			wantStatusEndStream: status.New(codes.Unknown, ""),
+		},
+		{
+			name: "bad status without grpc content-type",
+			metaHeaderFrame: &http2.MetaHeadersFrame{
+				Fields: []hpack.HeaderField{
+					{Name: "content-type", Value: "text/html"},
+					{Name: ":status", Value: "504"},
+				},
+			},
 			wantStatus: status.New(
-				codes.Internal,
-				"malformed header: missing HTTP status",
+				codes.Unavailable,
+				"unexpected HTTP status code received from server: 504 (Gateway Timeout); transport: received unexpected content-type \"text/html\"",
 			),
 		},
 	} {
@@ -2736,7 +2755,13 @@ func (s) TestClientDecodeHeaderStatusErr(t *testing.T) {
 
 			got := ts.status
 			want := test.wantStatus
-			if got.Code() != want.Code() || got.Message() != want.Message() {
+			if want == nil {
+				if got != nil {
+					t.Fatalf("operateHeaders(%v); status = \ngot: %s\nwant: nil", test.metaHeaderFrame, got)
+				}
+			} else if got == nil {
+				t.Fatalf("operateHeaders(%v); status = \ngot: nil\nwant: %s", test.metaHeaderFrame, want)
+			} else if got.Code() != want.Code() || got.Message() != want.Message() {
 				t.Fatalf("operateHeaders(%v); status = \ngot: %s\nwant: %s", test.metaHeaderFrame, got, want)
 			}
 		})
@@ -2754,8 +2779,17 @@ func (s) TestClientDecodeHeaderStatusErr(t *testing.T) {
 			s.operateHeaders(test.metaHeaderFrame)
 
 			got := ts.status
-			want := test.wantStatus
-			if got.Code() != want.Code() || got.Message() != want.Message() {
+			want := test.wantStatusEndStream
+			if want == nil {
+				want = test.wantStatus
+			}
+			if want == nil {
+				if got != nil {
+					t.Fatalf("operateHeaders(%v); status = \ngot: %s\nwant: nil", test.metaHeaderFrame, got)
+				}
+			} else if got == nil {
+				t.Fatalf("operateHeaders(%v); status = \ngot: nil\nwant: %s", test.metaHeaderFrame, want)
+			} else if got.Code() != want.Code() || got.Message() != want.Message() {
 				t.Fatalf("operateHeaders(%v); status = \ngot: %s\nwant: %s", test.metaHeaderFrame, got, want)
 			}
 		})
