@@ -34,6 +34,7 @@ import (
 
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/hpack"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/internal"
@@ -1534,7 +1535,7 @@ func (t *http2Client) operateHeaders(frame *http2.MetaHeadersFrame) {
 		}
 	}
 
-	if !isGRPC || httpStatusErr != "" {
+	if !isGRPC {
 		var code = codes.Internal // when header does not include HTTP status, return INTERNAL
 
 		if httpStatusCode != nil {
