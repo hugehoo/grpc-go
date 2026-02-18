@@ -377,14 +377,27 @@ func (r *xdsResolver) newConfigSelector() (*configSelector, error) {
 	}
 
 	for i, rt := range r.xdsConfig.VirtualHost.Routes {
-		clusters := rinternal.NewWRR.(func() wrr.WRR)()
 		if rt.ClusterSpecifierPlugin != "" {
 			clusterName := clusterSpecifierPluginPrefix + rt.ClusterSpecifierPlugin
-			clusters.Add(&routeCluster{name: clusterName}, 1)
+			cs.routes[i].cluster = &routeCluster{name: clusterName}
 			ci := r.addOrGetActiveClusterInfo(clusterName)
 			ci.cfg = xdsChildConfig{ChildPolicy: balancerConfig(r.xdsConfig.RouteConfig.ClusterSpecifierPlugins[rt.ClusterSpecifierPlugin])}
 			cs.clusters[clusterName] = ci
+		} else if rt.Cluster != "" {
+			clusterName := clusterPrefix + rt.Cluster
+			interceptor, err := newInterceptor(r.xdsConfig.Listener.APIListener.HTTPFilters, nil, rt.HTTPFilterConfigOverride, r.xdsConfig.VirtualHost.HTTPFilterConfigOverride)
+			if err != nil {
+				return nil, err
+			}
+			cs.routes[i].cluster = &routeCluster{
+				name:        clusterName,
+				interceptor: interceptor,
+			}
+			ci := r.addOrGetActiveClusterInfo(clusterName)
+			ci.cfg = xdsChildConfig{ChildPolicy: newBalancerConfig(cdsName, cdsBalancerConfig{Cluster: rt.Cluster})}
+			cs.clusters[clusterName] = ci
 		} else {
+			clusters := rinternal.NewWRR.(func() wrr.WRR)()
 			for _, wc := range rt.WeightedClusters {
 				clusterName := clusterPrefix + wc.Name
 				interceptor, err := newInterceptor(r.xdsConfig.Listener.APIListener.HTTPFilters, wc.HTTPFilterConfigOverride, rt.HTTPFilterConfigOverride, r.xdsConfig.VirtualHost.HTTPFilterConfigOverride)
@@ -399,8 +412,8 @@ func (r *xdsResolver) newConfigSelector() (*configSelector, error) {
 				ci.cfg = xdsChildConfig{ChildPolicy: newBalancerConfig(cdsName, cdsBalancerConfig{Cluster: wc.Name})}
 				cs.clusters[clusterName] = ci
 			}
+			cs.routes[i].clusters = clusters
 		}
-		cs.routes[i].clusters = clusters
 
 		cs.routes[i].m = xdsresource.RouteToMatcher(rt)
 		cs.routes[i].actionType = rt.ActionType

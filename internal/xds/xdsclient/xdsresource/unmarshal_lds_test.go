@@ -599,9 +599,9 @@ func (s) TestUnmarshalListener_ClientSide(t *testing.T) {
 						VirtualHosts: []*VirtualHost{{
 							Domains: []string{v3LDSTarget},
 							Routes: []*Route{{
-								Prefix:           newStringP("/"),
-								WeightedClusters: []WeightedCluster{{Name: clusterName, Weight: 1}},
-								ActionType:       RouteActionRoute,
+								Prefix:     newStringP("/"),
+								Cluster:    clusterName,
+								ActionType: RouteActionRoute,
 							}},
 						}}},
 					MaxStreamDuration: time.Second,

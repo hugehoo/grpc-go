@@ -29,6 +29,7 @@ import (
 	"time"
 
 	xxhash "github.com/cespare/xxhash/v2"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/internal/grpcutil"
 	iresolver "google.golang.org/grpc/internal/resolver"
@@ -111,6 +112,7 @@ type routeCluster struct {
 type route struct {
 	m                 *xdsresource.CompositeMatcher // converted from route matchers
 	actionType        xdsresource.RouteActionType   // holds route action type
+	cluster           *routeCluster                 // directly picked cluster
 	clusters          wrr.WRR                       // holds *routeCluster entries
 	maxStreamDuration time.Duration
 	retryConfig       *xdsresource.RetryConfig
@@ -119,7 +121,7 @@ type route struct {
 }
 
 func (r route) String() string {
-	return fmt.Sprintf("%s -> { clusters: %v, maxStreamDuration: %v }", r.m.String(), r.clusters, r.maxStreamDuration)
+	return fmt.Sprintf("%s -> { cluster: %v, clusters: %v, maxStreamDuration: %v }", r.m.String(), r.cluster, r.clusters, r.maxStreamDuration)
 }
 
 // stoppableConfigSelector extends the iresolver.ConfigSelector interface with a
@@ -179,7 +181,7 @@ func (cs *configSelector) SelectConfig(rpcInfo iresolver.RPCInfo) (*iresolver.RP
 		}
 	}
 
-	if rt == nil || rt.clusters == nil {
+	if rt == nil || (rt.cluster == nil && rt.clusters == nil) {
 		return nil, annotateErrorWithNodeID(errNoMatchedRouteFound, cs.xdsNodeID)
 	}
 
@@ -187,9 +189,13 @@ func (cs *configSelector) SelectConfig(rpcInfo iresolver.RPCInfo) (*iresolver.RP
 		return nil, annotateErrorWithNodeID(errUnsupportedClientRouteAction, cs.xdsNodeID)
 	}
 
-	cluster, ok := rt.clusters.Next().(*routeCluster)
-	if !ok {
-		return nil, annotateErrorWithNodeID(status.Errorf(codes.Internal, "error retrieving cluster for match: %v (%T)", cluster, cluster), cs.xdsNodeID)
+	cluster := rt.cluster
+	if cluster == nil {
+		next, ok := rt.clusters.Next().(*routeCluster)
+		if !ok {
+			return nil, annotateErrorWithNodeID(status.Errorf(codes.Internal, "error retrieving cluster for match: %v (%T)", next, next), cs.xdsNodeID)
+		}
+		cluster = next
 	}
 
 	// Add a ref to the selected cluster, as this RPC needs this cluster until

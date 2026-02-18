@@ -144,8 +144,9 @@ type Route struct {
 
 	ActionType RouteActionType
 
-	// Only one of the following fields (WeightedClusters or
+	// Only one of the following fields (Cluster, WeightedClusters, or
 	// ClusterSpecifierPlugin) will be set for a route.
+	Cluster          string
 	WeightedClusters []WeightedCluster
 	// ClusterSpecifierPlugin is the name of the Cluster Specifier Plugin that
 	// this Route is linked to, if specified by xDS.
