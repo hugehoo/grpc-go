@@ -20,6 +20,8 @@ package latency
 
 import (
 	"bytes"
+	"context"
+	"errors"
 	"fmt"
 	"net"
 	"reflect"
@@ -173,6 +175,70 @@ func (s) TestSyncTooSlow(t *testing.T) {
 	errWant := "measured network latency (10ms) higher than desired latency (5ms)"
 	if _, err := (&Network{Latency: 5 * time.Millisecond}).Conn(slowConn); err == nil || err.Error() != errWant {
 		t.Fatalf("Conn() = _, %q; want _, %q", err, errWant)
+	}
+}
+
+func (s) TestDialer(t *testing.T) {
+	defer restoreHooks()()
+
+	now = func() time.Time { return time.Unix(123, 0) }
+	sleep = func(time.Duration) {}
+
+	var gotNetwork, gotAddress string
+	dialer := (&Network{Latency: time.Second}).Dialer(func(network, address string) (net.Conn, error) {
+		gotNetwork, gotAddress = network, address
+		return bufConn{&bytes.Buffer{}}, nil
+	})
+	c, err := dialer("tcp", "localhost:1234")
+	if err != nil {
+		t.Fatalf("Dialer()(_, _) = _, %v; want _, nil", err)
+	}
+	if _, ok := c.(*conn); !ok {
+		t.Fatalf("Dialer() returned %T; want *conn", c)
+	}
+	if gotNetwork != "tcp" || gotAddress != "localhost:1234" {
+		t.Fatalf("Dialer called with %q, %q; want tcp, localhost:1234", gotNetwork, gotAddress)
+	}
+
+	wantErr := errors.New("dial error")
+	dialer = (&Network{Latency: time.Second}).Dialer(func(string, string) (net.Conn, error) {
+		return nil, wantErr
+	})
+	if _, err := dialer("tcp", "localhost:1234"); !errors.Is(err, wantErr) {
+		t.Fatalf("Dialer()(_, _) = _, %v; want _, %v", err, wantErr)
+	}
+}
+
+func (s) TestContextDialer(t *testing.T) {
+	defer restoreHooks()()
+
+	now = func() time.Time { return time.Unix(123, 0) }
+	sleep = func(time.Duration) {}
+
+	ctx := context.Background()
+	var gotCtx context.Context
+	var gotNetwork, gotAddress string
+	dialer := (&Network{Latency: time.Second}).ContextDialer(func(ctx context.Context, network, address string) (net.Conn, error) {
+		gotCtx, gotNetwork, gotAddress = ctx, network, address
+		return bufConn{&bytes.Buffer{}}, nil
+	})
+	c, err := dialer(ctx, "tcp", "localhost:1234")
+	if err != nil {
+		t.Fatalf("ContextDialer()(_, _, _) = _, %v; want _, nil", err)
+	}
+	if _, ok := c.(*conn); !ok {
+		t.Fatalf("ContextDialer() returned %T; want *conn", c)
+	}
+	if gotCtx != ctx || gotNetwork != "tcp" || gotAddress != "localhost:1234" {
+		t.Fatalf("ContextDialer called with %v, %q, %q; want %v, tcp, localhost:1234", gotCtx, gotNetwork, gotAddress, ctx)
+	}
+
+	wantErr := errors.New("dial error")
+	dialer = (&Network{Latency: time.Second}).ContextDialer(func(context.Context, string, string) (net.Conn, error) {
+		return nil, wantErr
+	})
+	if _, err := dialer(ctx, "tcp", "localhost:1234"); !errors.Is(err, wantErr) {
+		t.Fatalf("ContextDialer()(_, _, _) = _, %v; want _, %v", err, wantErr)
 	}
 }
 
