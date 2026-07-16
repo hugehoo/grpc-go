@@ -203,12 +203,10 @@ func (h *testStreamHandler) handleStreamMisbehave(t *testing.T, s *ServerStream)
 				p = make([]byte, n+1)
 			}
 		}
-		data := newBufferSlice(p)
-		data.Ref()
 		conn.controlBuf.put(&dataFrame{
 			streamID:    s.id,
 			h:           nil,
-			data:        data,
+			data:        newBufferSlice(p),
 			onEachWrite: func() {},
 		})
 		sent += len(p)
@@ -225,7 +223,7 @@ func (h *testStreamHandler) handleStreamEncodingRequiredStatus(s *ServerStream) 
 func (h *testStreamHandler) handleStreamInvalidContentType(s *ServerStream) {
 	headerFields := []hpack.HeaderField{}
 	headerFields = append(headerFields, hpack.HeaderField{Name: "content-type", Value: expectedInvalidHeaderField})
-	h.t.controlBuf.put(&headerFrame{
+	h.t.controlBuf.put(&serverHeaders{
 		streamID:  s.id,
 		hf:        headerFields,
 		endStream: true,
@@ -239,27 +237,23 @@ func (h *testStreamHandler) handleStreamInvalidContentType(s *ServerStream) {
 func (h *testStreamHandler) handleStreamInvalidContentTypeWithMultipleFrame(s *ServerStream) {
 	headerFields := []hpack.HeaderField{}
 	headerFields = append(headerFields, hpack.HeaderField{Name: "content-type", Value: expectedInvalidHeaderField})
-	h.t.controlBuf.put(&headerFrame{
+	h.t.controlBuf.put(&serverHeaders{
 		streamID:  s.id,
 		hf:        headerFields,
 		endStream: false,
 	})
-	d1 := newBufferSlice([]byte("first"))
-	d1.Ref()
 	h.t.controlBuf.put(&dataFrame{
 		streamID:    s.id,
 		h:           nil,
-		data:        d1,
+		data:        newBufferSlice([]byte("first")),
 		onEachWrite: func() {},
 	})
 	// Wait for the test to verify the first frame before sending the next frame.
 	<-h.notify
-	d2 := newBufferSlice([]byte(" second"))
-	d2.Ref()
 	h.t.controlBuf.put(&dataFrame{
 		streamID:    s.id,
 		h:           nil,
-		data:        d2,
+		data:        newBufferSlice([]byte(" second")),
 		onEachWrite: func() {},
 		endStream:   true,
 	})
@@ -271,7 +265,7 @@ func (h *testStreamHandler) handleStreamMalformedHeader(s *ServerStream) {
 		{Name: "content-type", Value: "application/grpc"},
 		{Name: "x-bad-bin", Value: "!!!invalid-base64!!!"},
 	}
-	h.t.controlBuf.put(&headerFrame{
+	h.t.controlBuf.put(&serverHeaders{
 		streamID:  s.id,
 		hf:        headerFields,
 		endStream: false,
@@ -377,6 +371,7 @@ type server struct {
 	ready            chan struct{}
 	channelz         *channelz.Server
 	servingTasksDone chan struct{}
+	timeout          time.Duration
 }
 
 func newTestServer() *server {
@@ -437,7 +432,11 @@ func (s *server) start(t *testing.T, port int, serverConfig *ServerConfig, ht hT
 		h := &testStreamHandler{t: transport.(*http2Server)}
 		s.h = h
 		s.mu.Unlock()
-		ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
+		timeout := s.timeout
+		if timeout == 0 {
+			timeout = defaultTestTimeout
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), timeout)
 		defer cancel()
 		wg.Add(1)
 		switch ht {
@@ -580,7 +579,12 @@ func (s *server) addr() string {
 }
 
 func setUpServerOnly(t *testing.T, port int, sc *ServerConfig, ht hType) *server {
+	return setUpServerOnlyWithTimeout(t, port, sc, ht, defaultTestTimeout)
+}
+
+func setUpServerOnlyWithTimeout(t *testing.T, port int, sc *ServerConfig, ht hType, timeout time.Duration) *server {
 	server := newTestServer()
+	server.timeout = timeout
 	sc.ChannelzParent = server.channelz
 	go server.start(t, port, sc, ht)
 	server.wait(t, 2*time.Second)
@@ -595,11 +599,15 @@ func setUp(t *testing.T, port int, ht hType) (*server, *http2Client, func()) {
 }
 
 func setUpWithOptions(t *testing.T, port int, sc *ServerConfig, ht hType, copts ConnectOptions) (*server, *http2Client, func()) {
-	server := setUpServerOnly(t, port, sc, ht)
+	return setUpWithOptionsAndTimeout(t, port, sc, ht, copts, defaultTestTimeout)
+}
+
+func setUpWithOptionsAndTimeout(t *testing.T, port int, sc *ServerConfig, ht hType, copts ConnectOptions, timeout time.Duration) (*server, *http2Client, func()) {
+	server := setUpServerOnlyWithTimeout(t, port, sc, ht, timeout)
 	addr := resolver.Address{Addr: "localhost:" + server.port}
 	copts.ChannelzParent = channelzSubChannel(t)
 
-	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	t.Cleanup(cancel)
 	connectCtx, cCancel := context.WithTimeout(context.Background(), 2*time.Second)
 	ct, connErr := NewHTTP2Client(connectCtx, ctx, addr, copts, func(GoAwayInfo) {})
@@ -1217,13 +1225,11 @@ func (s) TestServerContextCanceledOnClosedConnection(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to open stream: %v", err)
 	}
-	d := newBufferSlice(make([]byte, http2MaxFrameLen))
-	d.Ref()
 	ct.controlBuf.put(&dataFrame{
 		streamID:    s.id,
 		endStream:   false,
 		h:           nil,
-		data:        d,
+		data:        newBufferSlice(make([]byte, http2MaxFrameLen)),
 		onEachWrite: func() {},
 	})
 	// Loop until the server side stream is created.
@@ -1853,7 +1859,10 @@ func (s) TestAccountCheckWindowSizeWithLargeWindow(t *testing.T) {
 		clientStream: 6 * 1024 * 1024,
 		clientConn:   8 * 1024 * 1024,
 	}
-	testFlowControlAccountCheck(t, 1024*1024, wc)
+	// This test exercises the largest windows and message sizes of the flow
+	// control account checks, so it can be slow under load (e.g. the race
+	// detector on a busy CI machine).
+	testFlowControlAccountCheck(t, 1024*1024, wc, 30*time.Second)
 }
 
 func (s) TestAccountCheckWindowSizeWithSmallWindow(t *testing.T) {
@@ -1865,18 +1874,18 @@ func (s) TestAccountCheckWindowSizeWithSmallWindow(t *testing.T) {
 		clientStream: defaultWindowSize,
 		clientConn:   defaultWindowSize,
 	}
-	testFlowControlAccountCheck(t, 1024*1024, wc)
+	testFlowControlAccountCheck(t, 1024*1024, wc, defaultTestTimeout)
 }
 
 func (s) TestAccountCheckDynamicWindowSmallMessage(t *testing.T) {
-	testFlowControlAccountCheck(t, 1024, windowSizeConfig{})
+	testFlowControlAccountCheck(t, 1024, windowSizeConfig{}, defaultTestTimeout)
 }
 
 func (s) TestAccountCheckDynamicWindowLargeMessage(t *testing.T) {
-	testFlowControlAccountCheck(t, 1024*1024, windowSizeConfig{})
+	testFlowControlAccountCheck(t, 1024*1024, windowSizeConfig{}, defaultTestTimeout)
 }
 
-func testFlowControlAccountCheck(t *testing.T, msgSize int, wc windowSizeConfig) {
+func testFlowControlAccountCheck(t *testing.T, msgSize int, wc windowSizeConfig, timeout time.Duration) {
 	sc := &ServerConfig{
 		InitialWindowSize:     wc.serverStream,
 		InitialConnWindowSize: wc.serverConn,
@@ -1889,7 +1898,7 @@ func testFlowControlAccountCheck(t *testing.T, msgSize int, wc windowSizeConfig)
 		StaticWindowSize:      true,
 		BufferPool:            mem.DefaultBufferPool(),
 	}
-	server, client, cancel := setUpWithOptions(t, 0, sc, pingpong, co)
+	server, client, cancel := setUpWithOptionsAndTimeout(t, 0, sc, pingpong, co, timeout)
 	defer cancel()
 	defer server.stop()
 	defer client.Close(fmt.Errorf("closed manually by test"))
@@ -1908,7 +1917,7 @@ func testFlowControlAccountCheck(t *testing.T, msgSize int, wc windowSizeConfig)
 	}
 	server.mu.Unlock()
 
-	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	const numStreams = 5
 	clientStreams := make([]*ClientStream, numStreams)
