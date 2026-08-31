@@ -85,7 +85,10 @@ func GetDefaultScheme() string {
 	return defaultScheme
 }
 
-// Address represents a server the client connects to.
+// Address represents a server the client connects to. Address values are
+// immutable; use NewAddress and the With methods to construct modified values.
+// Values referenced by Attributes, BalancerAttributes, or Metadata must not be
+// mutated after they are stored in an Address.
 //
 // # Experimental
 //
@@ -260,7 +263,10 @@ type BuildOptions struct {
 }
 
 // An Endpoint is one network endpoint, or server, which may have multiple
-// addresses with which it can be accessed.
+// addresses with which it can be accessed. Endpoint values are immutable; use
+// NewEndpoint and the With methods to construct modified values. Values
+// referenced by Attributes must not be mutated after they are stored in an
+// Endpoint.
 type Endpoint struct {
 	addresses  []Address
 	attributes *attributes.Attributes
@@ -346,9 +352,9 @@ type State struct {
 	//
 	// If a resolver sets Addresses but does not set Endpoints, one Endpoint
 	// will be created for each Address before the State is passed to the LB
-	// policy.  The BalancerAttributes of each entry in Addresses will be set
-	// in Endpoints.Attributes, and be cleared in the Endpoint's Address's
-	// BalancerAttributes.
+	// policy. The BalancerAttributes of each entry in Addresses will be stored
+	// in the corresponding Endpoint's attributes and cleared from the Endpoint
+	// Address's BalancerAttributes.
 	//
 	// Soon, Addresses will be deprecated and replaced fully by Endpoints.
 	Addresses []Address
