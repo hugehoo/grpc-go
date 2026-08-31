@@ -144,8 +144,8 @@ func (s) TestEndpointShardingBasic(t *testing.T) {
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(json)
 	mr.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{{Addr: backend1.Address}}},
-			{Addresses: []resolver.Address{{Addr: backend2.Address}}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend1.Address)}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend2.Address)}},
 		},
 		ServiceConfig: sc,
 	})
@@ -174,7 +174,7 @@ func (s) TestEndpointShardingBasic(t *testing.T) {
 	// Assert a round robin distribution between the two spun up backends. This
 	// requires a poll and eventual consistency as both endpoint children do not
 	// start in state READY.
-	if err = roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{{Addr: backend1.Address}, {Addr: backend2.Address}}); err != nil {
+	if err = roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{resolver.NewAddress(backend1.Address), resolver.NewAddress(backend2.Address)}); err != nil {
 		t.Fatalf("error in expected round robin: %v", err)
 	}
 
@@ -237,8 +237,8 @@ func (s) TestEndpointShardingReconnectDisabled(t *testing.T) {
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(json)
 	mr.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{{Addr: backend1.Address}, {Addr: backend2.Address}}},
-			{Addresses: []resolver.Address{{Addr: backend3.Address}}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend1.Address), resolver.NewAddress(backend2.Address)}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend3.Address)}},
 		},
 		ServiceConfig: sc,
 	})
@@ -254,7 +254,7 @@ func (s) TestEndpointShardingReconnectDisabled(t *testing.T) {
 	// Assert a round robin distribution between the two spun up backends. This
 	// requires a poll and eventual consistency as both endpoint children do not
 	// start in state READY.
-	if err = roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{{Addr: backend1.Address}, {Addr: backend3.Address}}); err != nil {
+	if err = roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{resolver.NewAddress(backend1.Address), resolver.NewAddress(backend3.Address)}); err != nil {
 		t.Fatalf("error in expected round robin: %v", err)
 	}
 
@@ -265,7 +265,7 @@ func (s) TestEndpointShardingReconnectDisabled(t *testing.T) {
 	backend1.Stop()
 	// CheckRoundRobinRPCs waits for all the backends to become reachable, we
 	// call it to ensure the picker no longer sends RPCs to closed backend.
-	if err = roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{{Addr: backend3.Address}}); err != nil {
+	if err = roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{resolver.NewAddress(backend3.Address)}); err != nil {
 		t.Fatalf("error in expected round robin: %v", err)
 	}
 
@@ -321,7 +321,7 @@ func (s) TestEndpointShardingExitIdle(t *testing.T) {
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(json)
 	mr.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{{Addr: backend.Address}}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}},
 		},
 		ServiceConfig: sc,
 	})

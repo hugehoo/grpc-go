@@ -100,8 +100,8 @@ func TestBaseBalancerReserveAttributes(t *testing.T) {
 	b.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Addresses: []resolver.Address{
-				{Addr: "1.1.1.1", Attributes: attributes.New("foo", "2233niang")},
-				{Addr: "2.2.2.2", Attributes: nil},
+				resolver.NewAddress("1.1.1.1").WithAttributes(attributes.New("foo", "2233niang")),
+				resolver.NewAddress("2.2.2.2").WithAttributes(nil),
 			},
 		},
 	})

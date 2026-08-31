@@ -119,7 +119,7 @@ func makeEndpoints(n int) []resolver.Endpoint {
 	endpoints := make([]resolver.Endpoint, n)
 	for i := 0; i < n; i++ {
 		endpoints[i] = resolver.Endpoint{
-			Addresses: []resolver.Address{{Addr: fmt.Sprintf("endpoint-%d", i)}},
+			Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("endpoint-%d", i))},
 		}
 	}
 	return endpoints
@@ -193,11 +193,11 @@ func (s) TestCalculateSubset_EndpointsRetainHashValues(t *testing.T) {
 	// The subset is deterministic based on the hash, so we can hardcode
 	// the expected output.
 	want := []resolver.Endpoint{
-		{Addresses: []resolver.Address{{Addr: "endpoint-6"}}},
-		{Addresses: []resolver.Address{{Addr: "endpoint-0"}}},
-		{Addresses: []resolver.Address{{Addr: "endpoint-1"}}},
-		{Addresses: []resolver.Address{{Addr: "endpoint-7"}}},
-		{Addresses: []resolver.Address{{Addr: "endpoint-3"}}},
+		{Addresses: []resolver.Address{resolver.NewAddress("endpoint-6")}},
+		{Addresses: []resolver.Address{resolver.NewAddress("endpoint-0")}},
+		{Addresses: []resolver.Address{resolver.NewAddress("endpoint-1")}},
+		{Addresses: []resolver.Address{resolver.NewAddress("endpoint-7")}},
+		{Addresses: []resolver.Address{resolver.NewAddress("endpoint-3")}},
 	}
 
 	b := &subsettingBalancer{

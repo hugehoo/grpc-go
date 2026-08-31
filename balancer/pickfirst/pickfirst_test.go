@@ -68,8 +68,8 @@ func (s) TestPickFirst_InitialResolverError(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{{Addr: "1.1.1.1:1"}}},
-				{Addresses: []resolver.Address{{Addr: "2.2.2.2:2"}}},
+				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("2.2.2.2:2")}},
 			},
 		},
 	}
@@ -96,7 +96,7 @@ func (s) TestPickFirst_ResolverErrorinTF(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{{Addr: "1.1.1.1:1"}}},
+				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1")}},
 			},
 		},
 	}
@@ -136,24 +136,9 @@ func (s) TestPickFirst_ResolverErrorinTF(t *testing.T) {
 // iterating through the entries.
 func (s) TestAddressList_Iteration(t *testing.T) {
 	addrs := []resolver.Address{
-		{
-			Addr:               "192.168.1.1",
-			ServerName:         "test-host-1",
-			Attributes:         attributes.New("key-1", "val-1"),
-			BalancerAttributes: attributes.New("bal-key-1", "bal-val-1"),
-		},
-		{
-			Addr:               "192.168.1.2",
-			ServerName:         "test-host-2",
-			Attributes:         attributes.New("key-2", "val-2"),
-			BalancerAttributes: attributes.New("bal-key-2", "bal-val-2"),
-		},
-		{
-			Addr:               "192.168.1.3",
-			ServerName:         "test-host-3",
-			Attributes:         attributes.New("key-3", "val-3"),
-			BalancerAttributes: attributes.New("bal-key-3", "bal-val-3"),
-		},
+		resolver.NewAddress("192.168.1.1").WithServerName("test-host-1").WithAttributes(attributes.New("key-1", "val-1")).WithBalancerAttributes(attributes.New("bal-key-1", "bal-val-1")),
+		resolver.NewAddress("192.168.1.2").WithServerName("test-host-2").WithAttributes(attributes.New("key-2", "val-2")).WithBalancerAttributes(attributes.New("bal-key-2", "bal-val-2")),
+		resolver.NewAddress("192.168.1.3").WithServerName("test-host-3").WithAttributes(attributes.New("key-3", "val-3")).WithBalancerAttributes(attributes.New("bal-key-3", "bal-val-3")),
 	}
 
 	addressList := addressList{}
@@ -201,36 +186,16 @@ func (s) TestAddressList_Iteration(t *testing.T) {
 // TestAddressList_SeekTo verifies the behaviour of addressList.seekTo.
 func (s) TestAddressList_SeekTo(t *testing.T) {
 	addrs := []resolver.Address{
-		{
-			Addr:               "192.168.1.1",
-			ServerName:         "test-host-1",
-			Attributes:         attributes.New("key-1", "val-1"),
-			BalancerAttributes: attributes.New("bal-key-1", "bal-val-1"),
-		},
-		{
-			Addr:               "192.168.1.2",
-			ServerName:         "test-host-2",
-			Attributes:         attributes.New("key-2", "val-2"),
-			BalancerAttributes: attributes.New("bal-key-2", "bal-val-2"),
-		},
-		{
-			Addr:               "192.168.1.3",
-			ServerName:         "test-host-3",
-			Attributes:         attributes.New("key-3", "val-3"),
-			BalancerAttributes: attributes.New("bal-key-3", "bal-val-3"),
-		},
+		resolver.NewAddress("192.168.1.1").WithServerName("test-host-1").WithAttributes(attributes.New("key-1", "val-1")).WithBalancerAttributes(attributes.New("bal-key-1", "bal-val-1")),
+		resolver.NewAddress("192.168.1.2").WithServerName("test-host-2").WithAttributes(attributes.New("key-2", "val-2")).WithBalancerAttributes(attributes.New("bal-key-2", "bal-val-2")),
+		resolver.NewAddress("192.168.1.3").WithServerName("test-host-3").WithAttributes(attributes.New("key-3", "val-3")).WithBalancerAttributes(attributes.New("bal-key-3", "bal-val-3")),
 	}
 
 	addressList := addressList{}
 	addressList.updateAddrs(addrs)
 
 	// Try finding an address in the list.
-	key := resolver.Address{
-		Addr:               "192.168.1.2",
-		ServerName:         "test-host-2",
-		Attributes:         attributes.New("key-2", "val-2"),
-		BalancerAttributes: attributes.New("ignored", "bal-val-2"),
-	}
+	key := resolver.NewAddress("192.168.1.2").WithServerName("test-host-2").WithAttributes(attributes.New("key-2", "val-2")).WithBalancerAttributes(attributes.New("ignored", "bal-val-2"))
 
 	if got, want := addressList.seekTo(key), true; got != want {
 		t.Errorf("addressList.seekTo(%v) = %t, want %t", key, got, want)
@@ -251,12 +216,7 @@ func (s) TestAddressList_SeekTo(t *testing.T) {
 	}
 
 	// Seek to a key not in the list.
-	key = resolver.Address{
-		Addr:               "192.168.1.5",
-		ServerName:         "test-host-5",
-		Attributes:         attributes.New("key-5", "val-5"),
-		BalancerAttributes: attributes.New("ignored", "bal-val-5"),
-	}
+	key = resolver.NewAddress("192.168.1.5").WithServerName("test-host-5").WithAttributes(attributes.New("key-5", "val-5")).WithBalancerAttributes(attributes.New("ignored", "bal-val-5"))
 
 	if got, want := addressList.seekTo(key), false; got != want {
 		t.Errorf("addressList.seekTo(%v) = %t, want %t", key, got, want)
@@ -284,10 +244,10 @@ func (s) TestPickFirstLeaf_TFPickerUpdate(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{{Addr: "1.1.1.1:1"}}},
-				{Addresses: []resolver.Address{{Addr: "1.1.1.1:1"}}}, // duplicate, should be ignored.
-				{Addresses: []resolver.Address{{Addr: "2.2.2.2:2"}}},
-				{Addresses: []resolver.Address{{Addr: "1.1.1.1:1"}}}, // duplicate, should be ignored.
+				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1")}}, // duplicate, should be ignored.
+				{Addresses: []resolver.Address{resolver.NewAddress("2.2.2.2:2")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1")}}, // duplicate, should be ignored.
 			},
 		},
 	}

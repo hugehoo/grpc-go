@@ -100,7 +100,7 @@ func (s) TestLBCacheClientConnExpire(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	sc, _ := ccc.NewSubConn([]resolver.Address{{Addr: "address1"}}, balancer.NewSubConnOptions{})
+	sc, _ := ccc.NewSubConn([]resolver.Address{resolver.NewAddress("address1")}, balancer.NewSubConnOptions{})
 	// One subconn in MockCC.
 	if err := checkMockCC(mcc, 1); err != nil {
 		t.Fatal(err)
@@ -152,7 +152,7 @@ func (s) TestLBCacheClientConnReuse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	sc, _ := ccc.NewSubConn([]resolver.Address{{Addr: "address1"}}, balancer.NewSubConnOptions{})
+	sc, _ := ccc.NewSubConn([]resolver.Address{resolver.NewAddress("address1")}, balancer.NewSubConnOptions{})
 	// One subconn in MockCC.
 	if err := checkMockCC(mcc, 1); err != nil {
 		t.Fatal(err)
@@ -173,7 +173,7 @@ func (s) TestLBCacheClientConnReuse(t *testing.T) {
 	}
 
 	// Recreate the old subconn, this should cancel the deleting process.
-	sc, _ = ccc.NewSubConn([]resolver.Address{{Addr: "address1"}}, balancer.NewSubConnOptions{})
+	sc, _ = ccc.NewSubConn([]resolver.Address{resolver.NewAddress("address1")}, balancer.NewSubConnOptions{})
 	// One subconn in MockCC.
 	if err := checkMockCC(mcc, 1); err != nil {
 		t.Fatal(err)
@@ -237,7 +237,7 @@ func (s) TestLBCache_ShutdownTimer_New_Race(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	sc, _ := ccc.NewSubConn([]resolver.Address{{Addr: "address1"}}, balancer.NewSubConnOptions{})
+	sc, _ := ccc.NewSubConn([]resolver.Address{resolver.NewAddress("address1")}, balancer.NewSubConnOptions{})
 	// One subconn in MockCC.
 	if err := checkMockCC(mcc, 1); err != nil {
 		t.Fatal(err)
@@ -254,7 +254,7 @@ func (s) TestLBCache_ShutdownTimer_New_Race(t *testing.T) {
 			// Shutdown starts a timer with 1 ns timeout, the NewSubConn will
 			// race with the timer.
 			sc.Shutdown()
-			sc, _ = ccc.NewSubConn([]resolver.Address{{Addr: "address1"}}, balancer.NewSubConnOptions{})
+			sc, _ = ccc.NewSubConn([]resolver.Address{resolver.NewAddress("address1")}, balancer.NewSubConnOptions{})
 		}
 		close(done)
 	}()

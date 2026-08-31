@@ -108,7 +108,7 @@ func (s) TestUpdateClientConnState_NewRingSize(t *testing.T) {
 	origMinRingSize, origMaxRingSize := 1, 10 // Configured from `testConfig` in `setupTest`
 	newMinRingSize, newMaxRingSize := 20, 100
 
-	endpoints := []resolver.Endpoint{{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}}
+	endpoints := []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}}
 	cc, b, p1 := setupTest(t, endpoints)
 	ring1 := p1.(*picker).ring
 	if ringSize := len(ring1.items); ringSize < origMinRingSize || ringSize > origMaxRingSize {
@@ -138,7 +138,7 @@ func (s) TestUpdateClientConnState_NewRingSize(t *testing.T) {
 }
 
 func (s) TestOneEndpoint(t *testing.T) {
-	wantAddr1 := resolver.Address{Addr: testBackendAddrStrs[0]}
+	wantAddr1 := resolver.NewAddress(testBackendAddrStrs[0])
 	cc, _, p0 := setupTest(t, []resolver.Endpoint{{Addresses: []resolver.Address{wantAddr1}}})
 	ring0 := p0.(*picker).ring
 
@@ -189,9 +189,9 @@ func (s) TestOneEndpoint(t *testing.T) {
 // one will be picked.
 func (s) TestThreeSubConnsAffinity(t *testing.T) {
 	endpoints := []resolver.Endpoint{
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}},
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}},
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[2]}}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}},
 	}
 	remainingAddrs := map[string]bool{
 		testBackendAddrStrs[0]: true,
@@ -335,9 +335,9 @@ func (s) TestThreeSubConnsAffinity(t *testing.T) {
 // another backend, and verify the first hash still picks the first backend.
 func (s) TestThreeBackendsAffinityMultiple(t *testing.T) {
 	wantEndpoints := []resolver.Endpoint{
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}},
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}},
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[2]}}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}},
 	}
 	cc, _, p0 := setupTest(t, wantEndpoints)
 	// This test doesn't update addresses, so this ring will be used by all the
@@ -436,9 +436,9 @@ func (s) TestThreeBackendsAffinityMultiple(t *testing.T) {
 //     and weights.
 func (s) TestAddrWeightChange(t *testing.T) {
 	endpoints := []resolver.Endpoint{
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}},
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}},
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[2]}}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}},
 	}
 	cc, b, p0 := setupTest(t, endpoints)
 	ring0 := p0.(*picker).ring
@@ -527,10 +527,10 @@ func (s) TestAddrWeightChange(t *testing.T) {
 // (without a pick) when there is no endpoint already in Connecting state.
 func (s) TestAutoConnectEndpointOnTransientFailure(t *testing.T) {
 	wantEndpoints := []resolver.Endpoint{
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}},
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}},
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[2]}}},
-		{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[3]}}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}},
+		{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[3])}},
 	}
 	cc, _, p0 := setupTest(t, wantEndpoints)
 
@@ -667,7 +667,7 @@ func (s) TestAggregatedConnectivityState(t *testing.T) {
 				es := &endpointState{
 					state: balancer.State{ConnectivityState: cs},
 				}
-				ep := resolver.Endpoint{Addresses: []resolver.Address{{Addr: fmt.Sprintf("%d.%d.%d.%d:%d", i, i, i, i, i)}}}
+				ep := resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%d.%d.%d.%d:%d", i, i, i, i, i))}}
 				bal.endpointStates.Set(ep, es)
 			}
 			if got := bal.aggregatedStateLocked(); got != tt.want {
@@ -702,7 +702,7 @@ func setTestAttrEndpoint(endpoint resolver.Endpoint, content string) resolver.En
 // verifies that subConns are not recreated in this scenario.
 func (s) TestAddrBalancerAttributesChange(t *testing.T) {
 	content := "test"
-	addrs1 := []resolver.Address{setTestAttrAddr(resolver.Address{Addr: testBackendAddrStrs[0]}, content)}
+	addrs1 := []resolver.Address{setTestAttrAddr(resolver.NewAddress(testBackendAddrStrs[0]), content)}
 	wantEndpoints1 := []resolver.Endpoint{
 		setTestAttrEndpoint(resolver.Endpoint{Addresses: addrs1}, "content"),
 	}
@@ -723,7 +723,7 @@ func (s) TestAddrBalancerAttributesChange(t *testing.T) {
 	case <-cc.NewSubConnCh:
 	}
 
-	addrs2 := []resolver.Address{setTestAttrAddr(resolver.Address{Addr: testBackendAddrStrs[0]}, content)}
+	addrs2 := []resolver.Address{setTestAttrAddr(resolver.NewAddress(testBackendAddrStrs[0]), content)}
 	wantEndpoints2 := []resolver.Endpoint{setTestAttrEndpoint(resolver.Endpoint{Addresses: addrs2}, content)}
 	if err := b.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState:  resolver.State{Endpoints: wantEndpoints2},

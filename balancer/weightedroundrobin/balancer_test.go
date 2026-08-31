@@ -263,7 +263,7 @@ func (s) TestBalancer_TwoAddresses_ReportingDisabled(t *testing.T) {
 	if err := srv1.StartClient(grpc.WithDefaultServiceConfig(sc)); err != nil {
 		t.Fatalf("Error starting client: %v", err)
 	}
-	addrs := []resolver.Address{{Addr: srv1.Address}, {Addr: srv2.Address}}
+	addrs := []resolver.Address{resolver.NewAddress(srv1.Address), resolver.NewAddress(srv2.Address)}
 	srv1.R.UpdateState(resolver.State{Addresses: addrs})
 
 	// Perform many RPCs to ensure the LB policy works with 2 addresses.
@@ -293,7 +293,7 @@ func (s) TestBalancer_TwoAddresses_ReportingEnabledPerCall(t *testing.T) {
 	if err := srv1.StartClient(grpc.WithDefaultServiceConfig(sc)); err != nil {
 		t.Fatalf("Error starting client: %v", err)
 	}
-	addrs := []resolver.Address{{Addr: srv1.Address}, {Addr: srv2.Address}}
+	addrs := []resolver.Address{resolver.NewAddress(srv1.Address), resolver.NewAddress(srv2.Address)}
 	srv1.R.UpdateState(resolver.State{Addresses: addrs})
 
 	// Call each backend once to ensure the weights have been received.
@@ -348,7 +348,7 @@ func (s) TestBalancer_TwoAddresses_ReportingEnabledOOB(t *testing.T) {
 			if err := srv1.StartClient(grpc.WithDefaultServiceConfig(sc)); err != nil {
 				t.Fatalf("Error starting client: %v", err)
 			}
-			addrs := []resolver.Address{{Addr: srv1.Address}, {Addr: srv2.Address}}
+			addrs := []resolver.Address{resolver.NewAddress(srv1.Address), resolver.NewAddress(srv2.Address)}
 			srv1.R.UpdateState(resolver.State{Addresses: addrs})
 
 			// Call each backend once to ensure the weights have been received.
@@ -383,7 +383,7 @@ func (s) TestBalancer_TwoAddresses_UpdateLoads(t *testing.T) {
 	if err := srv1.StartClient(grpc.WithDefaultServiceConfig(sc)); err != nil {
 		t.Fatalf("Error starting client: %v", err)
 	}
-	addrs := []resolver.Address{{Addr: srv1.Address}, {Addr: srv2.Address}}
+	addrs := []resolver.Address{resolver.NewAddress(srv1.Address), resolver.NewAddress(srv2.Address)}
 	srv1.R.UpdateState(resolver.State{Addresses: addrs})
 
 	// Call each backend once to ensure the weights have been received.
@@ -437,7 +437,7 @@ func (s) TestBalancer_TwoAddresses_OOBThenPerCall(t *testing.T) {
 	if err := srv1.StartClient(grpc.WithDefaultServiceConfig(sc)); err != nil {
 		t.Fatalf("Error starting client: %v", err)
 	}
-	addrs := []resolver.Address{{Addr: srv1.Address}, {Addr: srv2.Address}}
+	addrs := []resolver.Address{resolver.NewAddress(srv1.Address), resolver.NewAddress(srv2.Address)}
 	srv1.R.UpdateState(resolver.State{Addresses: addrs})
 
 	// Call each backend once to ensure the weights have been received.
@@ -473,7 +473,7 @@ func (s) TestEndpoints_SharedAddress(t *testing.T) {
 		t.Fatalf("Error starting client: %v", err)
 	}
 
-	endpointsSharedAddress := []resolver.Endpoint{{Addresses: []resolver.Address{{Addr: srv.Address}}}, {Addresses: []resolver.Address{{Addr: srv.Address}}}}
+	endpointsSharedAddress := []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress(srv.Address)}}, {Addresses: []resolver.Address{resolver.NewAddress(srv.Address)}}}
 	srv.R.UpdateState(resolver.State{Endpoints: endpointsSharedAddress})
 
 	// Make some RPC's and make sure doesn't crash. It should go to one of the
@@ -509,7 +509,7 @@ func (s) TestEndpoints_MultipleAddresses(t *testing.T) {
 		t.Fatalf("Error starting client: %v", err)
 	}
 
-	twoEndpoints := []resolver.Endpoint{{Addresses: []resolver.Address{{Addr: "bad-address-1"}, {Addr: srv1.Address}}}, {Addresses: []resolver.Address{{Addr: "bad-address-2"}, {Addr: srv2.Address}}}}
+	twoEndpoints := []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress("bad-address-1"), resolver.NewAddress(srv1.Address)}}, {Addresses: []resolver.Address{resolver.NewAddress("bad-address-2"), resolver.NewAddress(srv2.Address)}}}
 	srv1.R.UpdateState(resolver.State{Endpoints: twoEndpoints})
 
 	// Call each backend once to ensure the weights have been received.
@@ -549,7 +549,7 @@ func (s) TestBalancer_TwoAddresses_ErrorPenalty(t *testing.T) {
 	if err := srv1.StartClient(grpc.WithDefaultServiceConfig(sc)); err != nil {
 		t.Fatalf("Error starting client: %v", err)
 	}
-	addrs := []resolver.Address{{Addr: srv1.Address}, {Addr: srv2.Address}}
+	addrs := []resolver.Address{resolver.NewAddress(srv1.Address), resolver.NewAddress(srv2.Address)}
 	srv1.R.UpdateState(resolver.State{Addresses: addrs})
 
 	// Call each backend once to ensure the weights have been received.
@@ -625,7 +625,7 @@ func (s) TestBalancer_TwoAddresses_BlackoutPeriod(t *testing.T) {
 		if err := srv1.StartClient(grpc.WithDefaultServiceConfig(sc)); err != nil {
 			t.Fatalf("Error starting client: %v", err)
 		}
-		addrs := []resolver.Address{{Addr: srv1.Address}, {Addr: srv2.Address}}
+		addrs := []resolver.Address{resolver.NewAddress(srv1.Address), resolver.NewAddress(srv2.Address)}
 		srv1.R.UpdateState(resolver.State{Addresses: addrs})
 
 		// Call each backend once to ensure the weights have been received.
@@ -693,7 +693,7 @@ func (s) TestBalancer_TwoAddresses_WeightExpiration(t *testing.T) {
 	if err := srv1.StartClient(grpc.WithDefaultServiceConfig(sc)); err != nil {
 		t.Fatalf("Error starting client: %v", err)
 	}
-	addrs := []resolver.Address{{Addr: srv1.Address}, {Addr: srv2.Address}}
+	addrs := []resolver.Address{resolver.NewAddress(srv1.Address), resolver.NewAddress(srv2.Address)}
 	srv1.R.UpdateState(resolver.State{Addresses: addrs})
 
 	// Call each backend once to ensure the weights have been received.
@@ -748,7 +748,7 @@ func (s) TestBalancer_AddressesChanging(t *testing.T) {
 		t.Fatalf("Error starting client: %v", err)
 	}
 	srv2.Client = srv1.Client
-	addrs := []resolver.Address{{Addr: srv1.Address}, {Addr: srv2.Address}, {Addr: srv3.Address}}
+	addrs := []resolver.Address{resolver.NewAddress(srv1.Address), resolver.NewAddress(srv2.Address), resolver.NewAddress(srv3.Address)}
 	srv1.R.UpdateState(resolver.State{Addresses: addrs})
 
 	// Call each backend once to ensure the weights have been received.
@@ -757,7 +757,7 @@ func (s) TestBalancer_AddressesChanging(t *testing.T) {
 	checkWeights(ctx, t, srvWeight{srv1, 1}, srvWeight{srv2, 10}, srvWeight{srv3, 2})
 
 	// Add backend 4
-	addrs = append(addrs, resolver.Address{Addr: srv4.Address})
+	addrs = append(addrs, resolver.NewAddress(srv4.Address))
 	srv1.R.UpdateState(resolver.State{Addresses: addrs})
 	time.Sleep(weightUpdatePeriod)
 	checkWeights(ctx, t, srvWeight{srv1, 1}, srvWeight{srv2, 10}, srvWeight{srv3, 2}, srvWeight{srv4, 20})
@@ -768,19 +768,19 @@ func (s) TestBalancer_AddressesChanging(t *testing.T) {
 	checkWeights(ctx, t, srvWeight{srv1, 1}, srvWeight{srv2, 10}, srvWeight{srv4, 20})
 
 	// Remove addresses 2 and 3.  RPCs will no longer be routed to 2 either.
-	addrs = []resolver.Address{{Addr: srv1.Address}, {Addr: srv4.Address}}
+	addrs = []resolver.Address{resolver.NewAddress(srv1.Address), resolver.NewAddress(srv4.Address)}
 	srv1.R.UpdateState(resolver.State{Addresses: addrs})
 	time.Sleep(weightUpdatePeriod)
 	checkWeights(ctx, t, srvWeight{srv1, 1}, srvWeight{srv4, 20})
 
 	// Re-add 2 and remove the rest.
-	addrs = []resolver.Address{{Addr: srv2.Address}}
+	addrs = []resolver.Address{resolver.NewAddress(srv2.Address)}
 	srv1.R.UpdateState(resolver.State{Addresses: addrs})
 	time.Sleep(weightUpdatePeriod)
 	checkWeights(ctx, t, srvWeight{srv2, 10})
 
 	// Re-add 4.
-	addrs = append(addrs, resolver.Address{Addr: srv4.Address})
+	addrs = append(addrs, resolver.NewAddress(srv4.Address))
 	srv1.R.UpdateState(resolver.State{Addresses: addrs})
 	time.Sleep(weightUpdatePeriod)
 	checkWeights(ctx, t, srvWeight{srv2, 10}, srvWeight{srv4, 20})

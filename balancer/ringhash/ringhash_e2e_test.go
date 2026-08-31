@@ -131,7 +131,7 @@ func (s) TestRingHash_ReconnectToMoveOutOfTransientFailure(t *testing.T) {
 	defer cc.Close()
 
 	// Push the address of the test backend through the manual resolver.
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: lis.Addr().String()}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(lis.Addr().String())}})
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	ctx = iringhash.SetXDSRequestHash(ctx, 0)
@@ -476,7 +476,7 @@ func (s) TestRingHash_AggregateClusterFallBackFromRingHashToLogicalDnsAtStartup(
 
 	dnsR := replaceDNSResolver(t)
 	dnsR.UpdateState(resolver.State{
-		Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{{Addr: backends[0]}}}},
+		Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress(backends[0])}}},
 	})
 
 	if err := xdsServer.Update(ctx, updateOpts); err != nil {
@@ -556,7 +556,7 @@ func (s) TestRingHash_AggregateClusterFallBackFromRingHashToLogicalDnsAtStartupN
 
 	dnsR := replaceDNSResolver(t)
 	dnsR.UpdateState(resolver.State{
-		Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{{Addr: backends[0]}}}},
+		Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress(backends[0])}}},
 	})
 
 	if err := xdsServer.Update(ctx, updateOpts); err != nil {
@@ -2689,7 +2689,7 @@ func (s) TestRingHash_RequestHashKey(t *testing.T) {
 	var endpoints []resolver.Endpoint
 	for _, backend := range backends {
 		endpoints = append(endpoints, resolver.Endpoint{
-			Addresses: []resolver.Address{{Addr: backend}},
+			Addresses: []resolver.Address{resolver.NewAddress(backend)},
 		})
 	}
 	r.UpdateState(resolver.State{
@@ -2770,7 +2770,7 @@ func (s) TestRingHash_RequestHashKeyRandom(t *testing.T) {
 	var endpoints []resolver.Endpoint
 	for _, backend := range backends {
 		endpoints = append(endpoints, resolver.Endpoint{
-			Addresses: []resolver.Address{{Addr: backend}},
+			Addresses: []resolver.Address{resolver.NewAddress(backend)},
 		})
 	}
 	r.UpdateState(resolver.State{
@@ -2839,7 +2839,7 @@ func (s) TestRingHash_RequestHashKeyConnecting(t *testing.T) {
 	var endpoints []resolver.Endpoint
 	for _, backend := range backends {
 		endpoints = append(endpoints, resolver.Endpoint{
-			Addresses: []resolver.Address{{Addr: backend}},
+			Addresses: []resolver.Address{resolver.NewAddress(backend)},
 		})
 	}
 	r.UpdateState(resolver.State{

@@ -1372,7 +1372,7 @@ func (s) TestUpdateStatePauses(t *testing.T) {
 
 			cfg := ccs.BalancerConfig.(*childPolicyConfig)
 			return bal.UpdateClientConnState(balancer.ClientConnState{
-				ResolverState: resolver.State{Addresses: []resolver.Address{{Addr: cfg.Backend}}},
+				ResolverState: resolver.State{Addresses: []resolver.Address{resolver.NewAddress(cfg.Backend)}},
 			})
 		},
 	})

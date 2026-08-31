@@ -123,7 +123,7 @@ func setupPickFirst(t *testing.T, backendCount int, opts ...grpc.DialOption) (*g
 		t.Cleanup(func() { backend.Stop() })
 
 		backends[i] = backend
-		addrs[i] = resolver.Address{Addr: backend.Address}
+		addrs[i] = resolver.NewAddress(backend.Address)
 	}
 
 	dopts := []grpc.DialOption{
@@ -154,7 +154,7 @@ func setupPickFirst(t *testing.T, backendCount int, opts ...grpc.DialOption) (*g
 func stubBackendsToResolverAddrs(backends []*stubserver.StubServer) []resolver.Address {
 	addrs := make([]resolver.Address, len(backends))
 	for i, backend := range backends {
-		addrs[i] = resolver.Address{Addr: backend.Address}
+		addrs[i] = resolver.NewAddress(backend.Address)
 	}
 	return addrs
 }
@@ -341,7 +341,7 @@ func (s) TestPickFirst_NewAddressWhileBlocking(t *testing.T) {
 
 	// Send a resolver update with a valid backend to push the channel to Ready
 	// and unblock the above RPC.
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: backends[0].Address}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(backends[0].Address)}})
 
 	select {
 	case <-ctx.Done():
@@ -725,7 +725,7 @@ func setupPickFirstWithListenerWrapper(t *testing.T, backendCount int, opts ...g
 		t.Cleanup(func() { backend.Stop() })
 
 		backends[i] = backend
-		addrs[i] = resolver.Address{Addr: backend.Address}
+		addrs[i] = resolver.NewAddress(backend.Address)
 		listeners[i] = lis
 	}
 
@@ -1011,7 +1011,7 @@ func (s) TestPickFirst_ResolverError_WithPreviousUpdate_Connecting(t *testing.T)
 	}
 	t.Cleanup(func() { cc.Close() })
 	cc.Connect()
-	addrs := []resolver.Address{{Addr: lis.Addr().String()}}
+	addrs := []resolver.Address{resolver.NewAddress(lis.Addr().String())}
 	r.UpdateState(resolver.State{Addresses: addrs})
 	testutils.AwaitState(ctx, t, cc, connectivity.Connecting)
 
@@ -1066,7 +1066,7 @@ func (s) TestPickFirst_ResolverError_WithPreviousUpdate_TransientFailure(t *test
 	}
 	t.Cleanup(func() { cc.Close() })
 	cc.Connect()
-	addrs := []resolver.Address{{Addr: lis.Addr().String()}}
+	addrs := []resolver.Address{resolver.NewAddress(lis.Addr().String())}
 	r.UpdateState(resolver.State{Addresses: addrs})
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()
@@ -1180,7 +1180,7 @@ func setupPickFirstLeaf(t *testing.T, backendCount int, opts ...grpc.DialOption)
 			backend.Stop()
 		})
 		backends[i] = server
-		addrs[i] = resolver.Address{Addr: backend.Address}
+		addrs[i] = resolver.NewAddress(backend.Address)
 	}
 
 	dopts := []grpc.DialOption{
@@ -2242,16 +2242,16 @@ func (s) TestPickFirstLeaf_InterleavingIPV4Preferred(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{{Addr: "1.1.1.1:1111"}}},
-				{Addresses: []resolver.Address{{Addr: "2.2.2.2:2"}}},
-				{Addresses: []resolver.Address{{Addr: "3.3.3.3:3"}}},
+				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1111")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("2.2.2.2:2")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("3.3.3.3:3")}},
 				// IPv4-mapped IPv6 address, considered as an IPv4 for
 				// interleaving.
-				{Addresses: []resolver.Address{{Addr: "[::FFFF:192.168.0.1]:2222"}}},
-				{Addresses: []resolver.Address{{Addr: "[0001:0001:0001:0001:0001:0001:0001:0001]:8080"}}},
-				{Addresses: []resolver.Address{{Addr: "[0002:0002:0002:0002:0002:0002:0002:0002]:8080"}}},
-				{Addresses: []resolver.Address{{Addr: "[fe80::1%eth0]:3333"}}},
-				{Addresses: []resolver.Address{{Addr: "grpc.io:80"}}}, // not an IP.
+				{Addresses: []resolver.Address{resolver.NewAddress("[::FFFF:192.168.0.1]:2222")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:8080")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("[fe80::1%eth0]:3333")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("grpc.io:80")}}, // not an IP.
 			},
 		},
 	}
@@ -2260,14 +2260,14 @@ func (s) TestPickFirstLeaf_InterleavingIPV4Preferred(t *testing.T) {
 	}
 
 	wantAddrs := []resolver.Address{
-		{Addr: "1.1.1.1:1111"},
-		{Addr: "[0001:0001:0001:0001:0001:0001:0001:0001]:8080"},
-		{Addr: "grpc.io:80"},
-		{Addr: "2.2.2.2:2"},
-		{Addr: "[0002:0002:0002:0002:0002:0002:0002:0002]:8080"},
-		{Addr: "3.3.3.3:3"},
-		{Addr: "[fe80::1%eth0]:3333"},
-		{Addr: "[::FFFF:192.168.0.1]:2222"},
+		resolver.NewAddress("1.1.1.1:1111"),
+		resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080"),
+		resolver.NewAddress("grpc.io:80"),
+		resolver.NewAddress("2.2.2.2:2"),
+		resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:8080"),
+		resolver.NewAddress("3.3.3.3:3"),
+		resolver.NewAddress("[fe80::1%eth0]:3333"),
+		resolver.NewAddress("[::FFFF:192.168.0.1]:2222"),
 	}
 
 	gotAddrs, err := subConnAddresses(ctx, cc, 8)
@@ -2288,15 +2288,15 @@ func (s) TestPickFirstLeaf_InterleavingIPv6Preferred(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{{Addr: "[0001:0001:0001:0001:0001:0001:0001:0001]:8080"}}},
-				{Addresses: []resolver.Address{{Addr: "[0001:0001:0001:0001:0001:0001:0001:0001]:8080"}}}, // duplicate, should be ignored.
-				{Addresses: []resolver.Address{{Addr: "1.1.1.1:1111"}}},
-				{Addresses: []resolver.Address{{Addr: "2.2.2.2:2"}}},
-				{Addresses: []resolver.Address{{Addr: "3.3.3.3:3"}}},
-				{Addresses: []resolver.Address{{Addr: "[::FFFF:192.168.0.1]:2222"}}},
-				{Addresses: []resolver.Address{{Addr: "[0002:0002:0002:0002:0002:0002:0002:0002]:2222"}}},
-				{Addresses: []resolver.Address{{Addr: "[fe80::1%eth0]:3333"}}},
-				{Addresses: []resolver.Address{{Addr: "grpc.io:80"}}}, // not an IP.
+				{Addresses: []resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}}, // duplicate, should be ignored.
+				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1111")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("2.2.2.2:2")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("3.3.3.3:3")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("[::FFFF:192.168.0.1]:2222")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:2222")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("[fe80::1%eth0]:3333")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("grpc.io:80")}}, // not an IP.
 			},
 		},
 	}
@@ -2305,14 +2305,14 @@ func (s) TestPickFirstLeaf_InterleavingIPv6Preferred(t *testing.T) {
 	}
 
 	wantAddrs := []resolver.Address{
-		{Addr: "[0001:0001:0001:0001:0001:0001:0001:0001]:8080"},
-		{Addr: "1.1.1.1:1111"},
-		{Addr: "grpc.io:80"},
-		{Addr: "[0002:0002:0002:0002:0002:0002:0002:0002]:2222"},
-		{Addr: "2.2.2.2:2"},
-		{Addr: "[fe80::1%eth0]:3333"},
-		{Addr: "3.3.3.3:3"},
-		{Addr: "[::FFFF:192.168.0.1]:2222"},
+		resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080"),
+		resolver.NewAddress("1.1.1.1:1111"),
+		resolver.NewAddress("grpc.io:80"),
+		resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:2222"),
+		resolver.NewAddress("2.2.2.2:2"),
+		resolver.NewAddress("[fe80::1%eth0]:3333"),
+		resolver.NewAddress("3.3.3.3:3"),
+		resolver.NewAddress("[::FFFF:192.168.0.1]:2222"),
 	}
 
 	gotAddrs, err := subConnAddresses(ctx, cc, 8)
@@ -2333,15 +2333,15 @@ func (s) TestPickFirstLeaf_InterleavingUnknownPreferred(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{{Addr: "grpc.io:80"}}}, // not an IP.
-				{Addresses: []resolver.Address{{Addr: "1.1.1.1:1111"}}},
-				{Addresses: []resolver.Address{{Addr: "2.2.2.2:2"}}},
-				{Addresses: []resolver.Address{{Addr: "3.3.3.3:3"}}},
-				{Addresses: []resolver.Address{{Addr: "[::FFFF:192.168.0.1]:2222"}}},
-				{Addresses: []resolver.Address{{Addr: "[0001:0001:0001:0001:0001:0001:0001:0001]:8080"}}},
-				{Addresses: []resolver.Address{{Addr: "[0002:0002:0002:0002:0002:0002:0002:0002]:8080"}}},
-				{Addresses: []resolver.Address{{Addr: "[fe80::1%eth0]:3333"}}},
-				{Addresses: []resolver.Address{{Addr: "example.com:80"}}}, // not an IP.
+				{Addresses: []resolver.Address{resolver.NewAddress("grpc.io:80")}}, // not an IP.
+				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1111")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("2.2.2.2:2")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("3.3.3.3:3")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("[::FFFF:192.168.0.1]:2222")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:8080")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("[fe80::1%eth0]:3333")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("example.com:80")}}, // not an IP.
 			},
 		},
 	}
@@ -2350,15 +2350,15 @@ func (s) TestPickFirstLeaf_InterleavingUnknownPreferred(t *testing.T) {
 	}
 
 	wantAddrs := []resolver.Address{
-		{Addr: "grpc.io:80"},
-		{Addr: "1.1.1.1:1111"},
-		{Addr: "[0001:0001:0001:0001:0001:0001:0001:0001]:8080"},
-		{Addr: "example.com:80"},
-		{Addr: "2.2.2.2:2"},
-		{Addr: "[0002:0002:0002:0002:0002:0002:0002:0002]:8080"},
-		{Addr: "3.3.3.3:3"},
-		{Addr: "[fe80::1%eth0]:3333"},
-		{Addr: "[::FFFF:192.168.0.1]:2222"},
+		resolver.NewAddress("grpc.io:80"),
+		resolver.NewAddress("1.1.1.1:1111"),
+		resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080"),
+		resolver.NewAddress("example.com:80"),
+		resolver.NewAddress("2.2.2.2:2"),
+		resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:8080"),
+		resolver.NewAddress("3.3.3.3:3"),
+		resolver.NewAddress("[fe80::1%eth0]:3333"),
+		resolver.NewAddress("[::FFFF:192.168.0.1]:2222"),
 	}
 
 	gotAddrs, err := subConnAddresses(ctx, cc, 9)
@@ -2405,7 +2405,7 @@ func (s) TestPickFirstLeaf_HealthListenerEnabled(t *testing.T) {
 	}
 	defer cc.Close()
 
-	if err := pickfirst.CheckRPCsToBackend(ctx, cc, resolver.Address{Addr: backend.Address}); err != nil {
+	if err := pickfirst.CheckRPCsToBackend(ctx, cc, resolver.NewAddress(backend.Address)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -2551,7 +2551,7 @@ func (s) TestPickFirstLeaf_HealthUpdates(t *testing.T) {
 	healthListener(balancer.SubConnState{
 		ConnectivityState: connectivity.Ready,
 	})
-	if err := pickfirst.CheckRPCsToBackend(ctx, cc, resolver.Address{Addr: backend.Address}); err != nil {
+	if err := pickfirst.CheckRPCsToBackend(ctx, cc, resolver.NewAddress(backend.Address)); err != nil {
 		t.Fatal(err)
 	}
 
@@ -2656,7 +2656,7 @@ func (s) TestPickFirstLeaf_Reconnection(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{{Addr: "1.1.1.1:1"}}},
+				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1")}},
 			},
 		},
 	}
@@ -2711,7 +2711,7 @@ func (s) TestPickFirstLeaf_Reconnection(t *testing.T) {
 	ccState = balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{{Addr: "2.2.2.2:2"}}},
+				{Addresses: []resolver.Address{resolver.NewAddress("2.2.2.2:2")}},
 			},
 		},
 	}
@@ -2900,7 +2900,7 @@ func (b *backendManager) stopAllExcept(index int) {
 func (b *backendManager) resolverAddrs() []resolver.Address {
 	addrs := make([]resolver.Address, len(b.backends))
 	for i, backend := range b.backends {
-		addrs[i] = resolver.Address{Addr: backend.Address}
+		addrs[i] = resolver.NewAddress(backend.Address)
 	}
 	return addrs
 }

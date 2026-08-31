@@ -73,7 +73,7 @@ func (s) TestExitIdle(t *testing.T) {
 
 	mr.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{{Addr: backend1.Address}}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend1.Address)}},
 		},
 	})
 
@@ -119,7 +119,7 @@ func (s) TestExitIdle(t *testing.T) {
 
 	mr.UpdateState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{{Addr: backend2.Address}}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend2.Address)}},
 		},
 	})
 
@@ -253,7 +253,7 @@ func (s) TestGoodUpdateThenResolverError(t *testing.T) {
 
 	mr.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{{Addr: backend.Address}}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}},
 		},
 	})
 
@@ -348,7 +348,7 @@ func (s) TestResolverErrorThenGoodUpdate(t *testing.T) {
 
 	mr.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{{Addr: backend.Address}}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}},
 		},
 	})
 
@@ -370,7 +370,7 @@ func (s) TestResolverErrorThenGoodUpdate(t *testing.T) {
 	mr.CC().ReportError(errors.New("test error"))
 	mr.UpdateState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{{Addr: backend.Address}}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}},
 		},
 	})
 
@@ -401,7 +401,7 @@ func (s) TestExitIdlePassthrough(t *testing.T) {
 
 	mr.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{{Addr: backend1.Address}}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend1.Address)}},
 		},
 	})
 
@@ -453,7 +453,7 @@ func (s) TestExitIdlePassthrough(t *testing.T) {
 
 	mr.UpdateState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{{Addr: backend2.Address}}},
+			{Addresses: []resolver.Address{resolver.NewAddress(backend2.Address)}},
 		},
 	})
 

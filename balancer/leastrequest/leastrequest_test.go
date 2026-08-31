@@ -234,9 +234,9 @@ func (s) TestLeastRequestE2E(t *testing.T) {
 }`
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(lrscJSON)
 	firstThreeAddresses := []resolver.Address{
-		{Addr: addresses[0]},
-		{Addr: addresses[1]},
-		{Addr: addresses[2]},
+		resolver.NewAddress(addresses[0]),
+		resolver.NewAddress(addresses[1]),
+		resolver.NewAddress(addresses[2]),
 	}
 	mr.InitialState(resolver.State{
 		Addresses:     firstThreeAddresses,
@@ -350,8 +350,8 @@ func (s) TestLeastRequestPersistsCounts(t *testing.T) {
 }`
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(lrscJSON)
 	firstTwoAddresses := []resolver.Address{
-		{Addr: addresses[0]},
-		{Addr: addresses[1]},
+		resolver.NewAddress(addresses[0]),
+		resolver.NewAddress(addresses[1]),
 	}
 	mr.InitialState(resolver.State{
 		Addresses:     firstTwoAddresses,
@@ -407,9 +407,9 @@ func (s) TestLeastRequestPersistsCounts(t *testing.T) {
 }`
 	sc = internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(lrscJSON)
 	fullAddresses := []resolver.Address{
-		{Addr: addresses[0]},
-		{Addr: addresses[1]},
-		{Addr: addresses[2]},
+		resolver.NewAddress(addresses[0]),
+		resolver.NewAddress(addresses[1]),
+		resolver.NewAddress(addresses[2]),
 	}
 	mr.UpdateState(resolver.State{
 		Addresses:     fullAddresses,
@@ -491,8 +491,8 @@ func (s) TestConcurrentRPCs(t *testing.T) {
 }`
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(lrscJSON)
 	firstTwoAddresses := []resolver.Address{
-		{Addr: addresses[0]},
-		{Addr: addresses[1]},
+		resolver.NewAddress(addresses[0]),
+		resolver.NewAddress(addresses[1]),
 	}
 	mr.InitialState(resolver.State{
 		Addresses:     firstTwoAddresses,
@@ -561,9 +561,9 @@ func (s) TestLeastRequestEndpoints_MultipleAddresses(t *testing.T) {
   ]
 }`
 	endpoints := []resolver.Endpoint{
-		{Addresses: []resolver.Address{{Addr: backends[0].Address}, {Addr: backends[1].Address}}},
-		{Addresses: []resolver.Address{{Addr: backends[2].Address}, {Addr: backends[3].Address}}},
-		{Addresses: []resolver.Address{{Addr: backends[4].Address}, {Addr: backends[5].Address}}},
+		{Addresses: []resolver.Address{resolver.NewAddress(backends[0].Address), resolver.NewAddress(backends[1].Address)}},
+		{Addresses: []resolver.Address{resolver.NewAddress(backends[2].Address), resolver.NewAddress(backends[3].Address)}},
+		{Addresses: []resolver.Address{resolver.NewAddress(backends[4].Address), resolver.NewAddress(backends[5].Address)}},
 	}
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(lrscJSON)
 	firstTwoEndpoints := []resolver.Endpoint{endpoints[0], endpoints[1]}
@@ -744,7 +744,7 @@ func (s) TestLeastRequestEndpoints_ResolverError(t *testing.T) {
 		conn.Close()
 	}()
 	mr.UpdateState(resolver.State{
-		Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{{Addr: lis.Addr().String()}}}},
+		Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress(lis.Addr().String())}}},
 	})
 	cc.Connect()
 

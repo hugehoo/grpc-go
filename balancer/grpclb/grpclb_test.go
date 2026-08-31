@@ -436,10 +436,7 @@ func (s) TestGRPCLB_Basic(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	s := &grpclbstate.State{
 		BalancerAddresses: []resolver.Address{
-			{
-				Addr:       tss.lbAddr,
-				ServerName: lbServerName,
-			},
+			resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName),
 		},
 	}
 	rs := grpclbstate.Set(resolver.State{ServiceConfig: internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(grpclbConfig)}, s)
@@ -494,10 +491,7 @@ func (s) TestGRPCLB_Weighted(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	s := &grpclbstate.State{
 		BalancerAddresses: []resolver.Address{
-			{
-				Addr:       tss.lbAddr,
-				ServerName: lbServerName,
-			},
+			resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName),
 		},
 	}
 	rs := grpclbstate.Set(resolver.State{ServiceConfig: internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(grpclbConfig)}, s)
@@ -530,7 +524,7 @@ func (s) TestGRPCLB_Weighted(t *testing.T) {
 		var wantAddrs []resolver.Address
 		for _, s := range seq {
 			backends = append(backends, beServers[s])
-			wantAddrs = append(wantAddrs, resolver.Address{Addr: tss.beListeners[s].Addr().String()})
+			wantAddrs = append(wantAddrs, resolver.NewAddress(tss.beListeners[s].Addr().String()))
 		}
 		tss.ls.sls <- &lbpb.ServerList{Servers: backends}
 
@@ -574,10 +568,7 @@ func (s) TestGRPCLB_DropRequest(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	s := &grpclbstate.State{
 		BalancerAddresses: []resolver.Address{
-			{
-				Addr:       tss.lbAddr,
-				ServerName: lbServerName,
-			},
+			resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName),
 		},
 	}
 	rs := grpclbstate.Set(resolver.State{ServiceConfig: internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(grpclbConfig)}, s)
@@ -743,14 +734,8 @@ func (s) TestGRPCLB_BalancerDisconnects(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	s := &grpclbstate.State{
 		BalancerAddresses: []resolver.Address{
-			{
-				Addr:       tests[0].lbAddr,
-				ServerName: lbServerName,
-			},
-			{
-				Addr:       tests[1].lbAddr,
-				ServerName: lbServerName,
-			},
+			resolver.NewAddress(tests[0].lbAddr).WithServerName(lbServerName),
+			resolver.NewAddress(tests[1].lbAddr).WithServerName(lbServerName),
 		},
 	}
 	rs := grpclbstate.Set(resolver.State{ServiceConfig: internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(grpclbConfig)}, s)
@@ -770,14 +755,14 @@ func (s) TestGRPCLB_BalancerDisconnects(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{{Addr: tests[0].beListeners[0].Addr().String()}}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{resolver.NewAddress(tests[0].beListeners[0].Addr().String())}); err != nil {
 		t.Fatal(err)
 	}
 
 	// Stop balancer[0], balancer[1] should be used by grpclb.
 	// Check peer address to see if that happened.
 	lbs[0].Stop()
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{{Addr: tests[1].beListeners[0].Addr().String()}}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{resolver.NewAddress(tests[1].beListeners[0].Addr().String())}); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -825,10 +810,10 @@ func (s) TestGRPCLB_Fallback(t *testing.T) {
 	// the `Addresses` field and an invalid remote balancer address stored in
 	// attributes, which will cause fallback behavior to be invoked.
 	rs := resolver.State{
-		Addresses:     []resolver.Address{{Addr: beLis.Addr().String()}},
+		Addresses:     []resolver.Address{resolver.NewAddress(beLis.Addr().String())},
 		ServiceConfig: internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(grpclbConfig),
 	}
-	rs = grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{{Addr: "invalid.address", ServerName: lbServerName}}})
+	rs = grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress("invalid.address").WithServerName(lbServerName)}})
 	r.InitialState(rs)
 
 	dopts := []grpc.DialOption{
@@ -846,7 +831,7 @@ func (s) TestGRPCLB_Fallback(t *testing.T) {
 	// Make an RPC and verify that it got routed to the fallback backend.
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{{Addr: beLis.Addr().String()}}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{resolver.NewAddress(beLis.Addr().String())}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -854,9 +839,9 @@ func (s) TestGRPCLB_Fallback(t *testing.T) {
 	// address in the attributes field.
 	rs = resolver.State{
 		ServiceConfig: r.CC().ParseServiceConfig(grpclbConfig),
-		Addresses:     []resolver.Address{{Addr: beLis.Addr().String()}},
+		Addresses:     []resolver.Address{resolver.NewAddress(beLis.Addr().String())},
 	}
-	rs = grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{{Addr: tss.lbAddr, ServerName: lbServerName}}})
+	rs = grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName)}})
 	r.UpdateState(rs)
 	select {
 	case <-ctx.Done():
@@ -865,14 +850,14 @@ func (s) TestGRPCLB_Fallback(t *testing.T) {
 	}
 
 	// Wait for RPCs to get routed to the backend behind the remote balancer.
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{{Addr: tss.beListeners[0].Addr().String()}}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{resolver.NewAddress(tss.beListeners[0].Addr().String())}); err != nil {
 		t.Fatal(err)
 	}
 
 	// Close backend and remote balancer connections, should use fallback.
 	tss.beListeners[0].(*testutils.RestartableListener).Stop()
 	tss.lbListener.(*testutils.RestartableListener).Stop()
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{{Addr: beLis.Addr().String()}}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{resolver.NewAddress(beLis.Addr().String())}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -880,7 +865,7 @@ func (s) TestGRPCLB_Fallback(t *testing.T) {
 	tss.beListeners[0].(*testutils.RestartableListener).Restart()
 	tss.lbListener.(*testutils.RestartableListener).Restart()
 	tss.ls.sls <- sl
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{{Addr: tss.beListeners[0].Addr().String()}}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{resolver.NewAddress(tss.beListeners[0].Addr().String())}); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -921,10 +906,10 @@ func (s) TestGRPCLB_ExplicitFallback(t *testing.T) {
 	// attributes.
 	r := manual.NewBuilderWithScheme("whatever")
 	rs := resolver.State{
-		Addresses:     []resolver.Address{{Addr: beLis.Addr().String()}},
+		Addresses:     []resolver.Address{resolver.NewAddress(beLis.Addr().String())},
 		ServiceConfig: internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(grpclbConfig),
 	}
-	rs = grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{{Addr: tss.lbAddr, ServerName: lbServerName}}})
+	rs = grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName)}})
 	r.InitialState(rs)
 
 	dopts := []grpc.DialOption{
@@ -941,19 +926,19 @@ func (s) TestGRPCLB_ExplicitFallback(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{{Addr: tss.beListeners[0].Addr().String()}}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{resolver.NewAddress(tss.beListeners[0].Addr().String())}); err != nil {
 		t.Fatal(err)
 	}
 
 	// Send fallback signal from remote balancer; should use fallback.
 	tss.ls.fallbackNow()
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{{Addr: beLis.Addr().String()}}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{resolver.NewAddress(beLis.Addr().String())}); err != nil {
 		t.Fatal(err)
 	}
 
 	// Send another server list; should use backends again.
 	tss.ls.sls <- sl
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{{Addr: tss.beListeners[0].Addr().String()}}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{resolver.NewAddress(tss.beListeners[0].Addr().String())}); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -1016,7 +1001,7 @@ func (s) TestGRPCLB_FallBackWithNoServerAddress(t *testing.T) {
 		// Send an update with only backend address. grpclb should enter
 		// fallback and use the fallback backend.
 		r.UpdateState(resolver.State{
-			Addresses:     []resolver.Address{{Addr: beLis.Addr().String()}},
+			Addresses:     []resolver.Address{resolver.NewAddress(beLis.Addr().String())},
 			ServiceConfig: r.CC().ParseServiceConfig(grpclbConfig),
 		})
 
@@ -1044,10 +1029,10 @@ func (s) TestGRPCLB_FallBackWithNoServerAddress(t *testing.T) {
 		// Send an update with balancer address. The backends behind grpclb should
 		// be used.
 		rs := resolver.State{
-			Addresses:     []resolver.Address{{Addr: beLis.Addr().String()}},
+			Addresses:     []resolver.Address{resolver.NewAddress(beLis.Addr().String())},
 			ServiceConfig: r.CC().ParseServiceConfig(grpclbConfig),
 		}
-		rs = grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{{Addr: tss.lbAddr, ServerName: lbServerName}}})
+		rs = grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName)}})
 		r.UpdateState(rs)
 
 		select {
@@ -1056,7 +1041,7 @@ func (s) TestGRPCLB_FallBackWithNoServerAddress(t *testing.T) {
 		case <-tss.ls.balanceLoadCh:
 		}
 
-		if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{{Addr: tss.beListeners[0].Addr().String()}}); err != nil {
+		if err := roundrobin.CheckRoundRobinRPCs(ctx, testC, []resolver.Address{resolver.NewAddress(tss.beListeners[0].Addr().String())}); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -1087,7 +1072,7 @@ func (s) TestGRPCLB_PickFirst(t *testing.T) {
 	}}
 	beServerAddrs := []resolver.Address{}
 	for _, lis := range tss.beListeners {
-		beServerAddrs = append(beServerAddrs, resolver.Address{Addr: lis.Addr().String()})
+		beServerAddrs = append(beServerAddrs, resolver.NewAddress(lis.Addr().String()))
 	}
 
 	// Connect to the test backends.
@@ -1110,7 +1095,7 @@ func (s) TestGRPCLB_PickFirst(t *testing.T) {
 
 	// Push a resolver update with the remote balancer address specified via
 	// attributes.
-	r.UpdateState(grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{{Addr: tss.lbAddr, ServerName: lbServerName}}}))
+	r.UpdateState(grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName)}}))
 
 	// Push all three backend addresses to the remote balancer, and verify that
 	// RPCs are routed to the first backend.
@@ -1140,10 +1125,7 @@ func (s) TestGRPCLB_PickFirst(t *testing.T) {
 	// Switch child policy to roundrobin.
 	s := &grpclbstate.State{
 		BalancerAddresses: []resolver.Address{
-			{
-				Addr:       tss.lbAddr,
-				ServerName: lbServerName,
-			},
+			resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName),
 		},
 	}
 	rs = grpclbstate.Set(resolver.State{ServiceConfig: r.CC().ParseServiceConfig(grpclbConfig)}, s)
@@ -1184,10 +1166,10 @@ func (s) TestGRPCLB_BackendConnectionErrorPropagation(t *testing.T) {
 	defer stopBackends(standaloneBEs)
 
 	rs := resolver.State{
-		Addresses:     []resolver.Address{{Addr: beLis.Addr().String()}},
+		Addresses:     []resolver.Address{resolver.NewAddress(beLis.Addr().String())},
 		ServiceConfig: internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(grpclbConfig),
 	}
-	rs = grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{{Addr: tss.lbAddr, ServerName: lbServerName}}})
+	rs = grpclbstate.Set(rs, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName)}})
 	r.InitialState(rs)
 	cc, err := grpc.NewClient(r.Scheme()+":///"+beServerName,
 		grpc.WithResolvers(r),
@@ -1249,10 +1231,7 @@ func testGRPCLBEmptyServerList(t *testing.T, svcfg string) {
 
 	s := &grpclbstate.State{
 		BalancerAddresses: []resolver.Address{
-			{
-				Addr:       tss.lbAddr,
-				ServerName: lbServerName,
-			},
+			resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName),
 		},
 	}
 	rs := grpclbstate.Set(resolver.State{ServiceConfig: r.CC().ParseServiceConfig(svcfg)}, s)
@@ -1324,10 +1303,7 @@ func (s) TestGRPCLBWithTargetNameFieldInConfig(t *testing.T) {
 	// target_name field. Our fake remote balancer is configured to always
 	// expect `beServerName` as the server name in the initial request.
 	rs := grpclbstate.Set(resolver.State{ServiceConfig: r.CC().ParseServiceConfig(grpclbConfig)},
-		&grpclbstate.State{BalancerAddresses: []resolver.Address{{
-			Addr:       tss.lbAddr,
-			ServerName: lbServerName,
-		}}})
+		&grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName)}})
 	r.UpdateState(rs)
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
@@ -1354,10 +1330,7 @@ func (s) TestGRPCLBWithTargetNameFieldInConfig(t *testing.T) {
 	lbCfg := fmt.Sprintf(`{"loadBalancingConfig": [{"grpclb": {"serviceName": "%s"}}]}`, newServerName)
 	s := &grpclbstate.State{
 		BalancerAddresses: []resolver.Address{
-			{
-				Addr:       tss.lbAddr,
-				ServerName: lbServerName,
-			},
+			resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName),
 		},
 	}
 	rs = grpclbstate.Set(resolver.State{ServiceConfig: r.CC().ParseServiceConfig(lbCfg)}, s)
@@ -1427,10 +1400,7 @@ func runAndCheckStats(t *testing.T, drop bool, statsChan chan *lbpb.ClientStats,
 	defer cc.Close()
 
 	rstate := resolver.State{ServiceConfig: r.CC().ParseServiceConfig(grpclbConfig)}
-	r.UpdateState(grpclbstate.Set(rstate, &grpclbstate.State{BalancerAddresses: []resolver.Address{{
-		Addr:       tss.lbAddr,
-		ServerName: lbServerName,
-	}}}))
+	r.UpdateState(grpclbstate.Set(rstate, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress(tss.lbAddr).WithServerName(lbServerName)}}))
 
 	runRPCs(cc)
 	end := time.Now().Add(time.Second)
