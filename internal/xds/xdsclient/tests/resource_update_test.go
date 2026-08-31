@@ -1095,7 +1095,7 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 				Localities: []xdsresource.Locality{
 					{
 						Endpoints: []xdsresource.Endpoint{{
-							ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr1:314")}...),
+							ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress("addr1:314")),
 							Weight:           1,
 						}},
 						ID:       clients.Locality{SubZone: "locality-1"},
@@ -1104,7 +1104,7 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 					},
 					{
 						Endpoints: []xdsresource.Endpoint{{
-							ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr2:159")}...),
+							ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress("addr2:159")),
 							Weight:           1,
 						}},
 						ID:       clients.Locality{SubZone: "locality-2"},
@@ -1135,7 +1135,7 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 				Localities: []xdsresource.Locality{
 					{
 						Endpoints: []xdsresource.Endpoint{{
-							ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr1:314")}...),
+							ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress("addr1:314")),
 							Weight:           1,
 						}},
 						ID:       clients.Locality{SubZone: "locality-1"},
@@ -1144,7 +1144,7 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 					},
 					{
 						Endpoints: []xdsresource.Endpoint{{
-							ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr2:159")}...),
+							ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress("addr2:159")),
 							Weight:           1,
 						}},
 						ID:       clients.Locality{SubZone: "locality-2"},

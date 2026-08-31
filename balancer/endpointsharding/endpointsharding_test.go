@@ -36,7 +36,7 @@ func Test(t *testing.T) {
 
 func (s) TestRotateEndpoints(t *testing.T) {
 	ep := func(addr string) resolver.Endpoint {
-		return resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(addr)}...)
+		return resolver.NewEndpoint(resolver.NewAddress(addr))
 	}
 	endpoints := []resolver.Endpoint{ep("1"), ep("2"), ep("3"), ep("4"), ep("5")}
 	testCases := []struct {

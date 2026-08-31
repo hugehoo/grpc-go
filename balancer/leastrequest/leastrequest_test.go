@@ -561,9 +561,9 @@ func (s) TestLeastRequestEndpoints_MultipleAddresses(t *testing.T) {
   ]
 }`
 	endpoints := []resolver.Endpoint{
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backends[0].Address), resolver.NewAddress(backends[1].Address)}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backends[2].Address), resolver.NewAddress(backends[3].Address)}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backends[4].Address), resolver.NewAddress(backends[5].Address)}...),
+		resolver.NewEndpoint(resolver.NewAddress(backends[0].Address), resolver.NewAddress(backends[1].Address)),
+		resolver.NewEndpoint(resolver.NewAddress(backends[2].Address), resolver.NewAddress(backends[3].Address)),
+		resolver.NewEndpoint(resolver.NewAddress(backends[4].Address), resolver.NewAddress(backends[5].Address)),
 	}
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(lrscJSON)
 	firstTwoEndpoints := []resolver.Endpoint{endpoints[0], endpoints[1]}
@@ -744,7 +744,7 @@ func (s) TestLeastRequestEndpoints_ResolverError(t *testing.T) {
 		conn.Close()
 	}()
 	mr.UpdateState(resolver.State{
-		Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(lis.Addr().String())}...)},
+		Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress(lis.Addr().String()))},
 	})
 	cc.Connect()
 

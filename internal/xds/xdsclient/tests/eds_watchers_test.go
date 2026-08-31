@@ -178,7 +178,7 @@ func (s) TestEDSWatch(t *testing.T) {
 					Localities: []xdsresource.Locality{
 						{
 							Endpoints: []xdsresource.Endpoint{{
-								ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))}...),
+								ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))),
 								Weight:           1,
 							}},
 							ID: clients.Locality{
@@ -204,7 +204,7 @@ func (s) TestEDSWatch(t *testing.T) {
 					Localities: []xdsresource.Locality{
 						{
 							Endpoints: []xdsresource.Endpoint{{
-								ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))}...),
+								ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))),
 								Weight:           1,
 							}},
 							ID: clients.Locality{
@@ -346,7 +346,7 @@ func (s) TestEDSWatch_TwoWatchesForSameResourceName(t *testing.T) {
 					Localities: []xdsresource.Locality{
 						{
 							Endpoints: []xdsresource.Endpoint{{
-								ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))}...),
+								ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))),
 								Weight:           1,
 							}},
 							ID: clients.Locality{
@@ -365,7 +365,7 @@ func (s) TestEDSWatch_TwoWatchesForSameResourceName(t *testing.T) {
 					Localities: []xdsresource.Locality{
 						{
 							Endpoints: []xdsresource.Endpoint{{
-								ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost2, edsPort2))}...),
+								ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost2, edsPort2))),
 								Weight:           1,
 							}},
 							ID: clients.Locality{
@@ -390,7 +390,7 @@ func (s) TestEDSWatch_TwoWatchesForSameResourceName(t *testing.T) {
 					Localities: []xdsresource.Locality{
 						{
 							Endpoints: []xdsresource.Endpoint{{
-								ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))}...),
+								ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))),
 								Weight:           1,
 							}},
 							ID: clients.Locality{
@@ -409,7 +409,7 @@ func (s) TestEDSWatch_TwoWatchesForSameResourceName(t *testing.T) {
 					Localities: []xdsresource.Locality{
 						{
 							Endpoints: []xdsresource.Endpoint{{
-								ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost2, edsPort2))}...),
+								ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost2, edsPort2))),
 								Weight:           1,
 							}},
 							ID: clients.Locality{
@@ -610,7 +610,7 @@ func (s) TestEDSWatch_ThreeWatchesForDifferentResourceNames(t *testing.T) {
 			Localities: []xdsresource.Locality{
 				{
 					Endpoints: []xdsresource.Endpoint{{
-						ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))}...),
+						ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))),
 						Weight:           1,
 					}},
 					ID: clients.Locality{
@@ -704,7 +704,7 @@ func (s) TestEDSWatch_ResourceCaching(t *testing.T) {
 			Localities: []xdsresource.Locality{
 				{
 					Endpoints: []xdsresource.Endpoint{{
-						ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))}...),
+						ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))),
 						Weight:           1,
 					}},
 					ID: clients.Locality{
@@ -839,7 +839,7 @@ func (s) TestEDSWatch_ValidResponseCancelsExpiryTimerBehavior(t *testing.T) {
 			Localities: []xdsresource.Locality{
 				{
 					Endpoints: []xdsresource.Endpoint{{
-						ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))}...),
+						ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))),
 						Weight:           1,
 					}},
 					ID: clients.Locality{
@@ -1005,7 +1005,7 @@ func (s) TestEDSWatch_PartialValid(t *testing.T) {
 			Localities: []xdsresource.Locality{
 				{
 					Endpoints: []xdsresource.Endpoint{{
-						ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))}...),
+						ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))),
 						Weight:           1,
 					}},
 					ID: clients.Locality{

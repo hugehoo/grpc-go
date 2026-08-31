@@ -473,7 +473,7 @@ func (s) TestEndpoints_SharedAddress(t *testing.T) {
 		t.Fatalf("Error starting client: %v", err)
 	}
 
-	endpointsSharedAddress := []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(srv.Address)}...), resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(srv.Address)}...)}
+	endpointsSharedAddress := []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress(srv.Address)), resolver.NewEndpoint(resolver.NewAddress(srv.Address))}
 	srv.R.UpdateState(resolver.State{Endpoints: endpointsSharedAddress})
 
 	// Make some RPC's and make sure doesn't crash. It should go to one of the
@@ -509,7 +509,7 @@ func (s) TestEndpoints_MultipleAddresses(t *testing.T) {
 		t.Fatalf("Error starting client: %v", err)
 	}
 
-	twoEndpoints := []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("bad-address-1"), resolver.NewAddress(srv1.Address)}...), resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("bad-address-2"), resolver.NewAddress(srv2.Address)}...)}
+	twoEndpoints := []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress("bad-address-1"), resolver.NewAddress(srv1.Address)), resolver.NewEndpoint(resolver.NewAddress("bad-address-2"), resolver.NewAddress(srv2.Address))}
 	srv1.R.UpdateState(resolver.State{Endpoints: twoEndpoints})
 
 	// Call each backend once to ensure the weights have been received.

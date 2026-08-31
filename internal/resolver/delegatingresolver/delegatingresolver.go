@@ -145,7 +145,7 @@ func New(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOpti
 	if target.URL.Scheme == "dns" && !targetResolutionEnabled {
 		r.targetResolverState = &resolver.State{
 			Addresses: []resolver.Address{resolver.NewAddress(addr)},
-			Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(addr)}...)},
+			Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress(addr))},
 		}
 		r.updateTargetResolverState(*r.targetResolverState)
 		return r, nil

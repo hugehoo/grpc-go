@@ -476,7 +476,7 @@ func (s) TestRingHash_AggregateClusterFallBackFromRingHashToLogicalDnsAtStartup(
 
 	dnsR := replaceDNSResolver(t)
 	dnsR.UpdateState(resolver.State{
-		Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backends[0])}...)},
+		Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress(backends[0]))},
 	})
 
 	if err := xdsServer.Update(ctx, updateOpts); err != nil {
@@ -556,7 +556,7 @@ func (s) TestRingHash_AggregateClusterFallBackFromRingHashToLogicalDnsAtStartupN
 
 	dnsR := replaceDNSResolver(t)
 	dnsR.UpdateState(resolver.State{
-		Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backends[0])}...)},
+		Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress(backends[0]))},
 	})
 
 	if err := xdsServer.Update(ctx, updateOpts); err != nil {
@@ -2688,7 +2688,7 @@ func (s) TestRingHash_RequestHashKey(t *testing.T) {
 	defer cc.Close()
 	var endpoints []resolver.Endpoint
 	for _, backend := range backends {
-		endpoints = append(endpoints, resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backend)}...))
+		endpoints = append(endpoints, resolver.NewEndpoint(resolver.NewAddress(backend)))
 	}
 	r.UpdateState(resolver.State{
 		Endpoints: endpoints,
@@ -2767,7 +2767,7 @@ func (s) TestRingHash_RequestHashKeyRandom(t *testing.T) {
 	defer cc.Close()
 	var endpoints []resolver.Endpoint
 	for _, backend := range backends {
-		endpoints = append(endpoints, resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backend)}...))
+		endpoints = append(endpoints, resolver.NewEndpoint(resolver.NewAddress(backend)))
 	}
 	r.UpdateState(resolver.State{
 		Endpoints: endpoints,
@@ -2834,7 +2834,7 @@ func (s) TestRingHash_RequestHashKeyConnecting(t *testing.T) {
 	defer cc.Close()
 	var endpoints []resolver.Endpoint
 	for _, backend := range backends {
-		endpoints = append(endpoints, resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backend)}...))
+		endpoints = append(endpoints, resolver.NewEndpoint(resolver.NewAddress(backend)))
 	}
 	r.UpdateState(resolver.State{
 		Endpoints: endpoints,

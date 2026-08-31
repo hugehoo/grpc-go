@@ -83,7 +83,7 @@ func verifyDNSResolution(ctx context.Context, t *testing.T, dnsTargetCh chan res
 			t.Fatalf("DNS resolution started for target %q, want %q", target.Endpoint(), addr)
 		}
 		dnsR.UpdateState(resolver.State{
-			Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(addr)}...)},
+			Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress(addr))},
 		})
 	}
 }

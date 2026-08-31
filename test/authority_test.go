@@ -222,7 +222,7 @@ func (s) TestAuthorityReplacedWithResolverAddress(t *testing.T) {
 	defer ss.Stop()
 
 	r := manual.NewBuilderWithScheme("whatever")
-	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress("").WithAddr(ss.Address).WithServerName(expectedAuthority)}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(ss.Address).WithServerName(expectedAuthority)}})
 	cc, err := grpc.NewClient(r.Scheme()+":///whatever", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithResolvers(r))
 	if err != nil {
 		t.Fatalf("grpc.NewClient(%q) = %v", ss.Address, err)

@@ -656,7 +656,7 @@ func (s) TestRouteResourceUpdate(t *testing.T) {
 							},
 								Endpoints: []xdsresource.Endpoint{
 									{
-										ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("localhost:8081")}...),
+										ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress("localhost:8081")),
 										HealthStatus:     xdsresource.EndpointHealthStatusUnknown,
 										Weight:           1,
 									},
@@ -780,7 +780,7 @@ func (s) TestRouteResourceChangeToInline(t *testing.T) {
 								},
 									Endpoints: []xdsresource.Endpoint{
 										{
-											ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("localhost:8081")}...),
+											ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress("localhost:8081")),
 											HealthStatus:     xdsresource.EndpointHealthStatusUnknown,
 											Weight:           1,
 										},
@@ -935,8 +935,8 @@ func (s) TestAggregateCluster(t *testing.T) {
 	dnsR := replaceDNSResolver(t)
 	dnsR.UpdateState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("127.0.0.1:8081")}...),
-			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[::1]:8081")}...),
+			resolver.NewEndpoint(resolver.NewAddress("127.0.0.1:8081")),
+			resolver.NewEndpoint(resolver.NewAddress("[::1]:8081")),
 		},
 	})
 
@@ -1034,7 +1034,7 @@ func (s) TestAggregateCluster(t *testing.T) {
 								},
 									Endpoints: []xdsresource.Endpoint{
 										{
-											ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("localhost:8080")}...),
+											ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress("localhost:8080")),
 											HealthStatus:     xdsresource.EndpointHealthStatusUnknown,
 											Weight:           1,
 										},
@@ -1055,8 +1055,8 @@ func (s) TestAggregateCluster(t *testing.T) {
 					EndpointConfig: &xdsresource.EndpointConfig{
 						DNSEndpoints: &xdsresource.DNSUpdate{
 							Endpoints: []resolver.Endpoint{
-								resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("127.0.0.1:8081")}...),
-								resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[::1]:8081")}...),
+								resolver.NewEndpoint(resolver.NewAddress("127.0.0.1:8081")),
+								resolver.NewEndpoint(resolver.NewAddress("[::1]:8081")),
 							},
 						},
 					},
@@ -1085,8 +1085,8 @@ func (s) TestAggregateClusterChildError(t *testing.T) {
 	dnsR := replaceDNSResolver(t)
 	dnsR.UpdateState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("127.0.0.1:8081")}...),
-			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[::1]:8081")}...),
+			resolver.NewEndpoint(resolver.NewAddress("127.0.0.1:8081")),
+			resolver.NewEndpoint(resolver.NewAddress("[::1]:8081")),
 		},
 	})
 
@@ -1176,8 +1176,8 @@ func (s) TestAggregateClusterChildError(t *testing.T) {
 					EndpointConfig: &xdsresource.EndpointConfig{
 						DNSEndpoints: &xdsresource.DNSUpdate{
 							Endpoints: []resolver.Endpoint{
-								resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("127.0.0.1:8081")}...),
-								resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[::1]:8081")}...),
+								resolver.NewEndpoint(resolver.NewAddress("127.0.0.1:8081")),
+								resolver.NewEndpoint(resolver.NewAddress("[::1]:8081")),
 							},
 						},
 					},
@@ -1526,7 +1526,7 @@ func (s) TestClusterSubscription_Lifecycle(t *testing.T) {
 									SubZone: "subzone-1",
 								},
 								Endpoints: []xdsresource.Endpoint{{
-									ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("localhost:8080")}...),
+									ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress("localhost:8080")),
 									HealthStatus:     xdsresource.EndpointHealthStatusUnknown,
 									Weight:           1,
 								}},
@@ -1552,7 +1552,7 @@ func (s) TestClusterSubscription_Lifecycle(t *testing.T) {
 									SubZone: "subzone-1",
 								},
 								Endpoints: []xdsresource.Endpoint{{
-									ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("localhost:8081")}...),
+									ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress("localhost:8081")),
 									HealthStatus:     xdsresource.EndpointHealthStatusUnknown,
 									Weight:           1,
 								}},
@@ -1715,7 +1715,7 @@ func (s) TestUpdateWithUnresolvedDynamicSubscription(t *testing.T) {
 									SubZone: "subzone-1",
 								},
 								Endpoints: []xdsresource.Endpoint{{
-									ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("localhost:9090")}...),
+									ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress("localhost:9090")),
 									HealthStatus:     xdsresource.EndpointHealthStatusUnknown,
 									Weight:           1,
 								}},
@@ -1741,7 +1741,7 @@ func (s) TestUpdateWithUnresolvedDynamicSubscription(t *testing.T) {
 									SubZone: "subzone-1",
 								},
 								Endpoints: []xdsresource.Endpoint{{
-									ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("localhost:10080")}...),
+									ResolverEndpoint: resolver.NewEndpoint(resolver.NewAddress("localhost:10080")),
 									HealthStatus:     xdsresource.EndpointHealthStatusUnknown,
 									Weight:           1,
 								}},

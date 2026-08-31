@@ -347,7 +347,7 @@ func (d *dnsResolver) lookup() (*resolver.State, error) {
 
 	eps := make([]resolver.Endpoint, 0, len(addrs))
 	for _, addr := range addrs {
-		eps = append(eps, resolver.NewEndpoint([]resolver.Address{addr}...))
+		eps = append(eps, resolver.NewEndpoint(addr))
 	}
 
 	state := resolver.State{

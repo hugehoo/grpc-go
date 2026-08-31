@@ -191,10 +191,7 @@ func (s) TestEndpoints_MultipleAddresses(t *testing.T) {
 	// First address is unreachable; pick_first falls through to the good one.
 	state := resolver.State{
 		Endpoints: []resolver.Endpoint{
-			resolver.NewEndpoint([]resolver.Address{
-				resolver.NewAddress("bad-address"),
-				resolver.NewAddress(srv.Address),
-			}...),
+			resolver.NewEndpoint(resolver.NewAddress("bad-address"), resolver.NewAddress(srv.Address)),
 		},
 	}
 	srv.R.UpdateState(state)
@@ -248,8 +245,8 @@ func (s) TestMultipleEndpoints_OOBListeners(t *testing.T) {
 	// pick_first children, each with its own OOB listener.
 	state := resolver.State{
 		Endpoints: []resolver.Endpoint{
-			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(srvA.Address)}...),
-			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(srvB.Address)}...),
+			resolver.NewEndpoint(resolver.NewAddress(srvA.Address)),
+			resolver.NewEndpoint(resolver.NewAddress(srvB.Address)),
 		},
 	}
 	r.UpdateState(state)
@@ -301,7 +298,7 @@ func (s) TestEndpointUpdate(t *testing.T) {
 
 	state := resolver.State{
 		Endpoints: []resolver.Endpoint{
-			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(srvA.Address)}...),
+			resolver.NewEndpoint(resolver.NewAddress(srvA.Address)),
 		},
 	}
 	r.UpdateState(state)
@@ -326,7 +323,7 @@ func (s) TestEndpointUpdate(t *testing.T) {
 
 	state = resolver.State{
 		Endpoints: []resolver.Endpoint{
-			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(srvB.Address)}...),
+			resolver.NewEndpoint(resolver.NewAddress(srvB.Address)),
 		},
 	}
 	r.UpdateState(state)

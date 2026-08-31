@@ -68,8 +68,8 @@ func (s) TestPickFirst_InitialResolverError(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1:1")}...),
-				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("2.2.2.2:2")}...),
+				resolver.NewEndpoint(resolver.NewAddress("1.1.1.1:1")),
+				resolver.NewEndpoint(resolver.NewAddress("2.2.2.2:2")),
 			},
 		},
 	}
@@ -96,7 +96,7 @@ func (s) TestPickFirst_ResolverErrorinTF(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1:1")}...),
+				resolver.NewEndpoint(resolver.NewAddress("1.1.1.1:1")),
 			},
 		},
 	}
@@ -244,10 +244,10 @@ func (s) TestPickFirstLeaf_TFPickerUpdate(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1:1")}...),
-				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1:1")}...), // duplicate, should be ignored.
-				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("2.2.2.2:2")}...),
-				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1:1")}...), // duplicate, should be ignored.
+				resolver.NewEndpoint(resolver.NewAddress("1.1.1.1:1")),
+				resolver.NewEndpoint(resolver.NewAddress("1.1.1.1:1")), // duplicate, should be ignored.
+				resolver.NewEndpoint(resolver.NewAddress("2.2.2.2:2")),
+				resolver.NewEndpoint(resolver.NewAddress("1.1.1.1:1")), // duplicate, should be ignored.
 			},
 		},
 	}

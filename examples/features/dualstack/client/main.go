@@ -57,18 +57,9 @@ func (*exampleResolver) Build(_ resolver.Target, cc resolver.ClientConn, _ resol
 	go func() {
 		err := cc.UpdateState(resolver.State{
 			Endpoints: []resolver.Endpoint{
-				resolver.NewEndpoint([]resolver.Address{
-					resolver.NewAddress("").WithAddr(fmt.Sprintf("[::1]:%d", port1)),
-					resolver.NewAddress("").WithAddr(fmt.Sprintf("127.0.0.1:%d", port1)),
-				}...),
-				resolver.NewEndpoint([]resolver.Address{
-					resolver.NewAddress("").WithAddr(fmt.Sprintf("[::1]:%d", port2)),
-					resolver.NewAddress("").WithAddr(fmt.Sprintf("127.0.0.1:%d", port2)),
-				}...),
-				resolver.NewEndpoint([]resolver.Address{
-					resolver.NewAddress("").WithAddr(fmt.Sprintf("[::1]:%d", port3)),
-					resolver.NewAddress("").WithAddr(fmt.Sprintf("127.0.0.1:%d", port3)),
-				}...),
+				resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("[::1]:%d", port1)), resolver.NewAddress(fmt.Sprintf("127.0.0.1:%d", port1))),
+				resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("[::1]:%d", port2)), resolver.NewAddress(fmt.Sprintf("127.0.0.1:%d", port2))),
+				resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("[::1]:%d", port3)), resolver.NewAddress(fmt.Sprintf("127.0.0.1:%d", port3))),
 			},
 		})
 		if err != nil {

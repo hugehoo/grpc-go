@@ -108,7 +108,7 @@ func (s) TestUpdateClientConnState_NewRingSize(t *testing.T) {
 	origMinRingSize, origMaxRingSize := 1, 10 // Configured from `testConfig` in `setupTest`
 	newMinRingSize, newMaxRingSize := 20, 100
 
-	endpoints := []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}...)}
+	endpoints := []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[0]))}
 	cc, b, p1 := setupTest(t, endpoints)
 	ring1 := p1.(*picker).ring
 	if ringSize := len(ring1.items); ringSize < origMinRingSize || ringSize > origMaxRingSize {
@@ -139,7 +139,7 @@ func (s) TestUpdateClientConnState_NewRingSize(t *testing.T) {
 
 func (s) TestOneEndpoint(t *testing.T) {
 	wantAddr1 := resolver.NewAddress(testBackendAddrStrs[0])
-	cc, _, p0 := setupTest(t, []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{wantAddr1}...)})
+	cc, _, p0 := setupTest(t, []resolver.Endpoint{resolver.NewEndpoint(wantAddr1)})
 	ring0 := p0.(*picker).ring
 
 	firstHash := ring0.items[0].hash
@@ -189,9 +189,9 @@ func (s) TestOneEndpoint(t *testing.T) {
 // one will be picked.
 func (s) TestThreeSubConnsAffinity(t *testing.T) {
 	endpoints := []resolver.Endpoint{
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}...),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[0])),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[1])),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[2])),
 	}
 	remainingAddrs := map[string]bool{
 		testBackendAddrStrs[0]: true,
@@ -335,9 +335,9 @@ func (s) TestThreeSubConnsAffinity(t *testing.T) {
 // another backend, and verify the first hash still picks the first backend.
 func (s) TestThreeBackendsAffinityMultiple(t *testing.T) {
 	wantEndpoints := []resolver.Endpoint{
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}...),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[0])),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[1])),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[2])),
 	}
 	cc, _, p0 := setupTest(t, wantEndpoints)
 	// This test doesn't update addresses, so this ring will be used by all the
@@ -436,9 +436,9 @@ func (s) TestThreeBackendsAffinityMultiple(t *testing.T) {
 //     and weights.
 func (s) TestAddrWeightChange(t *testing.T) {
 	endpoints := []resolver.Endpoint{
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}...),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[0])),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[1])),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[2])),
 	}
 	cc, b, p0 := setupTest(t, endpoints)
 	ring0 := p0.(*picker).ring
@@ -527,10 +527,10 @@ func (s) TestAddrWeightChange(t *testing.T) {
 // (without a pick) when there is no endpoint already in Connecting state.
 func (s) TestAutoConnectEndpointOnTransientFailure(t *testing.T) {
 	wantEndpoints := []resolver.Endpoint{
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(testBackendAddrStrs[3])}...),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[0])),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[1])),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[2])),
+		resolver.NewEndpoint(resolver.NewAddress(testBackendAddrStrs[3])),
 	}
 	cc, _, p0 := setupTest(t, wantEndpoints)
 
@@ -667,7 +667,7 @@ func (s) TestAggregatedConnectivityState(t *testing.T) {
 				es := &endpointState{
 					state: balancer.State{ConnectivityState: cs},
 				}
-				ep := resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%d.%d.%d.%d:%d", i, i, i, i, i))}...)
+				ep := resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("%d.%d.%d.%d:%d", i, i, i, i, i)))
 				bal.endpointStates.Set(ep, es)
 			}
 			if got := bal.aggregatedStateLocked(); got != tt.want {

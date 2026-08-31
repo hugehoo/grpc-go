@@ -233,7 +233,7 @@ func (s) TestWeightedTarget(t *testing.T) {
 	addr1 := resolver.NewAddress(testBackendAddrStrs[1]).WithAttributes(nil)
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
 		}},
 		BalancerConfig: config1,
 	}); err != nil {
@@ -276,7 +276,7 @@ func (s) TestWeightedTarget(t *testing.T) {
 	addr2 := resolver.NewAddress(testBackendAddrStrs[2]).WithAttributes(nil)
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr2}...), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr2), []string{"cluster_2"}),
 		}},
 		BalancerConfig: config2,
 	}); err != nil {
@@ -332,7 +332,7 @@ func (s) TestWeightedTarget(t *testing.T) {
 	addr3 := resolver.NewAddress(testBackendAddrStrs[3]).WithAttributes(nil)
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr3}...), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr3), []string{"cluster_2"}),
 		}},
 		BalancerConfig: config3,
 	}); err != nil {
@@ -420,7 +420,7 @@ func (s) TestWeightedTarget_OneSubBalancer_AddRemoveBackend(t *testing.T) {
 	addr1 := resolver.NewAddress(testBackendAddrStrs[1])
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -447,8 +447,8 @@ func (s) TestWeightedTarget_OneSubBalancer_AddRemoveBackend(t *testing.T) {
 	addr2 := resolver.NewAddress(testBackendAddrStrs[2])
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr2}...), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr2), []string{"cluster_1"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -473,7 +473,7 @@ func (s) TestWeightedTarget_OneSubBalancer_AddRemoveBackend(t *testing.T) {
 	// Remove the first address.
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr2}...), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr2), []string{"cluster_1"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -527,8 +527,8 @@ func (s) TestWeightedTarget_TwoSubBalancers_OneBackend(t *testing.T) {
 	addr2 := resolver.NewAddress(testBackendAddrStrs[2])
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr2}...), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr2), []string{"cluster_2"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -598,10 +598,10 @@ func (s) TestWeightedTarget_TwoSubBalancers_MoreBackends(t *testing.T) {
 	addr4 := resolver.NewAddress(testBackendAddrStrs[4])
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr2}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr3}...), []string{"cluster_2"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr4}...), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr2), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr3), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr4), []string{"cluster_2"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -673,9 +673,9 @@ func (s) TestWeightedTarget_TwoSubBalancers_MoreBackends(t *testing.T) {
 	// Shut down subConn corresponding to addr3.
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr2}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr4}...), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr2), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr4), []string{"cluster_2"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -760,10 +760,10 @@ func (s) TestWeightedTarget_TwoSubBalancers_DifferentWeight_MoreBackends(t *test
 	addr4 := resolver.NewAddress(testBackendAddrStrs[4])
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr2}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr3}...), []string{"cluster_2"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr4}...), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr2), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr3), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr4), []string{"cluster_2"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -846,9 +846,9 @@ func (s) TestWeightedTarget_ThreeSubBalancers_RemoveBalancer(t *testing.T) {
 	addr3 := resolver.NewAddress(testBackendAddrStrs[3])
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr2}...), []string{"cluster_2"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr3}...), []string{"cluster_3"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr2), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr3), []string{"cluster_3"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -908,8 +908,8 @@ func (s) TestWeightedTarget_ThreeSubBalancers_RemoveBalancer(t *testing.T) {
 	}
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr3}...), []string{"cluster_3"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr3), []string{"cluster_3"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -961,7 +961,7 @@ func (s) TestWeightedTarget_ThreeSubBalancers_RemoveBalancer(t *testing.T) {
 	}
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr3}...), []string{"cluster_3"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr3), []string{"cluster_3"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -1019,10 +1019,10 @@ func (s) TestWeightedTarget_TwoSubBalancers_ChangeWeight_MoreBackends(t *testing
 	addr4 := resolver.NewAddress(testBackendAddrStrs[4])
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr2}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr3}...), []string{"cluster_2"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr4}...), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr2), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr3), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr4), []string{"cluster_2"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -1087,10 +1087,10 @@ func (s) TestWeightedTarget_TwoSubBalancers_ChangeWeight_MoreBackends(t *testing
 	}
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr2}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr3}...), []string{"cluster_2"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr4}...), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr2), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr3), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr4), []string{"cluster_2"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -1137,8 +1137,8 @@ func (s) TestWeightedTarget_InitOneSubBalancerTransientFailure(t *testing.T) {
 	addr2 := resolver.NewAddress(testBackendAddrStrs[2])
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr1}...), []string{"cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr2}...), []string{"cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr1), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr2), []string{"cluster_2"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -1199,8 +1199,8 @@ func (s) TestBalancerGroup_SubBalancerTurnsConnectingFromTransientFailure(t *tes
 	// Send the config with one address for each cluster.
 	addr1 := resolver.NewAddress(testBackendAddrStrs[1])
 	addr2 := resolver.NewAddress(testBackendAddrStrs[2])
-	ep1 := resolver.NewEndpoint([]resolver.Address{addr1}...)
-	ep2 := resolver.NewEndpoint([]resolver.Address{addr2}...)
+	ep1 := resolver.NewEndpoint(addr1)
+	ep2 := resolver.NewEndpoint(addr2)
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
 			hierarchy.SetInEndpoint(ep1, []string{"cluster_1"}),
@@ -1401,7 +1401,7 @@ func (s) TestInitialIdle(t *testing.T) {
 	addrs := []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0]).WithAttributes(nil)}
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addrs[0]}...), []string{"cds:cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addrs[0]), []string{"cds:cluster_1"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -1445,7 +1445,7 @@ func (s) TestIgnoreSubBalancerStateTransitions(t *testing.T) {
 	addr := resolver.NewAddress(testBackendAddrStrs[0]).WithAttributes(nil)
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addr}...), []string{"cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addr), []string{"cluster_1"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {
@@ -1506,7 +1506,7 @@ func (s) TestUpdateStatePauses(t *testing.T) {
 	addrs := []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0]).WithAttributes(nil)}
 	if err := wtb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{addrs[0]}...), []string{"cds:cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint(addrs[0]), []string{"cds:cluster_1"}),
 		}},
 		BalancerConfig: config,
 	}); err != nil {

@@ -39,16 +39,16 @@ var (
 	addr6 = NewAddress("a1").WithAttributes(attributes.New("a1", 3)).WithServerName("s2")
 	addr7 = NewAddress("a1").WithAttributes(attributes.New("a1", 3)).WithServerName("s1").WithBalancerAttributes(attributes.New("xx", 3))
 
-	endpoint1   = NewEndpoint([]Address{NewAddress("addr1")}...)
-	endpoint2   = NewEndpoint([]Address{NewAddress("addr2")}...)
-	endpoint3   = NewEndpoint([]Address{NewAddress("addr3")}...)
-	endpoint4   = NewEndpoint([]Address{NewAddress("addr4")}...)
-	endpoint5   = NewEndpoint([]Address{NewAddress("addr5")}...)
-	endpoint6   = NewEndpoint([]Address{NewAddress("addr6")}...)
-	endpoint7   = NewEndpoint([]Address{NewAddress("addr7")}...)
-	endpoint12  = NewEndpoint([]Address{NewAddress("addr1"), NewAddress("addr2")}...)
-	endpoint21  = NewEndpoint([]Address{NewAddress("addr2"), NewAddress("addr1")}...)
-	endpoint123 = NewEndpoint([]Address{NewAddress("addr1"), NewAddress("addr2"), NewAddress("addr3")}...)
+	endpoint1   = NewEndpoint(NewAddress("addr1"))
+	endpoint2   = NewEndpoint(NewAddress("addr2"))
+	endpoint3   = NewEndpoint(NewAddress("addr3"))
+	endpoint4   = NewEndpoint(NewAddress("addr4"))
+	endpoint5   = NewEndpoint(NewAddress("addr5"))
+	endpoint6   = NewEndpoint(NewAddress("addr6"))
+	endpoint7   = NewEndpoint(NewAddress("addr7"))
+	endpoint12  = NewEndpoint(NewAddress("addr1"), NewAddress("addr2"))
+	endpoint21  = NewEndpoint(NewAddress("addr2"), NewAddress("addr1"))
+	endpoint123 = NewEndpoint(NewAddress("addr1"), NewAddress("addr2"), NewAddress("addr3"))
 )
 
 func (s) TestAddressMap_Length(t *testing.T) {
@@ -376,12 +376,12 @@ func (s) TestEndpointMap_KeyIsolation(t *testing.T) {
 func BenchmarkEndpointMap(b *testing.B) {
 	em := NewEndpointMap[any]()
 	for i := range b.N {
-		em.Set(NewEndpoint([]Address{NewAddress(fmt.Sprintf("%d.%d.%d.%d", i, i, i, i))}...), i)
+		em.Set(NewEndpoint(NewAddress(fmt.Sprintf("%d.%d.%d.%d", i, i, i, i))), i)
 	}
 	for i := range b.N {
-		em.Get(NewEndpoint([]Address{NewAddress(fmt.Sprintf("%d.%d.%d.%d", i, i, i, i))}...))
+		em.Get(NewEndpoint(NewAddress(fmt.Sprintf("%d.%d.%d.%d", i, i, i, i))))
 	}
 	for i := range b.N {
-		em.Delete(NewEndpoint([]Address{NewAddress(fmt.Sprintf("%d.%d.%d.%d", i, i, i, i))}...))
+		em.Delete(NewEndpoint(NewAddress(fmt.Sprintf("%d.%d.%d.%d", i, i, i, i))))
 	}
 }

@@ -310,7 +310,7 @@ func (s) TestDelegatingResolverwithDNSAndProxyWithNoTargetResolutionHappyPaths(t
 
 			wantState := resolver.State{
 				Addresses: []resolver.Address{proxyAddressWithTargetAttribute(resolvedProxyTestAddr1, test.wantConnectAddress)},
-				Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{proxyAddressWithTargetAttribute(resolvedProxyTestAddr1, test.wantConnectAddress)}...)},
+				Endpoints: []resolver.Endpoint{resolver.NewEndpoint(proxyAddressWithTargetAttribute(resolvedProxyTestAddr1, test.wantConnectAddress))},
 			}
 
 			var gotState resolver.State
@@ -475,12 +475,8 @@ func (s) TestDelegatingResolverForEndpointsWithProxy(t *testing.T) {
 
 	targetResolver.UpdateState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			resolver.NewEndpoint([]resolver.Address{
-				resolver.NewAddress(resolvedTargetTestAddr1),
-				resolver.NewAddress(resolvedTargetTestAddr2)}...),
-			resolver.NewEndpoint([]resolver.Address{
-				resolver.NewAddress(resolvedTargetTestAddr3),
-				resolver.NewAddress(resolvedTargetTestAddr4)}...),
+			resolver.NewEndpoint(resolver.NewAddress(resolvedTargetTestAddr1), resolver.NewAddress(resolvedTargetTestAddr2)),
+			resolver.NewEndpoint(resolver.NewAddress(resolvedTargetTestAddr3), resolver.NewAddress(resolvedTargetTestAddr4)),
 		},
 		ServiceConfig: &serviceconfig.ParseResult{},
 	})
@@ -497,25 +493,15 @@ func (s) TestDelegatingResolverForEndpointsWithProxy(t *testing.T) {
 	mustBuildResolver(ctx, t, proxyResolverBuilt)
 	proxyResolver.UpdateState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(resolvedProxyTestAddr1)}...),
-			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(resolvedProxyTestAddr2)}...),
+			resolver.NewEndpoint(resolver.NewAddress(resolvedProxyTestAddr1)),
+			resolver.NewEndpoint(resolver.NewAddress(resolvedProxyTestAddr2)),
 		},
 		ServiceConfig: &serviceconfig.ParseResult{},
 	})
 	wantState := resolver.State{
 		Endpoints: []resolver.Endpoint{
-			resolver.NewEndpoint([]resolver.Address{
-				proxyAddressWithTargetAttribute(resolvedProxyTestAddr1, resolvedTargetTestAddr1),
-				proxyAddressWithTargetAttribute(resolvedProxyTestAddr2, resolvedTargetTestAddr1),
-				proxyAddressWithTargetAttribute(resolvedProxyTestAddr1, resolvedTargetTestAddr2),
-				proxyAddressWithTargetAttribute(resolvedProxyTestAddr2, resolvedTargetTestAddr2),
-			}...),
-			resolver.NewEndpoint([]resolver.Address{
-				proxyAddressWithTargetAttribute(resolvedProxyTestAddr1, resolvedTargetTestAddr3),
-				proxyAddressWithTargetAttribute(resolvedProxyTestAddr2, resolvedTargetTestAddr3),
-				proxyAddressWithTargetAttribute(resolvedProxyTestAddr1, resolvedTargetTestAddr4),
-				proxyAddressWithTargetAttribute(resolvedProxyTestAddr2, resolvedTargetTestAddr4),
-			}...),
+			resolver.NewEndpoint(proxyAddressWithTargetAttribute(resolvedProxyTestAddr1, resolvedTargetTestAddr1), proxyAddressWithTargetAttribute(resolvedProxyTestAddr2, resolvedTargetTestAddr1), proxyAddressWithTargetAttribute(resolvedProxyTestAddr1, resolvedTargetTestAddr2), proxyAddressWithTargetAttribute(resolvedProxyTestAddr2, resolvedTargetTestAddr2)),
+			resolver.NewEndpoint(proxyAddressWithTargetAttribute(resolvedProxyTestAddr1, resolvedTargetTestAddr3), proxyAddressWithTargetAttribute(resolvedProxyTestAddr2, resolvedTargetTestAddr3), proxyAddressWithTargetAttribute(resolvedProxyTestAddr1, resolvedTargetTestAddr4), proxyAddressWithTargetAttribute(resolvedProxyTestAddr2, resolvedTargetTestAddr4)),
 		},
 		ServiceConfig: &serviceconfig.ParseResult{},
 	}
@@ -646,7 +632,7 @@ func (s) TestDelegatingResolverUpdateStateDuringClose(t *testing.T) {
 	}
 
 	targetResolver.UpdateState(resolver.State{
-		Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1")}...)},
+		Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress("1.1.1.1"))},
 	})
 
 	// Wait for the proxy resolver to be built before calling Close.
@@ -668,7 +654,7 @@ func (s) TestDelegatingResolverUpdateStateDuringClose(t *testing.T) {
 	proxyUpdateCh := make(chan struct{})
 	go func() {
 		proxyResolver.UpdateState(resolver.State{
-			Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1")}...)},
+			Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress("1.1.1.1"))},
 		})
 		close(proxyUpdateCh)
 	}()
@@ -707,7 +693,7 @@ func (s) TestDelegatingResolverUpdateStateFromResolveNow(t *testing.T) {
 	targetResolver.ResolveNowCallback = func(resolver.ResolveNowOptions) {
 		// Updating the resolver state should not deadlock.
 		targetResolver.CC().UpdateState(resolver.State{
-			Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1")}...)},
+			Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress("1.1.1.1"))},
 		})
 		close(targetResolverCalled)
 	}
@@ -726,7 +712,7 @@ func (s) TestDelegatingResolverUpdateStateFromResolveNow(t *testing.T) {
 	}
 
 	targetResolver.UpdateState(resolver.State{
-		Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1")}...)},
+		Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress("1.1.1.1"))},
 	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
@@ -738,7 +724,7 @@ func (s) TestDelegatingResolverUpdateStateFromResolveNow(t *testing.T) {
 	// Updating the channel will result in an error being returned. The
 	// delegating resolver should call call "ResolveNow" on the target resolver.
 	proxyResolver.UpdateState(resolver.State{
-		Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1")}...)},
+		Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress("1.1.1.1"))},
 	})
 
 	select {
@@ -761,7 +747,7 @@ func (s) TestDelegatingResolverResolveNow(t *testing.T) {
 	targetResolver.ResolveNowCallback = func(resolver.ResolveNowOptions) {
 		// Updating the resolver state should not deadlock.
 		targetResolver.CC().UpdateState(resolver.State{
-			Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1")}...)},
+			Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress("1.1.1.1"))},
 		})
 		targetResolverCalled <- struct{}{}
 	}
@@ -774,7 +760,7 @@ func (s) TestDelegatingResolverResolveNow(t *testing.T) {
 	proxyResolver.ResolveNowCallback = func(resolver.ResolveNowOptions) {
 		// Updating the resolver state should not deadlock.
 		proxyResolver.CC().UpdateState(resolver.State{
-			Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1")}...)},
+			Endpoints: []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress("1.1.1.1"))},
 		})
 		close(proxyResolverCalled)
 	}
@@ -841,7 +827,7 @@ func (s) TestDelegatingResolverForNonTCPTarget(t *testing.T) {
 	nonTCPAddr := networktype.Set(resolver.NewAddress(resolvedTargetTestAddr1), "unix")
 	targetResolver.UpdateState(resolver.State{
 		Addresses:     []resolver.Address{nonTCPAddr},
-		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{nonTCPAddr}...)},
+		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint(nonTCPAddr)},
 		ServiceConfig: &serviceconfig.ParseResult{},
 	})
 
@@ -862,7 +848,7 @@ func (s) TestDelegatingResolverForNonTCPTarget(t *testing.T) {
 
 	wantState := resolver.State{
 		Addresses:     []resolver.Address{nonTCPAddr},
-		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{nonTCPAddr}...)},
+		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint(nonTCPAddr)},
 		ServiceConfig: &serviceconfig.ParseResult{},
 	}
 
@@ -901,7 +887,7 @@ func (s) TestDelegatingResolverForMixNetworkType(t *testing.T) {
 	nonTCPAddr := networktype.Set(resolver.NewAddress(resolvedTargetTestAddr1), "unix")
 	targetResolver.UpdateState(resolver.State{
 		Addresses:     []resolver.Address{nonTCPAddr, resolver.NewAddress(resolvedTargetTestAddr2)},
-		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{nonTCPAddr, resolver.NewAddress(resolvedTargetTestAddr2)}...)},
+		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint(nonTCPAddr, resolver.NewAddress(resolvedTargetTestAddr2))},
 		ServiceConfig: &serviceconfig.ParseResult{},
 	})
 
@@ -929,7 +915,7 @@ func (s) TestDelegatingResolverForMixNetworkType(t *testing.T) {
 	}
 	wantState := resolver.State{
 		Addresses:     []resolver.Address{nonTCPAddr, proxyAddressWithTargetAttribute(envProxyAddr, resolvedTargetTestAddr2)},
-		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{nonTCPAddr, proxyAddressWithTargetAttribute(envProxyAddr, resolvedTargetTestAddr2)}...)},
+		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint(nonTCPAddr, proxyAddressWithTargetAttribute(envProxyAddr, resolvedTargetTestAddr2))},
 		ServiceConfig: &serviceconfig.ParseResult{},
 	}
 
@@ -979,7 +965,7 @@ func (s) TestDelegatingResolverWithNoProxyEnvUsed(t *testing.T) {
 
 	targetResolver.UpdateState(resolver.State{
 		Addresses:     []resolver.Address{resolver.NewAddress(noproxyresolvedTargetAddr), resolver.NewAddress(resolvedTargetTestAddr)},
-		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(noproxyresolvedTargetAddr), resolver.NewAddress(resolvedTargetTestAddr)}...)},
+		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress(noproxyresolvedTargetAddr), resolver.NewAddress(resolvedTargetTestAddr))},
 		ServiceConfig: &serviceconfig.ParseResult{},
 	})
 
@@ -1007,7 +993,7 @@ func (s) TestDelegatingResolverWithNoProxyEnvUsed(t *testing.T) {
 	}
 	wantState := resolver.State{
 		Addresses:     []resolver.Address{resolver.NewAddress(noproxyresolvedTargetAddr), proxyAddressWithTargetAttribute(envProxyAddr, resolvedTargetTestAddr)},
-		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(noproxyresolvedTargetAddr), proxyAddressWithTargetAttribute(envProxyAddr, resolvedTargetTestAddr)}...)},
+		Endpoints:     []resolver.Endpoint{resolver.NewEndpoint(resolver.NewAddress(noproxyresolvedTargetAddr), proxyAddressWithTargetAttribute(envProxyAddr, resolvedTargetTestAddr))},
 		ServiceConfig: &serviceconfig.ParseResult{},
 	}
 

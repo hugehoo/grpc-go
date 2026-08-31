@@ -116,39 +116,39 @@ func (s) TestValidateEndpoints(t *testing.T) {
 		{
 			name: "duplicate-address-across-endpoints",
 			endpoints: []Endpoint{
-				NewEndpoint([]Address{addr1}...),
-				NewEndpoint([]Address{addr1}...),
+				NewEndpoint(addr1),
+				NewEndpoint(addr1),
 			},
 			wantErr: false,
 		},
 		{
 			name: "duplicate-address-same-endpoint",
 			endpoints: []Endpoint{
-				NewEndpoint([]Address{addr1, addr1}...),
+				NewEndpoint(addr1, addr1),
 			},
 			wantErr: false,
 		},
 		{
 			name: "duplicate-address-across-endpoints-plural-addresses",
 			endpoints: []Endpoint{
-				NewEndpoint([]Address{addr1, addr2, addr3}...),
-				NewEndpoint([]Address{addr3, addr4}...),
+				NewEndpoint(addr1, addr2, addr3),
+				NewEndpoint(addr3, addr4),
 			},
 			wantErr: false,
 		},
 		{
 			name: "no-shared-addresses",
 			endpoints: []Endpoint{
-				NewEndpoint([]Address{addr1, addr2}...),
-				NewEndpoint([]Address{addr3, addr4}...),
+				NewEndpoint(addr1, addr2),
+				NewEndpoint(addr3, addr4),
 			},
 			wantErr: false,
 		},
 		{
 			name: "endpoint-with-no-addresses",
 			endpoints: []Endpoint{
-				NewEndpoint([]Address{addr1, addr2}...),
-				NewEndpoint([]Address{}...),
+				NewEndpoint(addr1, addr2),
+				NewEndpoint(),
 			},
 			wantErr: false,
 		},

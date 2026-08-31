@@ -118,7 +118,7 @@ func (s) TestParseConfig(t *testing.T) {
 func makeEndpoints(n int) []resolver.Endpoint {
 	endpoints := make([]resolver.Endpoint, n)
 	for i := 0; i < n; i++ {
-		endpoints[i] = resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("endpoint-%d", i))}...)
+		endpoints[i] = resolver.NewEndpoint(resolver.NewAddress(fmt.Sprintf("endpoint-%d", i)))
 	}
 	return endpoints
 }
@@ -166,7 +166,7 @@ func (s) TestCalculateSubset_Simple(t *testing.T) {
 }
 
 func (s) TestCalculateSubset_IgnoresEndpointsWithoutAddresses(t *testing.T) {
-	emptyEndpoint := resolver.NewEndpoint([]resolver.Address{}...)
+	emptyEndpoint := resolver.NewEndpoint()
 	endpoints := append([]resolver.Endpoint{emptyEndpoint}, makeEndpoints(3)...)
 	b := &subsettingBalancer{
 		cfg:        &lbConfig{SubsetSize: 2},
@@ -191,11 +191,11 @@ func (s) TestCalculateSubset_EndpointsRetainHashValues(t *testing.T) {
 	// The subset is deterministic based on the hash, so we can hardcode
 	// the expected output.
 	want := []resolver.Endpoint{
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("endpoint-6")}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("endpoint-0")}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("endpoint-1")}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("endpoint-7")}...),
-		resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("endpoint-3")}...),
+		resolver.NewEndpoint(resolver.NewAddress("endpoint-6")),
+		resolver.NewEndpoint(resolver.NewAddress("endpoint-0")),
+		resolver.NewEndpoint(resolver.NewAddress("endpoint-1")),
+		resolver.NewEndpoint(resolver.NewAddress("endpoint-7")),
+		resolver.NewEndpoint(resolver.NewAddress("endpoint-3")),
 	}
 
 	b := &subsettingBalancer{
