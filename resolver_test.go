@@ -133,8 +133,8 @@ func (s) TestResolverAddressesToEndpoints(t *testing.T) {
 	select {
 	case got := <-stateCh:
 		want := []resolver.Endpoint{
-			{Addresses: []resolver.Address{resolver.NewAddress("addr1")}, Attributes: a1},
-			{Addresses: []resolver.Address{resolver.NewAddress("addr2")}, Attributes: a2},
+			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr1")}...).WithAttributes(a1),
+			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr2")}...).WithAttributes(a2),
 		}
 		if diff := cmp.Diff(got.ResolverState.Endpoints, want); diff != "" {
 			t.Errorf("Did not receive expected endpoints.  Diff (-got +want):\n%v", diff)
@@ -185,8 +185,8 @@ func (s) TestResolverAddressesToEndpointsUsingNewAddresses(t *testing.T) {
 	select {
 	case got := <-stateCh:
 		want := []resolver.Endpoint{
-			{Addresses: []resolver.Address{resolver.NewAddress("addr1")}, Attributes: a1},
-			{Addresses: []resolver.Address{resolver.NewAddress("addr2")}, Attributes: a2},
+			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr1")}...).WithAttributes(a1),
+			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr2")}...).WithAttributes(a2),
 		}
 		if diff := cmp.Diff(got.ResolverState.Endpoints, want); diff != "" {
 			t.Errorf("Did not receive expected endpoints.  Diff (-got +want):\n%v", diff)
