@@ -71,7 +71,7 @@ func (s) TestNewClientWithMultipleBackendsNotSendingServerPreface(t *testing.T) 
 		t.Fatalf("Error while listening. Err: %v", err)
 	}
 	defer lis1.Close()
-	lis1Addr := resolver.Address{Addr: lis1.Addr().String()}
+	lis1Addr := resolver.NewAddress(lis1.Addr().String())
 	lis1Done := make(chan struct{})
 	// 1st listener accepts the connection and immediately closes it.
 	go func() {
@@ -90,7 +90,7 @@ func (s) TestNewClientWithMultipleBackendsNotSendingServerPreface(t *testing.T) 
 	}
 	defer lis2.Close()
 	lis2Done := make(chan struct{})
-	lis2Addr := resolver.Address{Addr: lis2.Addr().String()}
+	lis2Addr := resolver.NewAddress(lis2.Addr().String())
 	// 2nd listener should get a connection attempt since the first one failed.
 	go func() {
 		defer close(lis2Done)
@@ -311,8 +311,8 @@ func (s) TestNewClient_BackoffCountPerRetryGroup(t *testing.T) {
 
 	rb := manual.NewBuilderWithScheme("whatever")
 	rb.InitialState(resolver.State{Addresses: []resolver.Address{
-		{Addr: lis1.Addr().String()},
-		{Addr: lis2.Addr().String()},
+		resolver.NewAddress(lis1.Addr().String()),
+		resolver.NewAddress(lis2.Addr().String()),
 	}})
 	client, err := NewClient("whatever:///this-gets-overwritten",
 		WithTransportCredentials(insecure.NewCredentials()),
@@ -777,9 +777,9 @@ func (s) TestUpdateAddresses_NoopIfCalledWithSameAddresses(t *testing.T) {
 	}()
 
 	addrsList := []resolver.Address{
-		{Addr: lis1.Addr().String()},
-		{Addr: lis2.Addr().String()},
-		{Addr: lis3.Addr().String()},
+		resolver.NewAddress(lis1.Addr().String()),
+		resolver.NewAddress(lis2.Addr().String()),
+		resolver.NewAddress(lis3.Addr().String()),
 	}
 	rb := manual.NewBuilderWithScheme("whatever")
 	rb.InitialState(resolver.State{Addresses: addrsList})
@@ -916,7 +916,7 @@ func testDefaultServiceConfigWhenResolverServiceConfigDisabled(t *testing.T, r *
 	defer cc.Close()
 	// Resolver service config gets ignored since resolver service config is disabled.
 	r.UpdateState(resolver.State{
-		Addresses:     []resolver.Address{{Addr: addr}},
+		Addresses:     []resolver.Address{resolver.NewAddress(addr)},
 		ServiceConfig: parseCfg(r, "{}"),
 	})
 	if !verifyWaitForReadyEqualsTrue(cc) {
@@ -932,7 +932,7 @@ func testDefaultServiceConfigWhenResolverDoesNotReturnServiceConfig(t *testing.T
 	cc.Connect()
 	defer cc.Close()
 	r.UpdateState(resolver.State{
-		Addresses: []resolver.Address{{Addr: addr}},
+		Addresses: []resolver.Address{resolver.NewAddress(addr)},
 	})
 	if !verifyWaitForReadyEqualsTrue(cc) {
 		t.Fatal("default service config failed to be applied after 1s")
@@ -947,7 +947,7 @@ func testDefaultServiceConfigWhenResolverReturnInvalidServiceConfig(t *testing.T
 	cc.Connect()
 	defer cc.Close()
 	r.UpdateState(resolver.State{
-		Addresses: []resolver.Address{{Addr: addr}},
+		Addresses: []resolver.Address{resolver.NewAddress(addr)},
 	})
 	if !verifyWaitForReadyEqualsTrue(cc) {
 		t.Fatal("default service config failed to be applied after 1s")

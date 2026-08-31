@@ -46,7 +46,7 @@ func (s) TestDialWithTimeout(t *testing.T) {
 		t.Fatalf("Error while listening. Err: %v", err)
 	}
 	defer lis.Close()
-	lisAddr := resolver.Address{Addr: lis.Addr().String()}
+	lisAddr := resolver.NewAddress(lis.Addr().String())
 	lisDone := make(chan struct{})
 	dialDone := make(chan struct{})
 	// 1st listener accepts the connection and then does nothing
@@ -301,7 +301,7 @@ func (s) TestResolverAddressesWithTypedNilAttribute(t *testing.T) {
 	resolver.Register(r)
 
 	addrAttr := attributes.New("typed_nil", (*stringerVal)(nil))
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: "addr1", Attributes: addrAttr}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress("addr1").WithAttributes(addrAttr)}})
 
 	cc, err := Dial(r.Scheme()+":///", WithTransportCredentials(insecure.NewCredentials()), WithResolvers(r))
 	if err != nil {

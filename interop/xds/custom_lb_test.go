@@ -100,7 +100,7 @@ func (s) TestCustomLB(t *testing.T) {
 	defer mr.Close()
 	mr.InitialState(resolver.State{
 		Addresses: []resolver.Address{
-			{Addr: backend.Address},
+			resolver.NewAddress("").WithAddr(backend.Address),
 		},
 		ServiceConfig: sc,
 	})

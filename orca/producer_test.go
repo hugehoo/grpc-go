@@ -152,7 +152,7 @@ func (s) TestProducer(t *testing.T) {
 
 	lisOpts := orca.OOBListenerOptions{ReportInterval: 50 * time.Millisecond}
 	li := &listenerInfo{scChan: make(chan balancer.SubConn, 1), listener: oobLis, opts: lisOpts}
-	addr := setListenerInfo(resolver.Address{Addr: lis.Addr().String()}, li)
+	addr := setListenerInfo(resolver.NewAddress(lis.Addr().String()), li)
 	r.InitialState(resolver.State{Addresses: []resolver.Address{addr}})
 	dopts := []grpc.DialOption{
 		grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"customLB":{}}]}`),
@@ -329,7 +329,7 @@ func (s) TestProducerBackoff(t *testing.T) {
 
 	lisOpts := orca.OOBListenerOptions{ReportInterval: reportInterval}
 	li := &listenerInfo{scChan: make(chan balancer.SubConn, 1), listener: oobLis, opts: lisOpts}
-	r.InitialState(resolver.State{Addresses: []resolver.Address{setListenerInfo(resolver.Address{Addr: lis.Addr().String()}, li)}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{setListenerInfo(resolver.NewAddress(lis.Addr().String()), li)}})
 	dopts := []grpc.DialOption{
 		grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"customLB":{}}]}`),
 		grpc.WithResolvers(r),
@@ -447,7 +447,7 @@ func (s) TestProducerMultipleListeners(t *testing.T) {
 	oobLis1 := newTestOOBListener()
 	lisOpts1 := orca.OOBListenerOptions{ReportInterval: reportInterval1}
 	li := &listenerInfo{scChan: make(chan balancer.SubConn, 1), listener: oobLis1, opts: lisOpts1}
-	r.InitialState(resolver.State{Addresses: []resolver.Address{setListenerInfo(resolver.Address{Addr: lis.Addr().String()}, li)}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{setListenerInfo(resolver.NewAddress(lis.Addr().String()), li)}})
 	cc, err := grpc.NewClient("whatever:///whatever", grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"customLB":{}}]}`), grpc.WithResolvers(r), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		t.Fatalf("grpc.NewClient() failed: %v", err)

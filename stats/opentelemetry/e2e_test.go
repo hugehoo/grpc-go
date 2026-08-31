@@ -1927,7 +1927,7 @@ func (s) TestTraceSpan_WithRetriesAndNameResolutionDelay(t *testing.T) {
 
 			go func() {
 				<-resolutionWait.Done()
-				rb.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: ss.Address}}})
+				rb.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(ss.Address)}})
 			}()
 			if err := tt.doCall(ctx, client); err != nil {
 				t.Fatalf("%s call failed: %v", tt.name, err)
@@ -2177,7 +2177,7 @@ func (s) TestSubChannelMetrics_ConnectionLifecycle(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	r.InitialState(resolver.State{
 		ServiceConfig: sc,
-		Addresses:     []resolver.Address{{Addr: "bad address"}}},
+		Addresses:     []resolver.Address{resolver.NewAddress("bad address")}},
 	) // Will trigger connection failed.
 
 	grpcTarget := r.Scheme() + ":///"
@@ -2201,7 +2201,7 @@ func (s) TestSubChannelMetrics_ConnectionLifecycle(t *testing.T) {
 
 	r.UpdateState(resolver.State{
 		ServiceConfig: sc,
-		Addresses:     []resolver.Address{{Addr: ss.Address}},
+		Addresses:     []resolver.Address{resolver.NewAddress(ss.Address)},
 	}) // Will trigger successful connection metric.
 	if _, err := tsc.EmptyCall(ctx, &testpb.Empty{}, grpc.WaitForReady(true)); err != nil {
 		t.Fatalf("EmptyCall() failed: %v", err)
