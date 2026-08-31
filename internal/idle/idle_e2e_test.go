@@ -138,7 +138,7 @@ func (s) TestChannelIdleness_Disabled_NoActivity(t *testing.T) {
 	// Start a test backend and push an address update via the resolver.
 	backend := stubserver.StartTestService(t, nil)
 	defer backend.Stop()
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: backend.Address}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}})
 
 	// Verify that the ClientConn moves to READY.
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
@@ -186,7 +186,7 @@ func (s) TestChannelIdleness_Enabled_NoActivity(t *testing.T) {
 	lis := testutils.NewListenerWrapper(t, nil)
 	backend := stubserver.StartTestService(t, &stubserver.StubServer{Listener: lis})
 	defer backend.Stop()
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: backend.Address}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}})
 
 	// Verify that the ClientConn moves to READY.
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
@@ -290,7 +290,7 @@ func (s) TestChannelIdleness_Enabled_OngoingCall(t *testing.T) {
 
 			// Push an address update containing the address of the above
 			// backend via the manual resolver.
-			r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: backend.Address}}})
+			r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}})
 
 			// Verify that the ClientConn moves to READY.
 			ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
@@ -362,7 +362,7 @@ func (s) TestChannelIdleness_Enabled_ActiveSinceLastCheck(t *testing.T) {
 	// Start a test backend and push an address update via the resolver.
 	backend := stubserver.StartTestService(t, nil)
 	defer backend.Stop()
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: backend.Address}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}})
 
 	// Verify that the ClientConn moves to READY.
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
@@ -413,7 +413,7 @@ func (s) TestChannelIdleness_Enabled_ExitIdleOnRPC(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	backend := stubserver.StartTestService(t, nil)
 	defer backend.Stop()
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: backend.Address}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}})
 
 	// Create a ClientConn with a short idle_timeout.
 	dopts := []grpc.DialOption{
@@ -478,7 +478,7 @@ func (s) TestChannelIdleness_Enabled_IdleTimeoutRacesWithRPCs(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	backend := stubserver.StartTestService(t, nil)
 	defer backend.Stop()
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: backend.Address}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}})
 
 	// Create a ClientConn with a short idle_timeout.
 	dopts := []grpc.DialOption{
@@ -521,7 +521,7 @@ func (s) TestChannelIdleness_Connect(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	backend := stubserver.StartTestService(t, nil)
 	defer backend.Stop()
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: backend.Address}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}})
 
 	// Create a ClientConn with a short idle_timeout.
 	dopts := []grpc.DialOption{

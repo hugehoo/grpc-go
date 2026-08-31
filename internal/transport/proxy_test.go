@@ -74,7 +74,7 @@ func (s) TestHTTPConnectWithServerHello(t *testing.T) {
 	// Dial to proxy server.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	c, err := proxyDial(ctx, resolver.Address{Addr: pServer.Addr}, "test", proxyattributes.Options{ConnectAddr: blis.Addr().String()})
+	c, err := proxyDial(ctx, resolver.NewAddress(pServer.Addr), "test", proxyattributes.Options{ConnectAddr: blis.Addr().String()})
 	if err != nil {
 		t.Fatalf("HTTP connect Dial failed: %v", err)
 	}

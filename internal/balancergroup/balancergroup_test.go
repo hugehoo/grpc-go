@@ -55,7 +55,7 @@ const testBackendAddrsCount = 12
 
 func init() {
 	for i := 0; i < testBackendAddrsCount; i++ {
-		addr := resolver.Address{Addr: fmt.Sprintf("%d.%d.%d.%d:%d", i, i, i, i, i)}
+		addr := resolver.NewAddress(fmt.Sprintf("%d.%d.%d.%d:%d", i, i, i, i, i))
 		testBackendAddrs = append(testBackendAddrs, addr)
 		testBackendEndpoints = append(testBackendEndpoints, resolver.Endpoint{Addresses: []resolver.Address{addr}})
 	}

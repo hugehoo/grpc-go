@@ -47,29 +47,23 @@ func (s) TestGet(t *testing.T) {
 	}{
 		{
 			name: "connect_address_in_attribute",
-			addr: resolver.Address{
-				Addr: "test-address",
-				Attributes: attributes.New(proxyOptionsKey, Options{
-					ConnectAddr: "proxy-address",
-				}),
-			},
+			addr: resolver.NewAddress("test-address").WithAttributes(attributes.New(proxyOptionsKey, Options{
+				ConnectAddr: "proxy-address",
+			})),
 			wantConnectAddr: "proxy-address",
 			wantAttrPresent: true,
 		},
 		{
 			name: "user_in_attribute",
-			addr: resolver.Address{
-				Addr: "test-address",
-				Attributes: attributes.New(proxyOptionsKey, Options{
-					User: user,
-				}),
-			},
+			addr: resolver.NewAddress("test-address").WithAttributes(attributes.New(proxyOptionsKey, Options{
+				User: user,
+			})),
 			wantUser:        user,
 			wantAttrPresent: true,
 		},
 		{
 			name:            "no_attribute",
-			addr:            resolver.Address{Addr: "test-address"},
+			addr:            resolver.NewAddress("test-address"),
 			wantAttrPresent: false,
 		},
 	}
@@ -95,7 +89,7 @@ func (s) TestGet(t *testing.T) {
 // Tests that Set returns a copy of addr with attributes containing correct
 // user and connect address.
 func (s) TestSet(t *testing.T) {
-	addr := resolver.Address{Addr: "test-address"}
+	addr := resolver.NewAddress("test-address")
 	pOpts := Options{
 		User:        url.UserPassword("username", "password"),
 		ConnectAddr: "proxy-address",
