@@ -115,7 +115,7 @@ func hashKey(endpoint resolver.Endpoint) string {
 	}
 	// If no hash key is set, use the endpoint's first address as the hash key.
 	// This is the default behavior when no hash key is set.
-	return endpoint.Addresses[0].Addr
+	return endpoint.Addresses[0].Addr()
 }
 
 // UpdateState intercepts child balancer state updates. It updates the

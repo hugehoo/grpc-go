@@ -53,7 +53,7 @@ type hostnameKey struct{}
 // SetAddressHostname returns a copy of addr in which the Attributes field is
 // updated with the provided hostname.
 func SetAddressHostname(addr resolver.Address, hostname string) resolver.Address {
-	addr.Attributes = addr.Attributes.WithValue(hostnameKey{}, hostname)
+	addr = addr.WithAttributes(addr.Attributes().WithValue(hostnameKey{}, hostname))
 	return addr
 }
 
@@ -70,7 +70,7 @@ func Hostname(attr *attributes.Attributes) string {
 // SetHandshakeInfo returns a copy of addr in which the Attributes field is
 // updated with hiPtr.
 func SetHandshakeInfo(addr resolver.Address, hiPtr *atomic.Pointer[grpcsync.RefCounted[*HandshakeInfo]]) resolver.Address {
-	addr.Attributes = addr.Attributes.WithValue(handshakeAttrKey{}, hiPtr)
+	addr = addr.WithAttributes(addr.Attributes().WithValue(handshakeAttrKey{}, hiPtr))
 	return addr
 }
 

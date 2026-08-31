@@ -110,7 +110,7 @@ func (s) TestClusterPicks(t *testing.T) {
 		addrs := <-cc.NewSubConnAddrsCh
 		sc := <-cc.NewSubConnCh
 		// Clear the attributes before adding to map.
-		addrs[0].BalancerAttributes = nil
+		addrs[0] = addrs[0].WithBalancerAttributes(nil)
 		m1[addrs[0]] = sc
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Connecting})
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Ready})
@@ -187,7 +187,7 @@ func (s) TestConfigUpdateAddCluster(t *testing.T) {
 		addrs := <-cc.NewSubConnAddrsCh
 		sc := <-cc.NewSubConnCh
 		// Clear the attributes before adding to map.
-		addrs[0].BalancerAttributes = nil
+		addrs[0] = addrs[0].WithBalancerAttributes(nil)
 		m1[addrs[0]] = sc
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Connecting})
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Ready})
@@ -252,7 +252,7 @@ func (s) TestConfigUpdateAddCluster(t *testing.T) {
 	addrs := <-cc.NewSubConnAddrsCh
 	sc := <-cc.NewSubConnCh
 	// Clear the attributes before adding to map.
-	addrs[0].BalancerAttributes = nil
+	addrs[0] = addrs[0].WithBalancerAttributes(nil)
 	m1[addrs[0]] = sc
 	sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Connecting})
 	sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Ready})
@@ -341,7 +341,7 @@ func (s) TestRoutingConfigUpdateDeleteAll(t *testing.T) {
 		addrs := <-cc.NewSubConnAddrsCh
 		sc := <-cc.NewSubConnCh
 		// Clear the attributes before adding to map.
-		addrs[0].BalancerAttributes = nil
+		addrs[0] = addrs[0].WithBalancerAttributes(nil)
 		m1[addrs[0]] = sc
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Connecting})
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Ready})
@@ -424,7 +424,7 @@ func (s) TestRoutingConfigUpdateDeleteAll(t *testing.T) {
 		addrs := <-cc.NewSubConnAddrsCh
 		sc := <-cc.NewSubConnCh
 		// Clear the attributes before adding to map.
-		addrs[0].BalancerAttributes = nil
+		addrs[0] = addrs[0].WithBalancerAttributes(nil)
 		m2[addrs[0]] = sc
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Connecting})
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Ready})

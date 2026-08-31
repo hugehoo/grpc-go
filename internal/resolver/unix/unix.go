@@ -51,7 +51,7 @@ func (b *builder) Build(target resolver.Target, cc resolver.ClientConn, _ resolv
 	if b.scheme == unixAbstractScheme {
 		// We can not prepend \0 as c++ gRPC does, as in Golang '@' is used to signify we do
 		// not want trailing \0 in address.
-		addr.Addr = "@" + addr.Addr
+		addr = addr.WithAddr("@" + addr.Addr())
 	}
 	cc.UpdateState(resolver.State{Addresses: []resolver.Address{networktype.Set(addr, "unix")}})
 	return &nopResolver{}, nil

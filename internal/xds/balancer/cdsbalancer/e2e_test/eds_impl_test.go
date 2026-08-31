@@ -693,8 +693,8 @@ func (s) TestEDS_ClusterResourceUpdates(t *testing.T) {
 	if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer)); err != nil {
 		t.Fatalf("EmptyCall() failed: %v", err)
 	}
-	if peer.Addr.String() != addrs[0].Addr {
-		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr)
+	if peer.Addr.String() != addrs[0].Addr() {
+		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr())
 	}
 
 	// Ensure EDS watch is registered for eds_service_name.
@@ -728,12 +728,12 @@ func (s) TestEDS_ClusterResourceUpdates(t *testing.T) {
 		if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer)); err != nil {
 			continue
 		}
-		if peer.Addr.String() == addrs[1].Addr {
+		if peer.Addr.String() == addrs[1].Addr() {
 			break
 		}
 	}
 	if ctx.Err() != nil {
-		t.Fatalf("Timeout when waiting for EmptyCall() to be routed to correct backend %q", addrs[1].Addr)
+		t.Fatalf("Timeout when waiting for EmptyCall() to be routed to correct backend %q", addrs[1].Addr())
 	}
 
 	// Change cluster resource circuit breaking count.
@@ -755,8 +755,8 @@ func (s) TestEDS_ClusterResourceUpdates(t *testing.T) {
 		if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer)); err != nil {
 			t.Fatalf("EmptyCall() failed: %v", err)
 		}
-		if peer.Addr.String() != addrs[1].Addr {
-			t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[1].Addr)
+		if peer.Addr.String() != addrs[1].Addr() {
+			t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[1].Addr())
 		}
 	}
 }
@@ -1094,7 +1094,7 @@ func (s) TestEDS_EndpointWithMultipleAddresses(t *testing.T) {
 
 			gotEndpointPorts := []uint32{}
 			for _, a := range gotState.Endpoints[0].Addresses {
-				gotEndpointPorts = append(gotEndpointPorts, testutils.ParsePort(t, a.Addr))
+				gotEndpointPorts = append(gotEndpointPorts, testutils.ParsePort(t, a.Addr()))
 			}
 			if diff := cmp.Diff(gotEndpointPorts, tc.wantEndpointPorts); diff != "" {
 				t.Errorf("Unexpected endpoint address ports in resolver update, diff (-got +want): %v", diff)

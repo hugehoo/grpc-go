@@ -256,7 +256,7 @@ func skipProxy(address resolver.Address) bool {
 	// Avoid proxy when network is not tcp.
 	networkType, ok := networktype.Get(address)
 	if !ok {
-		networkType, _ = transport.ParseDialTarget(address.Addr)
+		networkType, _ = transport.ParseDialTarget(address.Addr())
 	}
 	if networkType != "tcp" {
 		return true
@@ -264,7 +264,7 @@ func skipProxy(address resolver.Address) bool {
 
 	req := &http.Request{URL: &url.URL{
 		Scheme: "https",
-		Host:   address.Addr,
+		Host:   address.Addr(),
 	}}
 	// Avoid proxy when address included in `NO_PROXY` environment variable or
 	// fails to get the proxy address.
@@ -311,7 +311,7 @@ func (r *delegatingResolver) updateClientConnStateLocked() error {
 		}
 		addresses = append(addresses, proxyattributes.Set(proxyAddr, proxyattributes.Options{
 			User:        r.proxyURL.User,
-			ConnectAddr: targetAddr.Addr,
+			ConnectAddr: targetAddr.Addr(),
 		}))
 	}
 
@@ -330,7 +330,7 @@ func (r *delegatingResolver) updateClientConnStateLocked() error {
 			for _, proxyAddr := range r.proxyAddrs {
 				addrs = append(addrs, proxyattributes.Set(proxyAddr, proxyattributes.Options{
 					User:        r.proxyURL.User,
-					ConnectAddr: targetAddr.Addr,
+					ConnectAddr: targetAddr.Addr(),
 				}))
 			}
 		}

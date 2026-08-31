@@ -33,7 +33,7 @@ func (s) TestIsDirectPathCluster(t *testing.T) {
 	defer cancel()
 	c := func(cluster string) context.Context {
 		return icredentials.NewClientHandshakeInfoContext(ctx, credentials.ClientHandshakeInfo{
-			Attributes: xds.SetXDSHandshakeClusterName(resolver.Address{}, cluster).Attributes,
+			Attributes: xds.SetXDSHandshakeClusterName(resolver.Address{}, cluster).Attributes(),
 		})
 	}
 

@@ -39,7 +39,7 @@ type Options struct {
 
 // Set returns a copy of addr with opts set in its attributes.
 func Set(addr resolver.Address, opts Options) resolver.Address {
-	addr.Attributes = addr.Attributes.WithValue(proxyOptionsKey, opts)
+	addr = addr.WithAttributes(addr.Attributes().WithValue(proxyOptionsKey, opts))
 	return addr
 }
 
@@ -47,7 +47,7 @@ func Set(addr resolver.Address, opts Options) resolver.Address {
 // value representing if the attribute is present or not. The returned data
 // should not be mutated.
 func Get(addr resolver.Address) (Options, bool) {
-	if a := addr.Attributes.Value(proxyOptionsKey); a != nil {
+	if a := addr.Attributes().Value(proxyOptionsKey); a != nil {
 		return a.(Options), true
 	}
 	return Options{}, false

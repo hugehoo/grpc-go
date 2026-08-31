@@ -100,7 +100,7 @@ func doHTTPConnectHandshake(ctx context.Context, conn net.Conn, grpcUA string, o
 
 // proxyDial establishes a TCP connection to the specified address and performs an HTTP CONNECT handshake.
 func proxyDial(ctx context.Context, addr resolver.Address, grpcUA string, opts proxyattributes.Options) (net.Conn, error) {
-	conn, err := internal.NetDialerWithTCPKeepalive().DialContext(ctx, "tcp", addr.Addr)
+	conn, err := internal.NetDialerWithTCPKeepalive().DialContext(ctx, "tcp", addr.Addr())
 	if err != nil {
 		return nil, err
 	}

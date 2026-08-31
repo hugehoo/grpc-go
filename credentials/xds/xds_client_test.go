@@ -237,7 +237,7 @@ func newTestContextWithHandshakeInfo(parent context.Context, root, identity cert
 	// Moving the attributes from the resolver.Address to the context passed to
 	// the handshaker is done in the transport layer. Since we directly call the
 	// handshaker in these tests, we need to do the same here.
-	return icredentials.NewClientHandshakeInfoContext(parent, credentials.ClientHandshakeInfo{Attributes: addr.Attributes})
+	return icredentials.NewClientHandshakeInfoContext(parent, credentials.ClientHandshakeInfo{Attributes: addr.Attributes()})
 }
 
 // compareAuthInfo compares the AuthInfo received on the client side after a
@@ -626,7 +626,7 @@ func (s) TestClientCredsProviderSwitch(t *testing.T) {
 	var hiPtr atomic.Pointer[grpcsync.RefCounted[*xdsinternal.HandshakeInfo]]
 	hiPtr.Store(handshakeInfo)
 	addr := xdsinternal.SetHandshakeInfo(resolver.Address{}, &hiPtr)
-	ctx = icredentials.NewClientHandshakeInfoContext(ctx, credentials.ClientHandshakeInfo{Attributes: addr.Attributes})
+	ctx = icredentials.NewClientHandshakeInfoContext(ctx, credentials.ClientHandshakeInfo{Attributes: addr.Attributes()})
 	if _, _, err := creds.ClientHandshake(ctx, authority, conn); err == nil {
 		t.Fatal("ClientHandshake() succeeded when expected to fail")
 	}

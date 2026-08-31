@@ -159,7 +159,7 @@ type http2Client struct {
 }
 
 func dial(ctx context.Context, fn func(context.Context, string) (net.Conn, error), addr resolver.Address, grpcUA string) (net.Conn, error) {
-	address := addr.Addr
+	address := addr.Addr()
 	networkType, ok := networktype.Get(addr)
 	if fn != nil {
 		// Special handling for unix scheme with custom dialer. Back in the day,
@@ -220,7 +220,7 @@ func NewHTTP2Client(connectCtx, ctx context.Context, addr resolver.Address, opts
 	// Attributes field of resolver.Address, which is shoved into connectCtx
 	// and passed to the dialer and credential handshaker. This makes it possible for
 	// address specific arbitrary data to reach custom dialers and credential handshakers.
-	connectCtx = icredentials.NewClientHandshakeInfoContext(connectCtx, credentials.ClientHandshakeInfo{Attributes: addr.Attributes})
+	connectCtx = icredentials.NewClientHandshakeInfoContext(connectCtx, credentials.ClientHandshakeInfo{Attributes: addr.Attributes()})
 
 	conn, err := dial(connectCtx, opts.Dialer, addr, opts.UserAgent)
 	if err != nil {
@@ -292,7 +292,7 @@ func NewHTTP2Client(connectCtx, ctx context.Context, addr resolver.Address, opts
 		}
 	}
 	if transportCreds != nil {
-		conn, authInfo, err = transportCreds.ClientHandshake(connectCtx, addr.ServerName, conn)
+		conn, authInfo, err = transportCreds.ClientHandshake(connectCtx, addr.ServerName(), conn)
 		if err != nil {
 			return nil, connectionErrorf(isTemporary(err), err, "transport: authentication handshake failed: %v", err)
 		}
@@ -381,7 +381,7 @@ func NewHTTP2Client(connectCtx, ctx context.Context, addr resolver.Address, opts
 	// Add peer information to the http2client context.
 	t.ctx = peer.NewContext(t.ctx, t.Peer())
 
-	if md, ok := addr.Metadata.(*metadata.MD); ok {
+	if md, ok := addr.Metadata().(*metadata.MD); ok {
 		t.md = *md
 	} else if md := imetadata.Get(addr); md != nil {
 		t.md = md
@@ -783,9 +783,9 @@ func (t *http2Client) NewStream(ctx context.Context, callHdr *CallHdr, handler s
 	// the ServerName field takes precedence for server authentication during
 	// TLS handshake, and the :authority header should match the value used
 	// for server authentication.
-	if t.address.ServerName != "" {
+	if t.address.ServerName() != "" {
 		newCallHdr := *callHdr
-		newCallHdr.Host = t.address.ServerName
+		newCallHdr.Host = t.address.ServerName()
 		callHdr = &newCallHdr
 	}
 

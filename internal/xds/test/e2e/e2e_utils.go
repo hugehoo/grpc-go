@@ -56,8 +56,8 @@ func getHash(e resolver.Endpoint) uint64 {
 	// We iterate through all addresses to ensure the hash represents
 	// the full endpoint identity.
 	for _, addr := range e.Addresses {
-		h.Write([]byte(addr.Addr))
-		h.Write([]byte(addr.ServerName))
+		h.Write([]byte(addr.Addr()))
+		h.Write([]byte(addr.ServerName()))
 	}
 
 	return h.Sum64()

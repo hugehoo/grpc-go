@@ -214,8 +214,8 @@ func (ccr *ccResolverWrapper) addChannelzTraceEvent(s resolver.State) {
 func addressesToEndpoints(addrs []resolver.Address) []resolver.Endpoint {
 	endpoints := make([]resolver.Endpoint, 0, len(addrs))
 	for _, a := range addrs {
-		ep := resolver.Endpoint{Addresses: []resolver.Address{a}, Attributes: a.BalancerAttributes}
-		ep.Addresses[0].BalancerAttributes = nil
+		ep := resolver.Endpoint{Addresses: []resolver.Address{a}, Attributes: a.BalancerAttributes()}
+		ep.Addresses[0] = ep.Addresses[0].WithBalancerAttributes(nil)
 		endpoints = append(endpoints, ep)
 	}
 	return endpoints

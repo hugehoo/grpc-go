@@ -36,7 +36,7 @@ type handshakeClusterNameKey struct{}
 // SetXDSHandshakeClusterName returns a copy of addr in which the Attributes field
 // is updated with the cluster name.
 func SetXDSHandshakeClusterName(addr resolver.Address, clusterName string) resolver.Address {
-	addr.Attributes = addr.Attributes.WithValue(handshakeClusterNameKey{}, clusterName)
+	addr = addr.WithAttributes(addr.Attributes().WithValue(handshakeClusterNameKey{}, clusterName))
 	return addr
 }
 
@@ -50,7 +50,7 @@ func GetXDSHandshakeClusterName(attr *attributes.Attributes) (string, bool) {
 // addressToTelemetryLabels prepares a telemetry label map from resolver
 // address attributes.
 func addressToTelemetryLabels(addr resolver.Address) map[string]string {
-	cluster, _ := GetXDSHandshakeClusterName(addr.Attributes)
+	cluster, _ := GetXDSHandshakeClusterName(addr.Attributes())
 	locality := LocalityString(GetLocalityID(addr))
 	return map[string]string{
 		"grpc.lb.locality":        locality,
@@ -89,13 +89,13 @@ const localityKey = localityKeyType("grpc.xds.internal.address.locality")
 
 // GetLocalityID returns the locality ID of addr.
 func GetLocalityID(addr resolver.Address) clients.Locality {
-	path, _ := addr.BalancerAttributes.Value(localityKey).(clients.Locality)
+	path, _ := addr.BalancerAttributes().Value(localityKey).(clients.Locality)
 	return path
 }
 
 // SetLocalityID sets locality ID in addr to l.
 func SetLocalityID(addr resolver.Address, l clients.Locality) resolver.Address {
-	addr.BalancerAttributes = addr.BalancerAttributes.WithValue(localityKey, l)
+	addr = addr.WithBalancerAttributes(addr.BalancerAttributes().WithValue(localityKey, l))
 	return addr
 }
 

@@ -75,16 +75,16 @@ func TestBaseBalancerReserveAttributes(t *testing.T) {
 	v := func(info PickerBuildInfo) {
 		defer func() { validated <- struct{}{} }()
 		for _, sc := range info.ReadySCs {
-			if sc.Address.Addr == "1.1.1.1" {
-				if sc.Address.Attributes == nil {
+			if sc.Address.Addr() == "1.1.1.1" {
+				if sc.Address.Attributes() == nil {
 					t.Errorf("in picker.validate, got address %+v with nil attributes, want not nil", sc.Address)
 				}
-				foo, ok := sc.Address.Attributes.Value("foo").(string)
+				foo, ok := sc.Address.Attributes().Value("foo").(string)
 				if !ok || foo != "2233niang" {
-					t.Errorf("in picker.validate, got address[1.1.1.1] with invalid attributes value %v, want 2233niang", sc.Address.Attributes.Value("foo"))
+					t.Errorf("in picker.validate, got address[1.1.1.1] with invalid attributes value %v, want 2233niang", sc.Address.Attributes().Value("foo"))
 				}
-			} else if sc.Address.Addr == "2.2.2.2" {
-				if sc.Address.Attributes != nil {
+			} else if sc.Address.Addr() == "2.2.2.2" {
+				if sc.Address.Attributes() != nil {
 					t.Error("in b.subConns, got address[2.2.2.2] with not nil attributes, want nil")
 				}
 			}

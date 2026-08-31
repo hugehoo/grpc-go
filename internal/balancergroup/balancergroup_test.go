@@ -100,7 +100,7 @@ func (s) TestBalancerGroup_start_close(t *testing.T) {
 	for i := 0; i < 4; i++ {
 		addrs := <-cc.NewSubConnAddrsCh
 		sc := <-cc.NewSubConnCh
-		m1[addrs[0].Addr] = sc
+		m1[addrs[0].Addr()] = sc
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Connecting})
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Ready})
 	}
@@ -108,9 +108,9 @@ func (s) TestBalancerGroup_start_close(t *testing.T) {
 	// Test roundrobin on the last picker.
 	p1 := <-cc.NewPickerCh
 	want := []balancer.SubConn{
-		m1[testBackendAddrs[0].Addr], m1[testBackendAddrs[0].Addr],
-		m1[testBackendAddrs[1].Addr], m1[testBackendAddrs[1].Addr],
-		m1[testBackendAddrs[2].Addr], m1[testBackendAddrs[3].Addr],
+		m1[testBackendAddrs[0].Addr()], m1[testBackendAddrs[0].Addr()],
+		m1[testBackendAddrs[1].Addr()], m1[testBackendAddrs[1].Addr()],
+		m1[testBackendAddrs[2].Addr()], m1[testBackendAddrs[3].Addr()],
 	}
 	if err := testutils.IsRoundRobin(want, testutils.SubConnFromPicker(p1)); err != nil {
 		t.Fatalf("want %v, got %v", want, err)
@@ -191,7 +191,7 @@ func initBalancerGroupForCachingTest(t *testing.T, idleCacheTimeout time.Duratio
 	for i := 0; i < 4; i++ {
 		addrs := <-cc.NewSubConnAddrsCh
 		sc := <-cc.NewSubConnCh
-		m1[addrs[0].Addr] = sc
+		m1[addrs[0].Addr()] = sc
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Connecting})
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Ready})
 	}
@@ -199,9 +199,9 @@ func initBalancerGroupForCachingTest(t *testing.T, idleCacheTimeout time.Duratio
 	// Test roundrobin on the last picker.
 	p1 := <-cc.NewPickerCh
 	want := []balancer.SubConn{
-		m1[testBackendAddrs[0].Addr], m1[testBackendAddrs[0].Addr],
-		m1[testBackendAddrs[1].Addr], m1[testBackendAddrs[1].Addr],
-		m1[testBackendAddrs[2].Addr], m1[testBackendAddrs[3].Addr],
+		m1[testBackendAddrs[0].Addr()], m1[testBackendAddrs[0].Addr()],
+		m1[testBackendAddrs[1].Addr()], m1[testBackendAddrs[1].Addr()],
+		m1[testBackendAddrs[2].Addr()], m1[testBackendAddrs[3].Addr()],
 	}
 	if err := testutils.IsRoundRobin(want, testutils.SubConnFromPicker(p1)); err != nil {
 		t.Fatalf("want %v, got %v", want, err)
@@ -222,7 +222,7 @@ func initBalancerGroupForCachingTest(t *testing.T, idleCacheTimeout time.Duratio
 	// Test roundrobin on the with only sub-balancer0.
 	p2 := <-cc.NewPickerCh
 	want = []balancer.SubConn{
-		m1[testBackendAddrs[0].Addr], m1[testBackendAddrs[1].Addr],
+		m1[testBackendAddrs[0].Addr()], m1[testBackendAddrs[1].Addr()],
 	}
 	if err := testutils.IsRoundRobin(want, testutils.SubConnFromPicker(p2)); err != nil {
 		t.Fatalf("want %v, got %v", want, err)
@@ -238,7 +238,7 @@ func (s) TestBalancerGroup_locality_caching(t *testing.T) {
 
 	// Turn down subconn for addr2, shouldn't get picker update because
 	// sub-balancer1 was removed.
-	addrToSC[testBackendAddrs[2].Addr].UpdateState(balancer.SubConnState{
+	addrToSC[testBackendAddrs[2].Addr()].UpdateState(balancer.SubConnState{
 		ConnectivityState: connectivity.TransientFailure,
 		ConnectionError:   errors.New("test error"),
 	})
@@ -259,10 +259,10 @@ func (s) TestBalancerGroup_locality_caching(t *testing.T) {
 
 	p3 := <-cc.NewPickerCh
 	want := []balancer.SubConn{
-		addrToSC[testBackendAddrs[0].Addr], addrToSC[testBackendAddrs[0].Addr],
-		addrToSC[testBackendAddrs[1].Addr], addrToSC[testBackendAddrs[1].Addr],
+		addrToSC[testBackendAddrs[0].Addr()], addrToSC[testBackendAddrs[0].Addr()],
+		addrToSC[testBackendAddrs[1].Addr()], addrToSC[testBackendAddrs[1].Addr()],
 		// addr2 is down, b2 only has addr3 in READY state.
-		addrToSC[testBackendAddrs[3].Addr], addrToSC[testBackendAddrs[3].Addr],
+		addrToSC[testBackendAddrs[3].Addr()], addrToSC[testBackendAddrs[3].Addr()],
 	}
 	if err := testutils.IsRoundRobin(want, testutils.SubConnFromPicker(p3)); err != nil {
 		t.Fatalf("want %v, got %v", want, err)
@@ -288,10 +288,10 @@ func (s) TestBalancerGroup_locality_caching_close_group(t *testing.T) {
 	// The balancer group is closed. The subconns should be shutdown immediately.
 	shutdownTimeout := time.After(time.Millisecond * 500)
 	scToShutdown := map[balancer.SubConn]int{
-		addrToSC[testBackendAddrs[0].Addr]: 1,
-		addrToSC[testBackendAddrs[1].Addr]: 1,
-		addrToSC[testBackendAddrs[2].Addr]: 1,
-		addrToSC[testBackendAddrs[3].Addr]: 1,
+		addrToSC[testBackendAddrs[0].Addr()]: 1,
+		addrToSC[testBackendAddrs[1].Addr()]: 1,
+		addrToSC[testBackendAddrs[2].Addr()]: 1,
+		addrToSC[testBackendAddrs[3].Addr()]: 1,
 	}
 	for i := 0; i < len(scToShutdown); i++ {
 		select {
@@ -317,8 +317,8 @@ func (s) TestBalancerGroup_locality_caching_not_read_within_timeout(t *testing.T
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()
 	scToShutdown := map[balancer.SubConn]int{
-		addrToSC[testBackendAddrs[2].Addr]: 1,
-		addrToSC[testBackendAddrs[3].Addr]: 1,
+		addrToSC[testBackendAddrs[2].Addr()]: 1,
+		addrToSC[testBackendAddrs[3].Addr()]: 1,
 	}
 	for i := 0; i < len(scToShutdown); i++ {
 		select {
@@ -363,8 +363,8 @@ func (s) TestBalancerGroup_locality_caching_read_with_different_builder(t *testi
 	// shut down immediately.
 	shutdownTimeout := time.After(time.Millisecond * 500)
 	scToShutdown := map[balancer.SubConn]int{
-		addrToSC[testBackendAddrs[2].Addr]: 1,
-		addrToSC[testBackendAddrs[3].Addr]: 1,
+		addrToSC[testBackendAddrs[2].Addr()]: 1,
+		addrToSC[testBackendAddrs[3].Addr()]: 1,
 	}
 	for i := 0; i < len(scToShutdown); i++ {
 		select {
@@ -383,19 +383,19 @@ func (s) TestBalancerGroup_locality_caching_read_with_different_builder(t *testi
 
 	newSCTimeout := time.After(time.Millisecond * 500)
 	scToAdd := map[string]int{
-		testBackendAddrs[4].Addr: 1,
-		testBackendAddrs[5].Addr: 1,
+		testBackendAddrs[4].Addr(): 1,
+		testBackendAddrs[5].Addr(): 1,
 	}
 	for i := 0; i < len(scToAdd); i++ {
 		select {
 		case addr := <-cc.NewSubConnAddrsCh:
-			c := scToAdd[addr[0].Addr]
+			c := scToAdd[addr[0].Addr()]
 			if c == 0 {
 				t.Fatalf("Got newSubConn for %v when there's %d new expected", addr, c)
 			}
-			scToAdd[addr[0].Addr] = c - 1
+			scToAdd[addr[0].Addr()] = c - 1
 			sc := <-cc.NewSubConnCh
-			addrToSC[addr[0].Addr] = sc
+			addrToSC[addr[0].Addr()] = sc
 			sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Connecting})
 			sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Ready})
 		case <-newSCTimeout:
@@ -406,9 +406,9 @@ func (s) TestBalancerGroup_locality_caching_read_with_different_builder(t *testi
 	// Test roundrobin on the new picker.
 	p3 := <-cc.NewPickerCh
 	want := []balancer.SubConn{
-		addrToSC[testBackendAddrs[0].Addr], addrToSC[testBackendAddrs[0].Addr],
-		addrToSC[testBackendAddrs[1].Addr], addrToSC[testBackendAddrs[1].Addr],
-		addrToSC[testBackendAddrs[4].Addr], addrToSC[testBackendAddrs[5].Addr],
+		addrToSC[testBackendAddrs[0].Addr()], addrToSC[testBackendAddrs[0].Addr()],
+		addrToSC[testBackendAddrs[1].Addr()], addrToSC[testBackendAddrs[1].Addr()],
+		addrToSC[testBackendAddrs[4].Addr()], addrToSC[testBackendAddrs[5].Addr()],
 	}
 	if err := testutils.IsRoundRobin(want, testutils.SubConnFromPicker(p3)); err != nil {
 		t.Fatalf("want %v, got %v", want, err)
@@ -660,7 +660,7 @@ func (s) TestBalancerGracefulSwitch(t *testing.T) {
 	for i := 0; i < 2; i++ {
 		addrs := <-cc.NewSubConnAddrsCh
 		sc := <-cc.NewSubConnCh
-		m1[addrs[0].Addr] = sc
+		m1[addrs[0].Addr()] = sc
 		scs[sc] = true
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Connecting})
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Ready})
@@ -668,7 +668,7 @@ func (s) TestBalancerGracefulSwitch(t *testing.T) {
 
 	p1 := <-cc.NewPickerCh
 	want := []balancer.SubConn{
-		m1[testBackendAddrs[0].Addr], m1[testBackendAddrs[1].Addr],
+		m1[testBackendAddrs[0].Addr()], m1[testBackendAddrs[1].Addr()],
 	}
 	if err := testutils.IsRoundRobin(want, testutils.SubConnFromPicker(p1)); err != nil {
 		t.Fatal(err)
@@ -704,10 +704,10 @@ func (s) TestBalancerGracefulSwitch(t *testing.T) {
 	}
 
 	addrs := <-cc.NewSubConnAddrsCh
-	if addrs[0].Addr != testBackendAddrs[3].Addr {
+	if addrs[0].Addr() != testBackendAddrs[3].Addr() {
 		// Verifies forwarded to new created balancer, as the wrapped pick first
 		// balancer will delete first address.
-		t.Fatalf("newSubConn called with wrong address, want: %v, got : %v", testBackendAddrs[3].Addr, addrs[0].Addr)
+		t.Fatalf("newSubConn called with wrong address, want: %v, got : %v", testBackendAddrs[3].Addr(), addrs[0].Addr())
 	}
 	sc := <-cc.NewSubConnCh
 

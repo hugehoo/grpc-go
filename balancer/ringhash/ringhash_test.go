@@ -158,7 +158,7 @@ func (s) TestOneEndpoint(t *testing.T) {
 		t.Fatalf("Timed out waiting for SubConn creation.")
 	case sc0 = <-cc.NewSubConnCh:
 	}
-	if got, want := sc0.Addresses[0].Addr, wantAddr1.Addr; got != want {
+	if got, want := sc0.Addresses[0].Addr(), wantAddr1.Addr(); got != want {
 		t.Fatalf("SubConn.Addresses = %v, want = %v", got, want)
 	}
 	select {
@@ -221,7 +221,7 @@ func (s) TestThreeSubConnsAffinity(t *testing.T) {
 		t.Fatalf("Timed out waiting for SubConn creation.")
 	case subConns[1] = <-cc.NewSubConnCh:
 	}
-	if got, want := subConns[1].Addresses[0].Addr, ring.items[1].hashKey; got != want {
+	if got, want := subConns[1].Addresses[0].Addr(), ring.items[1].hashKey; got != want {
 		t.Fatalf("SubConn.Address = %v, want = %v", got, want)
 	}
 	select {
@@ -243,7 +243,7 @@ func (s) TestThreeSubConnsAffinity(t *testing.T) {
 		t.Fatalf("Timed out waiting for SubConn creation.")
 	case sc = <-cc.NewSubConnCh:
 	}
-	scAddr := sc.Addresses[0].Addr
+	scAddr := sc.Addresses[0].Addr()
 	if _, ok := remainingAddrs[scAddr]; !ok {
 		t.Fatalf("New SubConn created with previously used address: %q", scAddr)
 	}
@@ -268,7 +268,7 @@ func (s) TestThreeSubConnsAffinity(t *testing.T) {
 		t.Fatalf("Timed out waiting for SubConn creation.")
 	case sc = <-cc.NewSubConnCh:
 	}
-	scAddr = sc.Addresses[0].Addr
+	scAddr = sc.Addresses[0].Addr()
 	if _, ok := remainingAddrs[scAddr]; !ok {
 		t.Fatalf("New SubConn created with previously used address: %q", scAddr)
 	}
@@ -361,7 +361,7 @@ func (s) TestThreeBackendsAffinityMultiple(t *testing.T) {
 		t.Fatalf("Timed out waiting for SubConn creation.")
 	case sc0 = <-cc.NewSubConnCh:
 	}
-	if got, want := sc0.Addresses[0].Addr, ring0.items[1].hashKey; got != want {
+	if got, want := sc0.Addresses[0].Addr(), ring0.items[1].hashKey; got != want {
 		t.Fatalf("SubConn.Address = %v, want = %v", got, want)
 	}
 	select {
@@ -398,7 +398,7 @@ func (s) TestThreeBackendsAffinityMultiple(t *testing.T) {
 		t.Fatalf("Timed out waiting for SubConn creation.")
 	case sc1 = <-cc.NewSubConnCh:
 	}
-	if got, want := sc1.Addresses[0].Addr, ring0.items[2].hashKey; got != want {
+	if got, want := sc1.Addresses[0].Addr(), ring0.items[2].hashKey; got != want {
 		t.Fatalf("SubConn.Address = %v, want = %v", got, want)
 	}
 	select {
@@ -686,7 +686,7 @@ type testAttribute struct {
 }
 
 func setTestAttrAddr(addr resolver.Address, content string) resolver.Address {
-	addr.BalancerAttributes = addr.BalancerAttributes.WithValue(testKey, testAttribute{content})
+	addr = addr.WithBalancerAttributes(addr.BalancerAttributes().WithValue(testKey, testAttribute{content}))
 	return addr
 }
 

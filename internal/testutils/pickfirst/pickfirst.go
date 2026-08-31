@@ -50,7 +50,7 @@ func CheckRPCsToBackend(ctx context.Context, cc *grpc.ClientConn, wantAddr resol
 	for {
 		time.Sleep(time.Millisecond)
 		if ctx.Err() != nil {
-			return fmt.Errorf("timeout waiting for RPC to be routed to %s", wantAddr.Addr)
+			return fmt.Errorf("timeout waiting for RPC to be routed to %s", wantAddr.Addr())
 		}
 		if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer)); err != nil {
 			// Some tests remove backends and check if pick_first is happening across
@@ -60,7 +60,7 @@ func CheckRPCsToBackend(ctx context.Context, cc *grpc.ClientConn, wantAddr resol
 			// removed.
 			continue
 		}
-		if peer.Addr.String() != wantAddr.Addr {
+		if peer.Addr.String() != wantAddr.Addr() {
 			count = 0
 			continue
 		}
@@ -74,7 +74,7 @@ func CheckRPCsToBackend(ctx context.Context, cc *grpc.ClientConn, wantAddr resol
 		if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer)); err != nil {
 			return fmt.Errorf("EmptyCall() = %v, want <nil>", err)
 		}
-		if gotAddr := peer.Addr.String(); gotAddr != wantAddr.Addr {
+		if gotAddr := peer.Addr.String(); gotAddr != wantAddr.Addr() {
 			return fmt.Errorf("rpc sent to peer %q, want peer %q", gotAddr, wantAddr)
 		}
 	}

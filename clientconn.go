@@ -917,7 +917,8 @@ func (cc *ClientConn) newAddrConnLocked(addrs []resolver.Address, opts balancer.
 	ac.ctx, ac.cancel = context.WithCancel(cc.ctx)
 	// Start with our address set to the first address; this may be updated if
 	// we connect to different addresses.
-	ac.channelz.ChannelMetrics.Target.Store(&addrs[0].Addr)
+	target := addrs[0].Addr()
+	ac.channelz.ChannelMetrics.Target.Store(&target)
 
 	channelz.AddTraceEvent(logger, ac.channelz, 0, &channelz.TraceEvent{
 		Desc:     "Subchannel created",
@@ -1003,9 +1004,9 @@ func (ac *addrConn) connect() {
 // considers all fields to determine equality. Here, we only consider fields
 // that are meaningful to the subConn.
 func equalAddressIgnoringBalAttributes(a, b *resolver.Address) bool {
-	return a.Addr == b.Addr && a.ServerName == b.ServerName &&
-		a.Attributes.Equal(b.Attributes) &&
-		a.Metadata == b.Metadata
+	return a.Addr() == b.Addr() && a.ServerName() == b.ServerName() &&
+		a.Attributes().Equal(b.Attributes()) &&
+		a.Metadata() == b.Metadata()
 }
 
 func equalAddressesIgnoringBalAttributes(a, b []resolver.Address) bool {
@@ -1041,7 +1042,7 @@ func (ac *addrConn) updateAddrs(addrs []resolver.Address) {
 	if ac.state == connectivity.Ready {
 		// Try to find the connected address.
 		for _, a := range addrs {
-			a.ServerName = ac.cc.getServerName(a)
+			a = a.WithServerName(ac.cc.getServerName(a))
 			if equalAddressIgnoringBalAttributes(&a, &ac.curAddr) {
 				// We are connected to a valid address, so do nothing but
 				// update the addresses.
@@ -1087,8 +1088,8 @@ func (cc *ClientConn) getServerName(addr resolver.Address) string {
 	if cc.dopts.authority != "" {
 		return cc.dopts.authority
 	}
-	if addr.ServerName != "" {
-		return addr.ServerName
+	if addr.ServerName() != "" {
+		return addr.ServerName()
 	}
 	return cc.authority
 }
@@ -1429,7 +1430,7 @@ func (ac *addrConn) securityLevelLocked() string {
 	// During disconnection, ac.transport is nil. Fall back to the security level
 	// stored in the current address during connection.
 	if ac.transport == nil {
-		secLevel, _ = ac.curAddr.Attributes.Value(securityLevelKey{}).(string)
+		secLevel, _ = ac.curAddr.Attributes().Value(securityLevelKey{}).(string)
 		return secLevel
 	}
 	authInfo := ac.transport.Peer().AuthInfo
@@ -1440,7 +1441,7 @@ func (ac *addrConn) securityLevelLocked() string {
 		// Store the security level in the current address' attributes so
 		// that it remains available for disconnection metrics after the
 		// transport is closed.
-		ac.curAddr.Attributes = ac.curAddr.Attributes.WithValue(securityLevelKey{}, secLevel)
+		ac.curAddr = ac.curAddr.WithAttributes(ac.curAddr.Attributes().WithValue(securityLevelKey{}, secLevel))
 	}
 	return secLevel
 }
@@ -1451,7 +1452,8 @@ func (ac *addrConn) securityLevelLocked() string {
 func (ac *addrConn) tryAllAddrs(ctx context.Context, addrs []resolver.Address, connectDeadline time.Time) error {
 	var firstConnErr error
 	for _, addr := range addrs {
-		ac.channelz.ChannelMetrics.Target.Store(&addr.Addr)
+		target := addr.Addr()
+		ac.channelz.ChannelMetrics.Target.Store(&target)
 		if ctx.Err() != nil {
 			return errConnClosing
 		}
@@ -1467,7 +1469,7 @@ func (ac *addrConn) tryAllAddrs(ctx context.Context, addrs []resolver.Address, c
 		}
 		ac.mu.Unlock()
 
-		channelz.Infof(logger, ac.channelz, "Subchannel picks a new address %q to connect", addr.Addr)
+		channelz.Infof(logger, ac.channelz, "Subchannel picks a new address %q to connect", addr.Addr())
 
 		err := ac.createTransport(ctx, addr, copts, connectDeadline)
 		if err == nil {
@@ -1487,7 +1489,7 @@ func (ac *addrConn) tryAllAddrs(ctx context.Context, addrs []resolver.Address, c
 // address was not successfully connected, or updates ac appropriately with the
 // new transport.
 func (ac *addrConn) createTransport(ctx context.Context, addr resolver.Address, copts transport.ConnectOptions, connectDeadline time.Time) error {
-	addr.ServerName = ac.cc.getServerName(addr)
+	addr = addr.WithServerName(ac.cc.getServerName(addr))
 	hctx, hcancel := context.WithCancel(ctx)
 
 	onClose := func(info transport.GoAwayInfo) {

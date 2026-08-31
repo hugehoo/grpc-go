@@ -337,11 +337,11 @@ func (b *outlierDetectionBalancer) UpdateClientConnState(s balancer.ClientConnSt
 	for _, ep := range s.ResolverState.Endpoints {
 		epInfo, _ := b.endpoints.Get(ep)
 		for _, addr := range ep.Addresses {
-			if _, ok := b.addrs[addr.Addr]; ok {
-				b.logger.Errorf("Endpoints contain duplicate address %q", addr.Addr)
+			if _, ok := b.addrs[addr.Addr()]; ok {
+				b.logger.Errorf("Endpoints contain duplicate address %q", addr.Addr())
 				continue
 			}
-			b.addrs[addr.Addr] = epInfo
+			b.addrs[addr.Addr()] = epInfo
 		}
 	}
 
@@ -497,7 +497,7 @@ func (b *outlierDetectionBalancer) NewSubConn(addrs []resolver.Address, opts bal
 	if len(addrs) != 1 {
 		return scw, nil
 	}
-	epInfo, ok := b.addrs[addrs[0].Addr]
+	epInfo, ok := b.addrs[addrs[0].Addr()]
 	if !ok {
 		return scw, nil
 	}

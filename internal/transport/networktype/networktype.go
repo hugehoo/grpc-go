@@ -31,14 +31,14 @@ const key = keyType("grpc.internal.transport.networktype")
 
 // Set returns a copy of the provided address with attributes containing networkType.
 func Set(address resolver.Address, networkType string) resolver.Address {
-	address.Attributes = address.Attributes.WithValue(key, networkType)
+	address = address.WithAttributes(address.Attributes().WithValue(key, networkType))
 	return address
 }
 
 // Get returns the network type in the resolver.Address and true, or "", false
 // if not present.
 func Get(address resolver.Address) (string, bool) {
-	v := address.Attributes.Value(key)
+	v := address.Attributes().Value(key)
 	if v == nil {
 		return "", false
 	}

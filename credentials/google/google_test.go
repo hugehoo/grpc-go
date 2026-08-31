@@ -127,7 +127,7 @@ func (s) TestClientHandshakeBasedOnClusterName(t *testing.T) {
 			{
 				name: "with non-CFE cluster name",
 				ctx: icredentials.NewClientHandshakeInfoContext(ctx, credentials.ClientHandshakeInfo{
-					Attributes: xds.SetXDSHandshakeClusterName(resolver.Address{}, "lalala").Attributes,
+					Attributes: xds.SetXDSHandshakeClusterName(resolver.Address{}, "lalala").Attributes(),
 				}),
 				// non-CFE backends should use alts.
 				wantTyp: "alts",
@@ -135,7 +135,7 @@ func (s) TestClientHandshakeBasedOnClusterName(t *testing.T) {
 			{
 				name: "with CFE cluster name",
 				ctx: icredentials.NewClientHandshakeInfoContext(ctx, credentials.ClientHandshakeInfo{
-					Attributes: xds.SetXDSHandshakeClusterName(resolver.Address{}, "google_cfe_bigtable.googleapis.com").Attributes,
+					Attributes: xds.SetXDSHandshakeClusterName(resolver.Address{}, "google_cfe_bigtable.googleapis.com").Attributes(),
 				}),
 				// CFE should use tls.
 				wantTyp: "tls",
@@ -143,7 +143,7 @@ func (s) TestClientHandshakeBasedOnClusterName(t *testing.T) {
 			{
 				name: "with xdstp CFE cluster name",
 				ctx: icredentials.NewClientHandshakeInfoContext(ctx, credentials.ClientHandshakeInfo{
-					Attributes: xds.SetXDSHandshakeClusterName(resolver.Address{}, "xdstp://traffic-director-c2p.xds.googleapis.com/envoy.config.cluster.v3.Cluster/google_cfe_bigtable.googleapis.com").Attributes,
+					Attributes: xds.SetXDSHandshakeClusterName(resolver.Address{}, "xdstp://traffic-director-c2p.xds.googleapis.com/envoy.config.cluster.v3.Cluster/google_cfe_bigtable.googleapis.com").Attributes(),
 				}),
 				// CFE should use tls.
 				wantTyp: "tls",
@@ -151,7 +151,7 @@ func (s) TestClientHandshakeBasedOnClusterName(t *testing.T) {
 			{
 				name: "with xdstp non-CFE cluster name",
 				ctx: icredentials.NewClientHandshakeInfoContext(ctx, credentials.ClientHandshakeInfo{
-					Attributes: xds.SetXDSHandshakeClusterName(resolver.Address{}, "xdstp://other.com/envoy.config.cluster.v3.Cluster/google_cfe_bigtable.googleapis.com").Attributes,
+					Attributes: xds.SetXDSHandshakeClusterName(resolver.Address{}, "xdstp://other.com/envoy.config.cluster.v3.Cluster/google_cfe_bigtable.googleapis.com").Attributes(),
 				}),
 				// non-CFE should use atls.
 				wantTyp: "alts",

@@ -121,7 +121,7 @@ type testConfigBalancer struct {
 type configKey struct{}
 
 func setConfigKey(addr resolver.Address, config string) resolver.Address {
-	addr.Attributes = addr.Attributes.WithValue(configKey{}, config)
+	addr = addr.WithAttributes(addr.Attributes().WithValue(configKey{}, config))
 	return addr
 }
 
@@ -623,10 +623,10 @@ func (s) TestWeightedTarget_TwoSubBalancers_MoreBackends(t *testing.T) {
 
 	// Due to connection order randomization in RR, and the assumed order in the
 	// remainder of this test, adjust the scs according to the addrs if needed.
-	if sc1.Addresses[0].Addr != addr1.Addr {
+	if sc1.Addresses[0].Addr() != addr1.Addr() {
 		sc1, sc2 = sc2, sc1
 	}
-	if sc3.Addresses[0].Addr != addr3.Addr {
+	if sc3.Addresses[0].Addr() != addr3.Addr() {
 		sc3, sc4 = sc4, sc3
 	}
 
@@ -1263,7 +1263,7 @@ func verifyAddressInNewSubConn(t *testing.T, cc *testutils.BalancerClientConn, a
 
 	gotAddr := <-cc.NewSubConnAddrsCh
 	wantAddr := []resolver.Address{addr}
-	gotAddr[0].BalancerAttributes = nil
+	gotAddr[0] = gotAddr[0].WithBalancerAttributes(nil)
 	if diff := cmp.Diff(gotAddr, wantAddr, cmp.AllowUnexported(attributes.Attributes{})); diff != "" {
 		t.Fatalf("got unexpected new subconn addrs: %v", diff)
 	}
@@ -1295,7 +1295,7 @@ func waitForNewSubConns(ctx context.Context, t *testing.T, cc *testutils.Balance
 		if len(addrs) != 1 {
 			t.Fatalf("received subConns with %d addresses, want 1", len(addrs))
 		}
-		cfg, ok := getConfigKey(addrs[0].Attributes)
+		cfg, ok := getConfigKey(addrs[0].Attributes())
 		if !ok {
 			t.Fatalf("received subConn address %v contains no attribute for balancer config", addrs[0])
 		}
@@ -1335,7 +1335,7 @@ func verifySubConnAddrs(t *testing.T, scs map[string][]subConnWithAddr, wantSubC
 func scwasToAddrs(ss []subConnWithAddr) []string {
 	ret := make([]string, len(ss))
 	for i, s := range ss {
-		ret[i] = s.addr.Addr
+		ret[i] = s.addr.Addr()
 	}
 	return ret
 }
@@ -1343,7 +1343,7 @@ func scwasToAddrs(ss []subConnWithAddr) []string {
 func addressesToAddrs(as []resolver.Address) []string {
 	ret := make([]string, len(as))
 	for i, a := range as {
-		ret[i] = a.Addr
+		ret[i] = a.Addr()
 	}
 	return ret
 }

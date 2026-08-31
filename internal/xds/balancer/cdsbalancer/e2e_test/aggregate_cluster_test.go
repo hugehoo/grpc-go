@@ -204,8 +204,8 @@ func (s) TestAggregateCluster_WithTwoEDSClusters(t *testing.T) {
 	if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer), grpc.WaitForReady(true)); err != nil {
 		t.Fatalf("EmptyCall() failed: %v", err)
 	}
-	if peer.Addr.String() != addrs[0].Addr {
-		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr)
+	if peer.Addr.String() != addrs[0].Addr() {
+		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr())
 	}
 }
 
@@ -263,8 +263,8 @@ func (s) TestAggregateCluster_WithTwoEDSClusters_PrioritiesChange(t *testing.T) 
 	if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer), grpc.WaitForReady(true)); err != nil {
 		t.Fatalf("EmptyCall() failed: %v", err)
 	}
-	if peer.Addr.String() != addrs[0].Addr {
-		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr)
+	if peer.Addr.String() != addrs[0].Addr() {
+		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr())
 	}
 
 	// Swap the priorities of the EDS clusters in the aggregate cluster.
@@ -283,7 +283,7 @@ func (s) TestAggregateCluster_WithTwoEDSClusters_PrioritiesChange(t *testing.T) 
 		if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer), grpc.WaitForReady(true)); err != nil {
 			t.Fatalf("EmptyCall() failed: %v", err)
 		}
-		if peer.Addr.String() == addrs[1].Addr {
+		if peer.Addr.String() == addrs[1].Addr() {
 			break
 		}
 	}
@@ -592,8 +592,8 @@ func (s) TestAggregateCluster_WithEDSAndDNS(t *testing.T) {
 	if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer), grpc.WaitForReady(true)); err != nil {
 		t.Fatalf("EmptyCall() failed: %v", err)
 	}
-	if peer.Addr.String() != addrs[0].Addr {
-		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr)
+	if peer.Addr.String() != addrs[0].Addr() {
+		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr())
 	}
 }
 
@@ -617,7 +617,7 @@ func (s) TestAggregateCluster_SwitchEDSAndDNS(t *testing.T) {
 	servers, cleanup3 := startTestServiceBackends(t, 2)
 	defer cleanup3()
 	addrs, ports := backendAddressesAndPorts(t, servers)
-	dnsHostName, dnsPort := hostAndPortFromAddress(t, addrs[1].Addr)
+	dnsHostName, dnsPort := hostAndPortFromAddress(t, addrs[1].Addr())
 
 	// Configure an aggregate cluster pointing to a single EDS cluster. Also,
 	// configure the underlying EDS cluster (and the corresponding endpoints
@@ -651,8 +651,8 @@ func (s) TestAggregateCluster_SwitchEDSAndDNS(t *testing.T) {
 	if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer), grpc.WaitForReady(true)); err != nil {
 		t.Fatalf("EmptyCall() failed: %v", err)
 	}
-	if peer.Addr.String() != addrs[0].Addr {
-		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr)
+	if peer.Addr.String() != addrs[0].Addr() {
+		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr())
 	}
 
 	// Update the aggregate cluster to point to a single DNS cluster.
@@ -669,12 +669,12 @@ func (s) TestAggregateCluster_SwitchEDSAndDNS(t *testing.T) {
 	// LOGICAL_DNS cluster.
 	for ; ctx.Err() == nil; <-time.After(defaultTestShortTimeout) {
 		client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer))
-		if peer.Addr.String() == addrs[1].Addr {
+		if peer.Addr.String() == addrs[1].Addr() {
 			break
 		}
 	}
 	if ctx.Err() != nil {
-		t.Fatalf("Timeout when waiting for RPCs to be routed to backend %q in the DNS cluster", addrs[1].Addr)
+		t.Fatalf("Timeout when waiting for RPCs to be routed to backend %q in the DNS cluster", addrs[1].Addr())
 	}
 }
 
@@ -766,12 +766,12 @@ func (s) TestAggregateCluster_BadEDS_GoodToBadDNS(t *testing.T) {
 			t.Logf("EmptyCall() failed: %v", err)
 			continue
 		}
-		if peer.Addr.String() == addrs[0].Addr {
+		if peer.Addr.String() == addrs[0].Addr() {
 			break
 		}
 	}
 	if ctx.Err() != nil {
-		t.Fatalf("Timeout when waiting for RPCs to be routed to backend %q in the DNS cluster", addrs[0].Addr)
+		t.Fatalf("Timeout when waiting for RPCs to be routed to backend %q in the DNS cluster", addrs[0].Addr())
 	}
 
 	// Push an error from the DNS resolver as well.
@@ -784,8 +784,8 @@ func (s) TestAggregateCluster_BadEDS_GoodToBadDNS(t *testing.T) {
 		if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer)); err != nil {
 			t.Fatalf("EmptyCall() failed: %v", err)
 		}
-		if peer.Addr.String() != addrs[0].Addr {
-			t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr)
+		if peer.Addr.String() != addrs[0].Addr() {
+			t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr())
 		}
 	}
 }
@@ -1081,8 +1081,8 @@ func (s) TestAggregateCluster_NoFallback_EDSNackedWithPreviousGoodUpdate(t *test
 	if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer), grpc.WaitForReady(true)); err != nil {
 		t.Fatalf("EmptyCall() failed: %v", err)
 	}
-	if peer.Addr.String() != addrs[0].Addr {
-		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr)
+	if peer.Addr.String() != addrs[0].Addr() {
+		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr())
 	}
 
 	// Push an EDS resource from the management server that is expected to be
@@ -1099,8 +1099,8 @@ func (s) TestAggregateCluster_NoFallback_EDSNackedWithPreviousGoodUpdate(t *test
 		if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer)); err != nil {
 			t.Fatalf("EmptyCall() failed: %v", err)
 		}
-		if peer.Addr.String() != addrs[0].Addr {
-			t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr)
+		if peer.Addr.String() != addrs[0].Addr() {
+			t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[0].Addr())
 		}
 	}
 }
@@ -1183,8 +1183,8 @@ func (s) TestAggregateCluster_Fallback_EDSNackedWithoutPreviousGoodUpdate(t *tes
 	if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(peer), grpc.WaitForReady(true)); err != nil {
 		t.Fatalf("EmptyCall() failed: %v", err)
 	}
-	if peer.Addr.String() != addrs[1].Addr {
-		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[1].Addr)
+	if peer.Addr.String() != addrs[1].Addr() {
+		t.Fatalf("EmptyCall() routed to backend %q, want %q", peer.Addr, addrs[1].Addr())
 	}
 }
 

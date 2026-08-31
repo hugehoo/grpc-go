@@ -71,7 +71,7 @@ const (
 var (
 	stateStoringServiceConfig = fmt.Sprintf(`{"loadBalancingConfig": [{"%s":{}}]}`, stateStoringBalancerName)
 	ignoreBalAttributesOpt    = cmp.Transformer("IgnoreBalancerAttributes", func(a resolver.Address) resolver.Address {
-		a.BalancerAttributes = nil
+		a = a.WithBalancerAttributes(nil)
 		return a
 	})
 )
@@ -765,7 +765,7 @@ func (s) TestPickFirst_AddressUpdateWithAttributes(t *testing.T) {
 	// pick_first LB policy through the manual resolver.
 	addrs := stubBackendsToResolverAddrs(backends)
 	for i := range addrs {
-		addrs[i].Attributes = addrs[i].Attributes.WithValue("test-attribute-1", fmt.Sprintf("%d", i))
+		addrs[i] = addrs[i].WithAttributes(addrs[i].Attributes().WithValue("test-attribute-1", fmt.Sprintf("%d", i)))
 	}
 	r.UpdateState(resolver.State{Addresses: addrs})
 
@@ -788,7 +788,7 @@ func (s) TestPickFirst_AddressUpdateWithAttributes(t *testing.T) {
 	// pick_first LB policy through the manual resolver. Leave the order of the
 	// addresses unchanged.
 	for i := range addrs {
-		addrs[i].Attributes = addrs[i].Attributes.WithValue("test-attribute-2", fmt.Sprintf("%d", i))
+		addrs[i] = addrs[i].WithAttributes(addrs[i].Attributes().WithValue("test-attribute-2", fmt.Sprintf("%d", i)))
 	}
 	r.UpdateState(resolver.State{Addresses: addrs})
 	if err := pickfirst.CheckRPCsToBackend(ctx, cc, addrs[0]); err != nil {
@@ -812,7 +812,7 @@ func (s) TestPickFirst_AddressUpdateWithAttributes(t *testing.T) {
 	// pick_first LB policy through the manual resolver.  Reverse of the order
 	// of addresses.
 	for i := range addrs {
-		addrs[i].Attributes = addrs[i].Attributes.WithValue("test-attribute-3", fmt.Sprintf("%d", i))
+		addrs[i] = addrs[i].WithAttributes(addrs[i].Attributes().WithValue("test-attribute-3", fmt.Sprintf("%d", i)))
 	}
 	addrs[0], addrs[1] = addrs[1], addrs[0]
 	r.UpdateState(resolver.State{Addresses: addrs})
@@ -843,7 +843,7 @@ func (s) TestPickFirst_AddressUpdateWithBalancerAttributes(t *testing.T) {
 	// the pick_first LB policy through the manual resolver.
 	addrs := stubBackendsToResolverAddrs(backends)
 	for i := range addrs {
-		addrs[i].BalancerAttributes = addrs[i].BalancerAttributes.WithValue("test-attribute-1", fmt.Sprintf("%d", i))
+		addrs[i] = addrs[i].WithBalancerAttributes(addrs[i].BalancerAttributes().WithValue("test-attribute-1", fmt.Sprintf("%d", i)))
 	}
 	r.UpdateState(resolver.State{Addresses: addrs})
 
@@ -866,7 +866,7 @@ func (s) TestPickFirst_AddressUpdateWithBalancerAttributes(t *testing.T) {
 	// the pick_first LB policy through the manual resolver. Leave the order of
 	// the addresses unchanged.
 	for i := range addrs {
-		addrs[i].BalancerAttributes = addrs[i].BalancerAttributes.WithValue("test-attribute-2", fmt.Sprintf("%d", i))
+		addrs[i] = addrs[i].WithBalancerAttributes(addrs[i].BalancerAttributes().WithValue("test-attribute-2", fmt.Sprintf("%d", i)))
 	}
 	r.UpdateState(resolver.State{Addresses: addrs})
 
@@ -892,7 +892,7 @@ func (s) TestPickFirst_AddressUpdateWithBalancerAttributes(t *testing.T) {
 	// the pick_first LB policy through the manual resolver. Reverse of the
 	// order of addresses.
 	for i := range addrs {
-		addrs[i].BalancerAttributes = addrs[i].BalancerAttributes.WithValue("test-attribute-3", fmt.Sprintf("%d", i))
+		addrs[i] = addrs[i].WithBalancerAttributes(addrs[i].BalancerAttributes().WithValue("test-attribute-3", fmt.Sprintf("%d", i)))
 	}
 	addrs[0], addrs[1] = addrs[1], addrs[0]
 	r.UpdateState(resolver.State{Addresses: addrs})
@@ -2579,9 +2579,9 @@ func (s) TestPickFirstLeaf_AddressUpdateWithMetadata(t *testing.T) {
 	// policy through the manual resolver.
 	addrs := backends.resolverAddrs()
 	for i := range addrs {
-		addrs[i].Metadata = &metadata.MD{
+		addrs[i] = addrs[i].WithMetadata(&metadata.MD{
 			"test-metadata-1": []string{fmt.Sprintf("%d", i)},
-		}
+		})
 	}
 	r.UpdateState(resolver.State{Addresses: addrs})
 
@@ -2600,9 +2600,9 @@ func (s) TestPickFirstLeaf_AddressUpdateWithMetadata(t *testing.T) {
 	// policy through the manual resolver. Leave the order of the addresses
 	// unchanged.
 	for i := range addrs {
-		addrs[i].Metadata = &metadata.MD{
+		addrs[i] = addrs[i].WithMetadata(&metadata.MD{
 			"test-metadata-2": []string{fmt.Sprintf("%d", i)},
-		}
+		})
 	}
 	r.UpdateState(resolver.State{Addresses: addrs})
 
@@ -2622,9 +2622,9 @@ func (s) TestPickFirstLeaf_AddressUpdateWithMetadata(t *testing.T) {
 	// Add metadata to the addresses before pushing them to the pick_first LB
 	// policy through the manual resolver. Reverse of the order of addresses.
 	for i := range addrs {
-		addrs[i].Metadata = &metadata.MD{
+		addrs[i] = addrs[i].WithMetadata(&metadata.MD{
 			"test-metadata-3": []string{fmt.Sprintf("%d", i)},
-		}
+		})
 	}
 	addrs[0], addrs[1] = addrs[1], addrs[0]
 	r.UpdateState(resolver.State{Addresses: addrs})
@@ -2908,7 +2908,7 @@ func (b *backendManager) resolverAddrs() []resolver.Address {
 func (b *backendManager) holds(dialer *testutils.BlockingDialer) []*testutils.Hold {
 	holds := []*testutils.Hold{}
 	for _, addr := range b.resolverAddrs() {
-		holds = append(holds, dialer.Hold(addr.Addr))
+		holds = append(holds, dialer.Hold(addr.Addr()))
 	}
 	return holds
 }

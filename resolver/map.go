@@ -58,7 +58,7 @@ type AddressMapV2[T any] struct {
 }
 
 func toMapKey(addr *Address) Address {
-	return NewAddress(addr.Addr).WithServerName(addr.ServerName)
+	return NewAddress(addr.Addr()).WithServerName(addr.ServerName())
 }
 
 type addressMapEntryList[T any] []*addressMapEntry[T]
@@ -81,7 +81,7 @@ func (l addressMapEntryList[T]) find(addr Address) int {
 	for i, entry := range l {
 		// Attributes are the only thing to match on here, since `Addr` and
 		// `ServerName` are already equal.
-		if entry.addr.Attributes.Equal(addr.Attributes) {
+		if entry.addr.Attributes().Equal(addr.Attributes()) {
 			return i
 		}
 	}
@@ -204,7 +204,7 @@ func encodeEndpoint(e Endpoint) endpointMapKey {
 	// within the strings. This allows us to use a delimiter without the need of
 	// escape characters.
 	for _, addr := range e.Addresses {
-		addrs = append(addrs, base64.StdEncoding.EncodeToString([]byte(addr.Addr)))
+		addrs = append(addrs, base64.StdEncoding.EncodeToString([]byte(addr.Addr())))
 	}
 	sort.Strings(addrs)
 	// " " should not appear in base64 encoded strings.

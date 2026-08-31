@@ -290,7 +290,7 @@ func (b *cdsBalancer) updateChildConfig() error {
 	for i := range endpoints {
 		for j := range endpoints[i].Addresses {
 			addr := endpoints[i].Addresses[j]
-			addr.BalancerAttributes = endpoints[i].Attributes
+			addr = addr.WithBalancerAttributes(endpoints[i].Attributes)
 			// BalancerAttributes are used for the following:
 			// * Authority Override.
 			// * grpc.lb.backend_service metric label propagation.

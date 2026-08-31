@@ -120,7 +120,7 @@ func clusterWithOutlierDetection(clusterName, edsServiceName string, secLevel e2
 func checkRoundRobinRPCs(ctx context.Context, client testgrpc.TestServiceClient, addrs []resolver.Address) error {
 	wantAddrCount := make(map[string]int)
 	for _, addr := range addrs {
-		wantAddrCount[addr.Addr]++
+		wantAddrCount[addr.Addr()]++
 	}
 	for ; ctx.Err() == nil; <-time.After(time.Millisecond) {
 		// Perform 3 iterations.

@@ -22,6 +22,7 @@ package resolver
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -90,59 +91,67 @@ func GetDefaultScheme() string {
 // Notice: This type is EXPERIMENTAL and may be changed or removed in a
 // later release.
 type Address struct {
-	// Addr is the server address on which a connection will be established.
-	Addr string
-
-	// ServerName is the name of this address.
-	// If non-empty, the ServerName is used as the transport certification authority for
-	// the address, instead of the hostname from the Dial target string. In most cases,
-	// this should not be set.
-	//
-	// WARNING: ServerName must only be populated with trusted values. It
-	// is insecure to populate it with data from untrusted inputs since untrusted
-	// values could be used to bypass the authority checks performed by TLS.
-	ServerName string
-
-	// Attributes contains arbitrary data about this address intended for
-	// consumption by the SubConn.
-	Attributes *attributes.Attributes
-
-	// BalancerAttributes contains arbitrary data about this address intended
-	// for consumption by the LB policy.  These attributes do not affect SubConn
-	// creation, connection establishment, handshaking, etc.
-	//
-	// Deprecated: when an Address is inside an Endpoint, this field should not
-	// be used, and it will eventually be removed entirely.
-	BalancerAttributes *attributes.Attributes
-
-	// Metadata is the information associated with Addr, which may be used
-	// to make load balancing decision.
-	//
-	// Deprecated: use Attributes instead.
-	Metadata any
+	addr               string
+	serverName         string
+	attributes         *attributes.Attributes
+	balancerAttributes *attributes.Attributes
+	metadata           any
 }
 
 // NewAddress returns an Address for addr.
 func NewAddress(addr string) Address {
-	return Address{Addr: addr}
+	return Address{addr: addr}
+}
+
+// Addr returns the server address on which a connection will be established.
+func (a Address) Addr() string {
+	return a.addr
 }
 
 // WithAddr returns a copy of a with Addr set to addr.
 func (a Address) WithAddr(addr string) Address {
-	a.Addr = addr
+	a.addr = addr
 	return a
+}
+
+// ServerName returns the name of this address. If non-empty, the ServerName is
+// used as the transport certification authority for the address, instead of
+// the hostname from the Dial target string. In most cases, this should not be
+// set.
+//
+// WARNING: ServerName must only be populated with trusted values. It is
+// insecure to populate it with data from untrusted inputs since untrusted
+// values could be used to bypass the authority checks performed by TLS.
+func (a Address) ServerName() string {
+	return a.serverName
 }
 
 // WithServerName returns a copy of a with ServerName set to serverName.
 func (a Address) WithServerName(serverName string) Address {
-	a.ServerName = serverName
+	a.serverName = serverName
 	return a
+}
+
+// Attributes returns arbitrary data about this address intended for
+// consumption by the SubConn.
+func (a Address) Attributes() *attributes.Attributes {
+	return a.attributes
 }
 
 // WithAttributes returns a copy of a with Attributes set to attrs.
 func (a Address) WithAttributes(attrs *attributes.Attributes) Address {
-	a.Attributes = attrs
+	a.attributes = attrs
 	return a
+}
+
+// BalancerAttributes returns arbitrary data about this address intended for
+// consumption by the LB policy. These attributes do not affect SubConn
+// creation, connection establishment, handshaking, etc.
+//
+// Deprecated: when an Address is inside an Endpoint, BalancerAttributes should
+// not be used, and it will eventually be removed entirely.
+func (a Address) BalancerAttributes() *attributes.Attributes {
+	return a.balancerAttributes
 }
 
 // WithBalancerAttributes returns a copy of a with BalancerAttributes set to
@@ -151,15 +160,24 @@ func (a Address) WithAttributes(attrs *attributes.Attributes) Address {
 // Deprecated: when an Address is inside an Endpoint, BalancerAttributes should
 // not be used, and it will eventually be removed entirely.
 func (a Address) WithBalancerAttributes(attrs *attributes.Attributes) Address {
-	a.BalancerAttributes = attrs
+	a.balancerAttributes = attrs
 	return a
 }
 
+// Metadata returns the information associated with Addr, which may be used to
+// make load balancing decisions. The returned value must not be mutated.
+//
+// Deprecated: use Attributes instead.
+func (a Address) Metadata() any {
+	return a.metadata
+}
+
 // WithMetadata returns a copy of a with Metadata set to metadata.
+// The value must not be mutated after it is stored.
 //
 // Deprecated: use WithAttributes instead.
 func (a Address) WithMetadata(metadata any) Address {
-	a.Metadata = metadata
+	a.metadata = metadata
 	return a
 }
 
@@ -170,25 +188,43 @@ func (a Address) WithMetadata(metadata any) Address {
 // addresses during subchannel creation or connection establishment, it might be
 // more appropriate for the caller to implement custom equality logic.
 func (a Address) Equal(o Address) bool {
-	return a.Addr == o.Addr && a.ServerName == o.ServerName &&
-		a.Attributes.Equal(o.Attributes) &&
-		a.BalancerAttributes.Equal(o.BalancerAttributes) &&
-		a.Metadata == o.Metadata
+	return a.addr == o.addr && a.serverName == o.serverName &&
+		a.attributes.Equal(o.attributes) &&
+		a.balancerAttributes.Equal(o.balancerAttributes) &&
+		a.metadata == o.metadata
 }
 
 // String returns JSON formatted string representation of the address.
 func (a Address) String() string {
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("{Addr: %q, ", a.Addr))
-	sb.WriteString(fmt.Sprintf("ServerName: %q, ", a.ServerName))
-	if a.Attributes != nil {
-		sb.WriteString(fmt.Sprintf("Attributes: %v, ", a.Attributes.String()))
+	sb.WriteString(fmt.Sprintf("{Addr: %q, ", a.addr))
+	sb.WriteString(fmt.Sprintf("ServerName: %q, ", a.serverName))
+	if a.attributes != nil {
+		sb.WriteString(fmt.Sprintf("Attributes: %v, ", a.attributes.String()))
 	}
-	if a.BalancerAttributes != nil {
-		sb.WriteString(fmt.Sprintf("BalancerAttributes: %v", a.BalancerAttributes.String()))
+	if a.balancerAttributes != nil {
+		sb.WriteString(fmt.Sprintf("BalancerAttributes: %v", a.balancerAttributes.String()))
 	}
 	sb.WriteString("}")
 	return sb.String()
+}
+
+// MarshalJSON implements json.Marshaler. It preserves the diagnostic JSON
+// representation used when Address had exported fields.
+func (a Address) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Addr               string
+		ServerName         string
+		Attributes         *attributes.Attributes
+		BalancerAttributes *attributes.Attributes
+		Metadata           any
+	}{
+		Addr:               a.addr,
+		ServerName:         a.serverName,
+		Attributes:         a.attributes,
+		BalancerAttributes: a.balancerAttributes,
+		Metadata:           a.metadata,
+	})
 }
 
 // BuildOptions includes additional information for the builder to create

@@ -165,7 +165,7 @@ func setupBackends(t *testing.T, numBackends int) []string {
 func checkRoundRobinRPCs(ctx context.Context, client testgrpc.TestServiceClient, addrs []resolver.Address) error {
 	wantAddrCount := make(map[string]int)
 	for _, addr := range addrs {
-		wantAddrCount[addr.Addr]++
+		wantAddrCount[addr.Addr()]++
 	}
 	gotAddrCount := make(map[string]int)
 	for ; ctx.Err() == nil; <-time.After(time.Millisecond) {
@@ -659,7 +659,7 @@ func (s) TestLeastRequestEndpoints_MultipleAddresses(t *testing.T) {
 		if !ok {
 			t.Fatalf("testServiceClient.FullDuplexCall has no Peer")
 		}
-		if p.Addr.String() != newAddress.Addr {
+		if p.Addr.String() != newAddress.Addr() {
 			t.Fatalf("testServiceClient.FullDuplexCall's Peer got: %v, want: %v", p.Addr.String(), newAddress)
 		}
 	}
@@ -669,9 +669,9 @@ func (s) TestLeastRequestEndpoints_MultipleAddresses(t *testing.T) {
 	// cause it to search all three endpoints for fewest outstanding requests on
 	// each iteration.
 	wantAddrCount := map[string]int{
-		endpoints[0].Addresses[1].Addr: 1,
-		endpoints[1].Addresses[0].Addr: 1,
-		endpoints[2].Addresses[0].Addr: 1,
+		endpoints[0].Addresses[1].Addr(): 1,
+		endpoints[1].Addresses[0].Addr(): 1,
+		endpoints[2].Addresses[0].Addr(): 1,
 	}
 	gotAddrCount := make(map[string]int)
 	for i := 0; i < len(endpoints); i++ {

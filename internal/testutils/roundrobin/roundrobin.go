@@ -55,7 +55,7 @@ func waitForTrafficToReachBackends(ctx context.Context, client testgrpc.TestServ
 			for {
 				time.Sleep(time.Millisecond)
 				if ctx.Err() != nil {
-					return fmt.Errorf("timeout waiting for connection to %q to be up", addrs[i].Addr)
+					return fmt.Errorf("timeout waiting for connection to %q to be up", addrs[i].Addr())
 				}
 				var peer peer.Peer
 				if _, err := client.EmptyCall(ctx, &testpb.Empty{}, grpc.Peer(&peer)); err != nil {
@@ -67,7 +67,7 @@ func waitForTrafficToReachBackends(ctx context.Context, client testgrpc.TestServ
 					// will be removed.
 					continue
 				}
-				if peer.Addr.String() == addrs[i].Addr {
+				if peer.Addr.String() == addrs[i].Addr() {
 					break
 				}
 			}
@@ -97,7 +97,7 @@ func CheckRoundRobinRPCs(ctx context.Context, client testgrpc.TestServiceClient,
 	//    deadline expires.
 	wantAddrCount := make(map[string]int)
 	for _, addr := range addrs {
-		wantAddrCount[addr.Addr]++
+		wantAddrCount[addr.Addr()]++
 	}
 	for ; ctx.Err() == nil; <-time.After(time.Millisecond) {
 		// Perform 3 more iterations.
@@ -149,7 +149,7 @@ func CheckWeightedRoundRobinRPCs(ctx context.Context, t *testing.T, client testg
 	// look for approximate distribution instead of exact.
 	wantAddrCount := make(map[string]int)
 	for _, addr := range addrs {
-		wantAddrCount[addr.Addr]++
+		wantAddrCount[addr.Addr()]++
 	}
 	attemptCount := attemptCounts(wantAddrCount)
 

@@ -194,10 +194,10 @@ func (s) TestClusterNameInAddressAttributes(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendEndpoints[0].Addresses[0].Addr; got != want {
+	if got, want := addrs1[0].Addr(), testBackendEndpoints[0].Addresses[0].Addr(); got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
-	cn, ok := xdsinternal.GetXDSHandshakeClusterName(addrs1[0].Attributes)
+	cn, ok := xdsinternal.GetXDSHandshakeClusterName(addrs1[0].Attributes())
 	if !ok || cn != testClusterName {
 		t.Fatalf("sc is created with addr with cluster name %v, %v, want cluster name %v", cn, ok, testClusterName)
 	}
@@ -238,11 +238,11 @@ func (s) TestClusterNameInAddressAttributes(t *testing.T) {
 	}
 
 	addrs2 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs2[0].Addr, addr2.Addr; got != want {
+	if got, want := addrs2[0].Addr(), addr2.Addr(); got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	// New addresses should have the new cluster name.
-	cn2, ok := xdsinternal.GetXDSHandshakeClusterName(addrs2[0].Attributes)
+	cn2, ok := xdsinternal.GetXDSHandshakeClusterName(addrs2[0].Attributes())
 	if !ok || cn2 != testClusterName2 {
 		t.Fatalf("sc is created with addr with cluster name %v, %v, want cluster name %v", cn2, ok, testClusterName2)
 	}

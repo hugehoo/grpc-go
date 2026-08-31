@@ -93,12 +93,12 @@ type listenerInfo struct {
 type listenerInfoKey struct{}
 
 func setListenerInfo(addr resolver.Address, l *listenerInfo) resolver.Address {
-	addr.Attributes = addr.Attributes.WithValue(listenerInfoKey{}, l)
+	addr = addr.WithAttributes(addr.Attributes().WithValue(listenerInfoKey{}, l))
 	return addr
 }
 
 func getListenerInfo(addr resolver.Address) *listenerInfo {
-	return addr.Attributes.Value(listenerInfoKey{}).(*listenerInfo)
+	return addr.Attributes().Value(listenerInfoKey{}).(*listenerInfo)
 }
 
 // testOOBListener is a simple listener that pushes load reports to a channel.

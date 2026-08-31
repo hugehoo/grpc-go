@@ -395,7 +395,7 @@ func (s) TestAddressAttributesInNewSubConn(t *testing.T) {
 
 			// Only use the first address.
 			attr := attributes.New(testAttrKey, testAttrVal)
-			addrs[0].Attributes = attr
+			addrs[0] = addrs[0].WithAttributes(attr)
 			var sc balancer.SubConn
 			sc, err := bd.ClientConn.NewSubConn([]resolver.Address{addrs[0]}, balancer.NewSubConnOptions{
 				StateListener: func(state balancer.SubConnState) {

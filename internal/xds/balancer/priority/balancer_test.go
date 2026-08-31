@@ -122,7 +122,7 @@ func testPriorityHighPriorityReady(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -247,7 +247,7 @@ func testPrioritySwitchPriority(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -271,7 +271,7 @@ func testPrioritySwitchPriority(t *testing.T) {
 
 	t.Log("Handle SubConn creation from 1.")
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[1]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[1]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -329,7 +329,7 @@ func testPrioritySwitchPriority(t *testing.T) {
 	}
 
 	addrs2 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs2[0].Addr, testBackendAddrStrs[2]; got != want {
+	if got, want := addrs2[0].Addr(), testBackendAddrStrs[2]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc2 := <-cc.NewSubConnCh
@@ -430,7 +430,7 @@ func (s) TestPriority_HighPriorityToConnectingFromReady(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -454,7 +454,7 @@ func (s) TestPriority_HighPriorityToConnectingFromReady(t *testing.T) {
 
 	t.Log("Handle SubConn creation from 1.")
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[1]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[1]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -512,7 +512,7 @@ func (s) TestPriority_HigherDownWhileAddingLower(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -531,7 +531,7 @@ func (s) TestPriority_HigherDownWhileAddingLower(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[1]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[1]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -575,7 +575,7 @@ func (s) TestPriority_HigherDownWhileAddingLower(t *testing.T) {
 	}
 
 	addrs2 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs2[0].Addr, testBackendAddrStrs[2]; got != want {
+	if got, want := addrs2[0].Addr(), testBackendAddrStrs[2]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc2 := <-cc.NewSubConnCh
@@ -622,7 +622,7 @@ func (s) TestPriority_HigherReadyCloseAllLower(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -636,7 +636,7 @@ func (s) TestPriority_HigherReadyCloseAllLower(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[1]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[1]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -650,7 +650,7 @@ func (s) TestPriority_HigherReadyCloseAllLower(t *testing.T) {
 	}
 
 	addrs2 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs2[0].Addr, testBackendAddrStrs[2]; got != want {
+	if got, want := addrs2[0].Addr(), testBackendAddrStrs[2]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc2 := <-cc.NewSubConnCh
@@ -707,7 +707,7 @@ func (s) TestPriority_InitTimeout(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -723,7 +723,7 @@ func (s) TestPriority_InitTimeout(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[1]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[1]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -783,7 +783,7 @@ func testPriorityRemovesAllPriorities(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -848,7 +848,7 @@ func testPriorityRemovesAllPriorities(t *testing.T) {
 	}
 
 	addrs01 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs01[0].Addr, testBackendAddrStrs[2]; got != want {
+	if got, want := addrs01[0].Addr(), testBackendAddrStrs[2]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc01 := <-cc.NewSubConnCh
@@ -867,7 +867,7 @@ func testPriorityRemovesAllPriorities(t *testing.T) {
 
 	// p1 will be used after priority init timeout.
 	addrs11 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs11[0].Addr, testBackendAddrStrs[3]; got != want {
+	if got, want := addrs11[0].Addr(), testBackendAddrStrs[3]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc11 := <-cc.NewSubConnCh
@@ -968,7 +968,7 @@ func (s) TestPriority_HighPriorityNoEndpoints(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -1006,7 +1006,7 @@ func (s) TestPriority_HighPriorityNoEndpoints(t *testing.T) {
 	scToShutdown.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Shutdown})
 
 	addrs2 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs2[0].Addr, testBackendAddrStrs[1]; got != want {
+	if got, want := addrs2[0].Addr(), testBackendAddrStrs[1]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc2 := <-cc.NewSubConnCh
@@ -1066,7 +1066,7 @@ func testPriorityFirstPriorityUnavailable(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -1148,7 +1148,7 @@ func testPriorityMoveChildToHigherPriority(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -1191,7 +1191,7 @@ func testPriorityMoveChildToHigherPriority(t *testing.T) {
 	}
 
 	addrs2 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs2[0].Addr, testBackendAddrStrs[1]; got != want {
+	if got, want := addrs2[0].Addr(), testBackendAddrStrs[1]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc2 := <-cc.NewSubConnCh
@@ -1250,7 +1250,7 @@ func testPriorityMoveReadyChildToHigherPriority(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -1264,7 +1264,7 @@ func testPriorityMoveReadyChildToHigherPriority(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[1]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[1]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -1351,7 +1351,7 @@ func testPriorityRemoveReadyLowestChild(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -1368,7 +1368,7 @@ func testPriorityRemoveReadyLowestChild(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[1]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[1]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -1456,7 +1456,7 @@ func (s) TestPriority_RemoveOnlyReadyChild_CachingEnabled(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -1556,7 +1556,7 @@ func (s) TestPriority_RemoveOnlyReadyChild_CachingDisabled(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -1612,7 +1612,7 @@ func (s) TestPriority_RemoveOnlyReadyChild_CachingDisabled(t *testing.T) {
 	}
 
 	addrs1 = <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 = <-cc.NewSubConnCh
@@ -1657,7 +1657,7 @@ func (s) TestPriority_ChildPolicyChange(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -1703,7 +1703,7 @@ func (s) TestPriority_ChildPolicyChange(t *testing.T) {
 
 	// A new subconn should be created.
 	addrs2 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs2[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs2[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc2 := <-cc.NewSubConnCh
@@ -1920,7 +1920,7 @@ func (s) TestPriority_IgnoreReresolutionRequestTwoChildren(t *testing.T) {
 
 	// Set p0 to transient failure, p1 will be started.
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -2026,7 +2026,7 @@ func (s) TestPriority_HighPriorityInitIdle(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -2046,7 +2046,7 @@ func (s) TestPriority_HighPriorityInitIdle(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[1]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[1]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -2090,7 +2090,7 @@ func (s) TestPriority_AddLowPriorityWhenHighIsInIdle(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -2134,7 +2134,7 @@ func (s) TestPriority_AddLowPriorityWhenHighIsInIdle(t *testing.T) {
 	// The check below makes sure that the addresses are still from p0, and not
 	// from p1. This is good enough for the purpose of this test.
 	addrsNew := <-cc.NewSubConnAddrsCh
-	if got, want := addrsNew[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrsNew[0].Addr(), testBackendAddrStrs[0]; got != want {
 		// Fail if p1 is started and creates a SubConn.
 		t.Fatalf("got unexpected call to NewSubConn with addr: %v, want %v", addrsNew, want)
 	}
@@ -2173,7 +2173,7 @@ func (s) TestPriority_HighPriorityUpdatesWhenLowInUse(t *testing.T) {
 	}
 
 	addrs0 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs0[0].Addr, testBackendAddrStrs[0]; got != want {
+	if got, want := addrs0[0].Addr(), testBackendAddrStrs[0]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc0 := <-cc.NewSubConnCh
@@ -2190,7 +2190,7 @@ func (s) TestPriority_HighPriorityUpdatesWhenLowInUse(t *testing.T) {
 
 	t.Log("Make p1 ready.")
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr, testBackendAddrStrs[1]; got != want {
+	if got, want := addrs1[0].Addr(), testBackendAddrStrs[1]; got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	sc1 := <-cc.NewSubConnCh
@@ -2238,13 +2238,13 @@ func (s) TestPriority_HighPriorityUpdatesWhenLowInUse(t *testing.T) {
 	for i := 0; i < 2; i++ {
 		addr := <-cc.NewSubConnAddrsCh
 		sc := <-cc.NewSubConnCh
-		switch addr[0].Addr {
+		switch addr[0].Addr() {
 		case testBackendAddrStrs[2]:
 			sc2 = sc
 		case testBackendAddrStrs[3]:
 			sc3 = sc
 		default:
-			t.Fatalf("sc is created with addr %v, want %v or %v", addr[0].Addr, testBackendAddrStrs[2], testBackendAddrStrs[3])
+			t.Fatalf("sc is created with addr %v, want %v or %v", addr[0].Addr(), testBackendAddrStrs[2], testBackendAddrStrs[3])
 		}
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Connecting})
 		sc.UpdateState(balancer.SubConnState{ConnectivityState: connectivity.Ready})
@@ -2313,7 +2313,7 @@ func (s) TestPriority_InitTimerNotRestarted_OnConnectingToConnecting(t *testing.
 		case <-ctx.Done():
 			t.Fatalf("Timeout waiting for subconn %d to be created", i)
 		}
-		switch got := addrs[0].Addr; got {
+		switch got := addrs[0].Addr(); got {
 		case testBackendAddrStrs[0]:
 			sc0 = <-cc.NewSubConnCh
 		case testBackendAddrStrs[1]:

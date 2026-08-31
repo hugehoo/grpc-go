@@ -59,7 +59,7 @@ func (m mdValue) Equal(o any) bool {
 
 // Get returns the metadata of addr.
 func Get(addr resolver.Address) metadata.MD {
-	attrs := addr.Attributes
+	attrs := addr.Attributes()
 	if attrs == nil {
 		return nil
 	}
@@ -72,7 +72,7 @@ func Get(addr resolver.Address) metadata.MD {
 // When a SubConn is created with this address, the RPCs sent on it will all
 // have this metadata.
 func Set(addr resolver.Address, md metadata.MD) resolver.Address {
-	addr.Attributes = addr.Attributes.WithValue(mdKey, mdValue(md))
+	addr = addr.WithAttributes(addr.Attributes().WithValue(mdKey, mdValue(md)))
 	return addr
 }
 

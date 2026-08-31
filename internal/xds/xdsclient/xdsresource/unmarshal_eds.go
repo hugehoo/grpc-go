@@ -41,7 +41,7 @@ import (
 // given Address. If this attribute is not set, it returns the empty
 // string.
 func Hostname(addr resolver.Address) string {
-	ep := resolver.Endpoint{Attributes: addr.BalancerAttributes}
+	ep := resolver.Endpoint{Attributes: addr.BalancerAttributes()}
 	return hostname.FromEndpoint(ep)
 }
 

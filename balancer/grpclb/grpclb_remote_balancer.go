@@ -175,7 +175,7 @@ func (lb *lbBalancer) refreshSubConns(backendAddrs []resolver.Address, fallback 
 	// Create new SubConns.
 	for _, addr := range backendAddrs {
 		addrWithoutAttrs := addr
-		addrWithoutAttrs.Attributes = nil
+		addrWithoutAttrs = addrWithoutAttrs.WithAttributes(nil)
 		addrsSet[addrWithoutAttrs] = struct{}{}
 		lb.backendAddrsWithoutMetadata = append(lb.backendAddrsWithoutMetadata, addrWithoutAttrs)
 

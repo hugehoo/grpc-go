@@ -414,7 +414,7 @@ func interleaveAddresses(addrs []resolver.Address) []resolver.Address {
 	familyAddrsMap := map[ipAddrFamily][]resolver.Address{}
 	interleavingOrder := []ipAddrFamily{}
 	for _, addr := range addrs {
-		family := addressFamily(addr.Addr)
+		family := addressFamily(addr.Addr())
 		if _, found := familyAddrsMap[family]; !found {
 			interleavingOrder = append(interleavingOrder, family)
 		}
@@ -574,7 +574,7 @@ func (b *pickfirstBalancer) scheduleNextConnectionLocked() {
 			return
 		}
 		if b.logger.V(2) {
-			b.logger.Infof("Happy Eyeballs timer expired while waiting for connection to %q.", curAddr.Addr)
+			b.logger.Infof("Happy Eyeballs timer expired while waiting for connection to %q.", curAddr.Addr())
 		}
 		if b.addressList.increment() {
 			b.requestConnectionLocked()
@@ -902,8 +902,8 @@ func (al *addressList) hasNext() bool {
 // which considers all fields to determine equality. Here, we only consider
 // fields that are meaningful to the SubConn.
 func equalAddressIgnoringBalAttributes(a, b *resolver.Address) bool {
-	return a.Addr == b.Addr && a.ServerName == b.ServerName &&
-		a.Attributes.Equal(b.Attributes)
+	return a.Addr() == b.Addr() && a.ServerName() == b.ServerName() &&
+		a.Attributes().Equal(b.Attributes())
 }
 
 // weightAttribute is a convenience function which returns the value of the

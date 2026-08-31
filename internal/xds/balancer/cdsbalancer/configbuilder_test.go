@@ -65,7 +65,7 @@ var (
 		cmp.Transformer("SortEndpoints", func(in []resolver.Endpoint) []resolver.Endpoint {
 			out := append([]resolver.Endpoint(nil), in...) // Copy input to avoid mutating it
 			sort.Slice(out, func(i, j int) bool {
-				return out[i].Addresses[0].Addr < out[j].Addresses[0].Addr
+				return out[i].Addresses[0].Addr() < out[j].Addresses[0].Addr()
 			})
 			return out
 		}),
