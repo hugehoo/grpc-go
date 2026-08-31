@@ -336,7 +336,7 @@ func (b *outlierDetectionBalancer) UpdateClientConnState(s balancer.ClientConnSt
 	b.addrs = map[string]*endpointInfo{}
 	for _, ep := range s.ResolverState.Endpoints {
 		epInfo, _ := b.endpoints.Get(ep)
-		for _, addr := range ep.Addresses {
+		for addr := range ep.Addresses() {
 			if _, ok := b.addrs[addr.Addr()]; ok {
 				b.logger.Errorf("Endpoints contain duplicate address %q", addr.Addr())
 				continue

@@ -1093,7 +1093,7 @@ func (s) TestEDS_EndpointWithMultipleAddresses(t *testing.T) {
 			gotState := resolverState.Load()
 
 			gotEndpointPorts := []uint32{}
-			for _, a := range gotState.Endpoints[0].Addresses {
+			for a := range gotState.Endpoints[0].Addresses() {
 				gotEndpointPorts = append(gotEndpointPorts, testutils.ParsePort(t, a.Addr()))
 			}
 			if diff := cmp.Diff(gotEndpointPorts, tc.wantEndpointPorts); diff != "" {

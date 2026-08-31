@@ -101,13 +101,13 @@ func SetLocalityID(addr resolver.Address, l clients.Locality) resolver.Address {
 
 // SetLocalityIDInEndpoint sets locality ID in endpoint to l.
 func SetLocalityIDInEndpoint(endpoint resolver.Endpoint, l clients.Locality) resolver.Endpoint {
-	endpoint.Attributes = endpoint.Attributes.WithValue(localityKey, l)
+	endpoint = endpoint.WithAttributes(endpoint.Attributes().WithValue(localityKey, l))
 	return endpoint
 }
 
 // LocalityIDFromEndpoint returns the locality ID of ep.
 func LocalityIDFromEndpoint(ep resolver.Endpoint) clients.Locality {
-	path, _ := ep.Attributes.Value(localityKey).(clients.Locality)
+	path, _ := ep.Attributes().Value(localityKey).(clients.Locality)
 	return path
 }
 

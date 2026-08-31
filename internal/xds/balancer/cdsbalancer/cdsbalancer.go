@@ -20,6 +20,7 @@ package cdsbalancer
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 
 	"google.golang.org/grpc/attributes"
 	"google.golang.org/grpc/balancer"
@@ -288,15 +289,16 @@ func (b *cdsBalancer) updateChildConfig() error {
 	}
 
 	for i := range endpoints {
-		for j := range endpoints[i].Addresses {
-			addr := endpoints[i].Addresses[j]
-			addr = addr.WithBalancerAttributes(endpoints[i].Attributes)
+		addresses := slices.Collect(endpoints[i].Addresses())
+		for j, addr := range addresses {
+			addr = addr.WithBalancerAttributes(endpoints[i].Attributes())
 			// BalancerAttributes are used for the following:
 			// * Authority Override.
 			// * grpc.lb.backend_service metric label propagation.
 			// See https://github.com/grpc/grpc-go/issues/6472
-			endpoints[i].Addresses[j] = addr
+			addresses[j] = addr
 		}
+		endpoints[i] = endpoints[i].WithAddresses(addresses...)
 	}
 	if err := b.childLB.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{

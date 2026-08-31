@@ -161,7 +161,7 @@ func (b *wrrBalancer) updateEndpointsLocked(endpoints []resolver.Endpoint) {
 	addressSet := resolver.NewAddressMapV2[*endpointWeight]()
 	for _, endpoint := range endpoints {
 		endpointSet.Set(endpoint, nil)
-		for _, addr := range endpoint.Addresses {
+		for addr := range endpoint.Addresses() {
 			addressSet.Set(addr, nil)
 		}
 		ew, ok := b.endpointToWeight.Get(endpoint)
@@ -177,7 +177,7 @@ func (b *wrrBalancer) updateEndpointsLocked(endpoints []resolver.Endpoint) {
 				locality:        b.locality,
 				clusterName:     b.clusterName,
 			}
-			for _, addr := range endpoint.Addresses {
+			for addr := range endpoint.Addresses() {
 				b.addressWeights.Set(addr, ew)
 			}
 			b.endpointToWeight.Set(endpoint, ew)
@@ -191,7 +191,7 @@ func (b *wrrBalancer) updateEndpointsLocked(endpoints []resolver.Endpoint) {
 			continue
 		}
 		b.endpointToWeight.Delete(endpoint)
-		for _, addr := range endpoint.Addresses {
+		for addr := range endpoint.Addresses() {
 			if _, ok := addressSet.Get(addr); !ok { // old endpoints to be deleted can share addresses with new endpoints, so only delete if necessary
 				b.addressWeights.Delete(addr)
 			}

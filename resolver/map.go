@@ -199,11 +199,11 @@ func NewEndpointMap[T any]() *EndpointMap[T] {
 // encodeEndpoint returns a string that uniquely identifies the unordered set of
 // addresses within an endpoint.
 func encodeEndpoint(e Endpoint) endpointMapKey {
-	addrs := make([]string, 0, len(e.Addresses))
+	addrs := make([]string, 0, e.AddressCount())
 	// base64 encoding the address strings restricts the characters present
 	// within the strings. This allows us to use a delimiter without the need of
 	// escape characters.
-	for _, addr := range e.Addresses {
+	for addr := range e.Addresses() {
 		addrs = append(addrs, base64.StdEncoding.EncodeToString([]byte(addr.Addr())))
 	}
 	sort.Strings(addrs)
@@ -224,7 +224,7 @@ func (em *EndpointMap[T]) Get(e Endpoint) (value T, ok bool) {
 func (em *EndpointMap[T]) Set(e Endpoint, value T) {
 	en := encodeEndpoint(e)
 	em.endpoints[en] = endpointData[T]{
-		decodedKey: NewEndpoint(e.Addresses...),
+		decodedKey: NewEndpoint(e.addresses...),
 		value:      value,
 	}
 }

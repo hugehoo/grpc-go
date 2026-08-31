@@ -163,7 +163,7 @@ func TestGroupE2E(t *testing.T) {
 		gotHierarchy[p1] = make(map[string][]string)
 		for p2, eps := range hierarchy.Group(wts) {
 			for _, ep := range eps {
-				gotHierarchy[p1][p2] = append(gotHierarchy[p1][p2], ep.Addresses[0].Addr())
+				gotHierarchy[p1][p2] = append(gotHierarchy[p1][p2], ep.Address(0).Addr())
 			}
 		}
 	}

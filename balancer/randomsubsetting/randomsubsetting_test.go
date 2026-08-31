@@ -179,7 +179,7 @@ func (s) TestCalculateSubset_IgnoresEndpointsWithoutAddresses(t *testing.T) {
 		t.Fatalf("calculateSubset() returned %d endpoints, want 2", len(got))
 	}
 	for _, endpoint := range got {
-		if len(endpoint.Addresses) == 0 {
+		if endpoint.AddressCount() == 0 {
 			t.Errorf("calculateSubset() returned an endpoint without addresses")
 		}
 	}

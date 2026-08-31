@@ -171,13 +171,14 @@ func buildClusterImplConfigForDNS(g *nameGenerator, config *xdsresource.ClusterC
 	if len(endpoints) == 0 {
 		return pName, lbconfig, nil
 	}
-	var retEndpoint resolver.Endpoint
+	var retAddresses []resolver.Address
 	for _, e := range endpoints {
 		// LOGICAL_DNS requires all resolved addresses to be grouped into a
 		// single logical endpoint. We iterate over the input endpoints and
 		// aggregate their addresses into a new endpoint variable.
-		retEndpoint.Addresses = append(retEndpoint.Addresses, e.Addresses...)
+		retAddresses = slices.AppendSeq(retAddresses, e.Addresses())
 	}
+	retEndpoint := resolver.NewEndpoint(retAddresses...)
 	// Even though localities are not a thing for the LOGICAL_DNS cluster and
 	// its endpoint(s), we add an empty locality attribute here to ensure that
 	// LB policies that rely on locality information (like weighted_target)
@@ -289,11 +290,10 @@ func priorityLocalitiesToClusterImpl(localities []xdsresource.Locality, priority
 				continue
 			}
 
-			// Create a copy of endpoint.ResolverEndpoint to avoid race between
-			// the xDS Client (which owns this shared object in its cache) and
-			// the Cluster Resolver (which is trying to modify attributes).
-			resolverEndpoint := endpoint.ResolverEndpoint
-			resolverEndpoint.Addresses = slices.Clone(endpoint.ResolverEndpoint.Addresses)
+			// Create a copy of endpoint.ResolverEndpoint to avoid a race between
+			// the xDS Client (which owns this shared object in its cache) and the
+			// Cluster Resolver (which is trying to modify attributes).
+			resolverEndpoint := endpoint.ResolverEndpoint.WithAddresses(slices.Collect(endpoint.ResolverEndpoint.Addresses())...)
 
 			if clusterUpdate.IsHTTP11ProxyEnabled {
 				var proxyAddrStr string
@@ -303,13 +303,15 @@ func priorityLocalitiesToClusterImpl(localities []xdsresource.Locality, priority
 					proxyAddrStr = val.Address
 				}
 				if proxyAddrStr != "" {
-					for idx, addr := range resolverEndpoint.Addresses {
+					addresses := make([]resolver.Address, 0, resolverEndpoint.AddressCount())
+					for addr := range resolverEndpoint.Addresses() {
 						connectAddr := addr.Addr()
 						addr = addr.WithAddr(proxyAddrStr)
-						resolverEndpoint.Addresses[idx] = proxyattributes.Set(addr, proxyattributes.Options{
+						addresses = append(addresses, proxyattributes.Set(addr, proxyattributes.Options{
 							ConnectAddr: connectAddr,
-						})
+						}))
 					}
+					resolverEndpoint = resolverEndpoint.WithAddresses(addresses...)
 				}
 			}
 

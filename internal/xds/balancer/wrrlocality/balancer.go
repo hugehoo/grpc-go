@@ -116,7 +116,7 @@ type AddrInfo struct {
 // SetAddrInfo returns a copy of endpoint in which the Attributes field is
 // updated with AddrInfo.
 func SetAddrInfo(endpoint resolver.Endpoint, addrInfo AddrInfo) resolver.Endpoint {
-	endpoint.Attributes = endpoint.Attributes.WithValue(attributeKey{}, addrInfo)
+	endpoint = endpoint.WithAttributes(endpoint.Attributes().WithValue(attributeKey{}, addrInfo))
 	return endpoint
 }
 
@@ -127,7 +127,7 @@ func (a AddrInfo) String() string {
 // getAddrInfo returns the AddrInfo stored in the Attributes field of
 // ep. Returns false if no AddrInfo found.
 func getAddrInfo(ep resolver.Endpoint) (AddrInfo, bool) {
-	v := ep.Attributes.Value(attributeKey{})
+	v := ep.Attributes().Value(attributeKey{})
 	ai, ok := v.(AddrInfo)
 	return ai, ok
 }

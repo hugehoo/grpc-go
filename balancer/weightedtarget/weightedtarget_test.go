@@ -138,11 +138,12 @@ func (b *testConfigBalancer) UpdateClientConnState(s balancer.ClientConnState) e
 	}
 
 	for i, ep := range s.ResolverState.Endpoints {
-		addrsWithAttr := make([]resolver.Address, len(ep.Addresses))
-		for j, addr := range ep.Addresses {
+		addrsWithAttr := make([]resolver.Address, ep.AddressCount())
+		for j := range ep.AddressCount() {
+			addr := ep.Address(j)
 			addrsWithAttr[j] = setConfigKey(addr, c.configStr)
 		}
-		s.ResolverState.Endpoints[i].Addresses = addrsWithAttr
+		s.ResolverState.Endpoints[i] = ep.WithAddresses(addrsWithAttr...)
 	}
 	s.BalancerConfig = nil
 	return b.Balancer.UpdateClientConnState(s)

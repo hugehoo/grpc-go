@@ -50,13 +50,13 @@ func (p pathValue) Equal(o any) bool {
 
 // FromEndpoint returns the hierarchical path of endpoint.
 func FromEndpoint(endpoint resolver.Endpoint) []string {
-	path, _ := endpoint.Attributes.Value(pathKey).(pathValue)
+	path, _ := endpoint.Attributes().Value(pathKey).(pathValue)
 	return path
 }
 
 // SetInEndpoint overrides the hierarchical path in endpoint with path.
 func SetInEndpoint(endpoint resolver.Endpoint, path []string) resolver.Endpoint {
-	endpoint.Attributes = endpoint.Attributes.WithValue(pathKey, pathValue(path))
+	endpoint = endpoint.WithAttributes(endpoint.Attributes().WithValue(pathKey, pathValue(path)))
 	return endpoint
 }
 

@@ -194,7 +194,7 @@ func (s) TestClusterNameInAddressAttributes(t *testing.T) {
 	}
 
 	addrs1 := <-cc.NewSubConnAddrsCh
-	if got, want := addrs1[0].Addr(), testBackendEndpoints[0].Addresses[0].Addr(); got != want {
+	if got, want := addrs1[0].Addr(), testBackendEndpoints[0].Address(0).Addr(); got != want {
 		t.Fatalf("sc is created with addr %v, want %v", got, want)
 	}
 	cn, ok := xdsinternal.GetXDSHandshakeClusterName(addrs1[0].Attributes())

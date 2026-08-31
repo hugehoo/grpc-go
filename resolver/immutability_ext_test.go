@@ -21,6 +21,7 @@ package resolver_test
 import (
 	"encoding/json"
 	"reflect"
+	"slices"
 	"testing"
 
 	"google.golang.org/grpc/attributes"
@@ -105,5 +106,110 @@ func TestAddressMarshalJSON(t *testing.T) {
 	want := `{"Addr":"address","ServerName":"server-name","Attributes":null,"BalancerAttributes":null,"Metadata":"metadata"}`
 	if string(got) != want {
 		t.Errorf("json.Marshal(%v) = %s, want %s", address, got, want)
+	}
+}
+
+func TestEndpointIsImmutable(t *testing.T) {
+	typ := reflect.TypeOf(resolver.Endpoint{})
+	for i := 0; i < typ.NumField(); i++ {
+		if field := typ.Field(i); field.IsExported() {
+			t.Errorf("resolver.Endpoint field %q is exported", field.Name)
+		}
+	}
+
+	addresses := []resolver.Address{resolver.NewAddress("one"), resolver.NewAddress("two")}
+	originalAttrs := attributes.New("original", true)
+	updatedAttrs := attributes.New("updated", true)
+	original := resolver.NewEndpoint(addresses...).WithAttributes(originalAttrs)
+	addresses[0] = resolver.NewAddress("caller-update")
+
+	if got, want := slices.Collect(original.Addresses()), []resolver.Address{resolver.NewAddress("one"), resolver.NewAddress("two")}; !slices.EqualFunc(got, want, resolver.Address.Equal) {
+		t.Fatalf("NewEndpoint() retained the caller's slice: got %v, want %v", got, want)
+	}
+
+	collected := slices.Collect(original.Addresses())
+	collected[0] = resolver.NewAddress("collected-update")
+	if got, want := original.Address(0), resolver.NewAddress("one"); !got.Equal(want) {
+		t.Fatalf("mutating collected addresses changed original.Address(0) to %v, want %v", got, want)
+	}
+
+	updated := original.
+		WithAddress(0, resolver.NewAddress("three")).
+		WithAttributes(updatedAttrs)
+	if got, want := original.Address(0), resolver.NewAddress("one"); !got.Equal(want) {
+		t.Errorf("original.Address(0) = %v after update, want %v", got, want)
+	}
+	if got := original.Attributes(); got != originalAttrs {
+		t.Errorf("original.Attributes() = %v after update, want %v", got, originalAttrs)
+	}
+	if got, want := updated.Address(0), resolver.NewAddress("three"); !got.Equal(want) {
+		t.Errorf("updated.Address(0) = %v, want %v", got, want)
+	}
+	if got := updated.Attributes(); got != updatedAttrs {
+		t.Errorf("updated.Attributes() = %v, want %v", got, updatedAttrs)
+	}
+}
+
+func TestEndpointAddressIterator(t *testing.T) {
+	endpoint := resolver.NewEndpoint(resolver.NewAddress("one"), resolver.NewAddress("two"))
+	var got []resolver.Address
+	for address := range endpoint.Addresses() {
+		got = append(got, address)
+	}
+	want := []resolver.Address{resolver.NewAddress("one"), resolver.NewAddress("two")}
+	if !slices.EqualFunc(got, want, resolver.Address.Equal) {
+		t.Fatalf("Endpoint.Addresses() yielded %v, want %v", got, want)
+	}
+
+	yields := 0
+	endpoint.Addresses()(func(resolver.Address) bool {
+		yields++
+		return false
+	})
+	if yields != 1 {
+		t.Errorf("Endpoint.Addresses() ignored early stop: got %d yields, want 1", yields)
+	}
+}
+
+func TestEndpointDoesNotShareConstructorInput(t *testing.T) {
+	addresses := []resolver.Address{resolver.NewAddress("one")}
+	endpoint := resolver.NewEndpoint(addresses...)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for range 1000 {
+			addresses[0] = resolver.NewAddress("caller-update")
+		}
+	}()
+	for range 1000 {
+		if got, want := endpoint.Address(0).Addr(), "one"; got != want {
+			t.Fatalf("endpoint.Address(0).Addr() = %q, want %q", got, want)
+		}
+	}
+	<-done
+}
+
+func TestEndpointZeroValue(t *testing.T) {
+	var endpoint resolver.Endpoint
+	if got := endpoint.AddressCount(); got != 0 {
+		t.Errorf("zero Endpoint.AddressCount() = %d, want 0", got)
+	}
+	if got := slices.Collect(endpoint.Addresses()); len(got) != 0 {
+		t.Errorf("zero Endpoint.Addresses() = %v, want empty", got)
+	}
+	if got := endpoint.Attributes(); got != nil {
+		t.Errorf("zero Endpoint.Attributes() = %v, want nil", got)
+	}
+}
+
+func TestEndpointMarshalJSON(t *testing.T) {
+	endpoint := resolver.NewEndpoint(resolver.NewAddress("address"))
+	got, err := json.Marshal(endpoint)
+	if err != nil {
+		t.Fatalf("json.Marshal(%v) failed: %v", endpoint, err)
+	}
+	want := `{"Addresses":[{"Addr":"address","ServerName":"","Attributes":null,"BalancerAttributes":null,"Metadata":null}],"Attributes":null}`
+	if string(got) != want {
+		t.Errorf("json.Marshal(%v) = %s, want %s", endpoint, got, want)
 	}
 }

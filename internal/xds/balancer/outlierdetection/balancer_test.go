@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -447,7 +448,8 @@ func (s) TestEjectUnejectSuccessRate(t *testing.T) {
 			stub.Register(test.name, stub.BalancerFuncs{
 				UpdateClientConnState: func(bd *stub.BalancerData, ccs balancer.ClientConnState) error {
 					for i := range test.numberOfConns {
-						scw, err := bd.ClientConn.NewSubConn(ccs.ResolverState.Endpoints[i].Addresses, balancer.NewSubConnOptions{
+						addresses := slices.Collect(ccs.ResolverState.Endpoints[i].Addresses())
+						scw, err := bd.ClientConn.NewSubConn(addresses, balancer.NewSubConnOptions{
 							StateListener: func(state balancer.SubConnState) {
 								if state.ConnectivityState == connectivity.Ready {
 									connectivityCh <- struct{}{}
@@ -455,7 +457,7 @@ func (s) TestEjectUnejectSuccessRate(t *testing.T) {
 							},
 						})
 						if err != nil {
-							t.Errorf("NewSubConn(%v) failed: %v", ccs.ResolverState.Endpoints[i].Addresses, err)
+							t.Errorf("NewSubConn(%v) failed: %v", addresses, err)
 						}
 						scw.Connect()
 						allSubConns[i] = scw
@@ -1232,7 +1234,7 @@ func (s) TestMultipleAddressesPerEndpoint(t *testing.T) {
 
 	// The first endpoint should be ejected, requests should only go to
 	// endpoints[1].
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{endpoints[1].Addresses[0]}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{endpoints[1].Address(0)}); err != nil {
 		t.Fatalf("RPCs didn't go to the second endpoint: %v", err)
 	}
 
@@ -1264,7 +1266,7 @@ func (s) TestMultipleAddressesPerEndpoint(t *testing.T) {
 	// shutdown the connected backend in endpoints[1], requests should start
 	// going to the second address in the same endpoint.
 	healthyBackends[1].Stop()
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{endpoints[1].Addresses[1]}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{endpoints[1].Address(1)}); err != nil {
 		t.Fatalf("RPCs didn't go to second address in the second endpoint: %v", err)
 	}
 
@@ -1275,7 +1277,7 @@ func (s) TestMultipleAddressesPerEndpoint(t *testing.T) {
 	<-time.After(time.Millisecond)
 	r.UpdateState(resolver.State{Endpoints: endpoints})
 	od.intervalTimerAlgorithm()
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{endpoints[0].Addresses[1], endpoints[1].Addresses[1]}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{endpoints[0].Address(1), endpoints[1].Address(1)}); err != nil {
 		t.Fatalf("RPCs didn't go to the second addresses of both endpoints: %v", err)
 	}
 }
@@ -1404,7 +1406,7 @@ func (s) TestEjectionStateResetsWhenEndpointAddressesChange(t *testing.T) {
 
 	// The first endpoint should be ejected, requests should only go to
 	// endpoints[1].
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{endpoints[1].Addresses[0]}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{endpoints[1].Address(0)}); err != nil {
 		t.Fatalf("RPCs didn't go to the second endpoint: %v", err)
 	}
 
@@ -1412,11 +1414,11 @@ func (s) TestEjectionStateResetsWhenEndpointAddressesChange(t *testing.T) {
 	// endpoint a new endpoint for outlier detection, resetting its ejection
 	// status.
 	r.UpdateState(resolver.State{Endpoints: []resolver.Endpoint{
-		resolver.NewEndpoint([]resolver.Address{endpoints[0].Addresses[1]}...),
+		resolver.NewEndpoint([]resolver.Address{endpoints[0].Address(1)}...),
 		endpoints[1],
 	}})
 	od.intervalTimerAlgorithm()
-	if err := roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{endpoints[0].Addresses[1], endpoints[1].Addresses[0]}); err != nil {
+	if err := roundrobin.CheckRoundRobinRPCs(ctx, client, []resolver.Address{endpoints[0].Address(1), endpoints[1].Address(0)}); err != nil {
 		t.Fatalf("RPCs didn't go to the second addresses of both endpoints: %v", err)
 	}
 }
@@ -1435,7 +1437,7 @@ func (s) TestSubConnShutdownRemovesFromEndpointMap(t *testing.T) {
 					childBalancerUpdateCh.Send(subConnWithState{sc: sc, state: scs})
 				},
 			}
-			sc, err := bd.ClientConn.NewSubConn(ccs.ResolverState.Endpoints[0].Addresses, opts)
+			sc, err := bd.ClientConn.NewSubConn(slices.Collect(ccs.ResolverState.Endpoints[0].Addresses()), opts)
 			if err != nil {
 				return err
 			}

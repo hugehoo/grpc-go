@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"iter"
 	"net"
 	"net/url"
 	"slices"
@@ -260,60 +261,83 @@ type BuildOptions struct {
 
 // An Endpoint is one network endpoint, or server, which may have multiple
 // addresses with which it can be accessed.
-// TODO(i/8773) : make resolver.Endpoint and resolver.Address immutable
 type Endpoint struct {
-	// Addresses contains a list of addresses used to access this endpoint.
-	Addresses []Address
-
-	// Attributes contains arbitrary data about this endpoint intended for
-	// consumption by the LB policy.
-	Attributes *attributes.Attributes
+	addresses  []Address
+	attributes *attributes.Attributes
 }
 
 // NewEndpoint returns an Endpoint containing addresses. The returned Endpoint
 // owns its address list; subsequent changes to addresses do not affect it.
 func NewEndpoint(addresses ...Address) Endpoint {
-	return Endpoint{Addresses: slices.Clone(addresses)}
+	return Endpoint{addresses: slices.Clone(addresses)}
+}
+
+// Addresses returns an iterator over the addresses in e, in order.
+func (e Endpoint) Addresses() iter.Seq[Address] {
+	return slices.Values(e.addresses)
 }
 
 // AddressCount returns the number of addresses in e.
 func (e Endpoint) AddressCount() int {
-	return len(e.Addresses)
+	return len(e.addresses)
 }
 
 // Address returns the Address at index. It panics if index is outside the
 // address list.
 func (e Endpoint) Address(index int) Address {
-	return e.Addresses[index]
+	return e.addresses[index]
 }
 
 // WithAddresses returns a copy of e containing addresses. The returned
 // Endpoint owns its address list; subsequent changes to addresses do not
 // affect it.
 func (e Endpoint) WithAddresses(addresses ...Address) Endpoint {
-	e.Addresses = slices.Clone(addresses)
+	e.addresses = slices.Clone(addresses)
 	return e
 }
 
 // WithAddress returns a copy of e with the Address at index replaced by addr.
 // It panics if index is outside the address list.
 func (e Endpoint) WithAddress(index int, addr Address) Endpoint {
-	e.Addresses = slices.Clone(e.Addresses)
-	e.Addresses[index] = addr
+	e.addresses = slices.Clone(e.addresses)
+	e.addresses[index] = addr
 	return e
+}
+
+// Attributes returns arbitrary data about this endpoint intended for
+// consumption by the LB policy.
+func (e Endpoint) Attributes() *attributes.Attributes {
+	return e.attributes
 }
 
 // WithAttributes returns a copy of e with Attributes set to attrs.
 func (e Endpoint) WithAttributes(attrs *attributes.Attributes) Endpoint {
-	e.Attributes = attrs
+	e.attributes = attrs
 	return e
 }
 
 // Equal returns whether e and o contain the same ordered addresses and
 // attributes.
 func (e Endpoint) Equal(o Endpoint) bool {
-	return slices.EqualFunc(e.Addresses, o.Addresses, Address.Equal) &&
-		e.Attributes.Equal(o.Attributes)
+	return slices.EqualFunc(e.addresses, o.addresses, Address.Equal) &&
+		e.attributes.Equal(o.attributes)
+}
+
+// String returns a string representation of e.
+func (e Endpoint) String() string {
+	return fmt.Sprintf("{Addresses: %v, Attributes: %v}", e.addresses, e.attributes)
+}
+
+// MarshalJSON implements json.Marshaler. It preserves the diagnostic JSON
+// representation used when Endpoint had exported fields.
+func (e Endpoint) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Addresses  []Address
+		Attributes *attributes.Attributes
+	}{
+		Addresses:  e.addresses,
+		Attributes: e.attributes,
+	})
 }
 
 // State contains the current Resolver state relevant to the ClientConn.
@@ -475,7 +499,7 @@ func ValidateEndpoints(endpoints []Endpoint) error {
 	}
 
 	for _, endpoint := range endpoints {
-		for range endpoint.Addresses {
+		for range endpoint.Addresses() {
 			return nil
 		}
 	}

@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"testing"
 	"time"
 
@@ -1977,7 +1978,7 @@ func init() {
 					})
 				}
 
-				sc, err := bd.ClientConn.NewSubConn(opts.ResolverState.Endpoints[0].Addresses, balancer.NewSubConnOptions{StateListener: lis})
+				sc, err := bd.ClientConn.NewSubConn(slices.Collect(opts.ResolverState.Endpoints[0].Addresses()), balancer.NewSubConnOptions{StateListener: lis})
 				if err != nil {
 					return err
 				}

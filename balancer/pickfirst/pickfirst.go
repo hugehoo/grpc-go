@@ -276,7 +276,7 @@ func (b *pickfirstBalancer) UpdateClientConnState(state balancer.ClientConnState
 		// "Flatten the list by concatenating the ordered list of addresses for
 		// each of the endpoints, in order." - A61
 		for _, endpoint := range endpoints {
-			newAddrs = append(newAddrs, endpoint.Addresses...)
+			newAddrs = slices.AppendSeq(newAddrs, endpoint.Addresses())
 		}
 	} else {
 		// Endpoints not set, process addresses until we migrate resolver

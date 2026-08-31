@@ -43,7 +43,7 @@ func SetHashKey(endpoint resolver.Endpoint, hashKey string) resolver.Endpoint {
 	if hashKey == "" {
 		return endpoint
 	}
-	endpoint.Attributes = endpoint.Attributes.WithValue(hashKeyKey, hashKey)
+	endpoint = endpoint.WithAttributes(endpoint.Attributes().WithValue(hashKeyKey, hashKey))
 	return endpoint
 }
 
@@ -55,6 +55,6 @@ func SetHashKey(endpoint resolver.Endpoint, hashKey string) resolver.Endpoint {
 // Notice: This API is EXPERIMENTAL and may be changed or removed in a
 // later release.
 func HashKey(endpoint resolver.Endpoint) string {
-	hashKey, _ := endpoint.Attributes.Value(hashKeyKey).(string)
+	hashKey, _ := endpoint.Attributes().Value(hashKeyKey).(string)
 	return hashKey
 }

@@ -586,8 +586,8 @@ func (s) TestLeastRequestEndpoints_MultipleAddresses(t *testing.T) {
 	// the picker update with the two backends is present, this test can start
 	// to populate those backends with streams.
 	wantAddrs := []resolver.Address{
-		endpoints[0].Addresses[0],
-		endpoints[1].Addresses[0],
+		endpoints[0].Address(0),
+		endpoints[1].Address(0),
 	}
 	if err := checkRoundRobinRPCs(ctx, testServiceClient, wantAddrs); err != nil {
 		t.Fatalf("error in expected round robin: %v", err)
@@ -597,8 +597,8 @@ func (s) TestLeastRequestEndpoints_MultipleAddresses(t *testing.T) {
 	// should fallback to the next address in endpoints[0].
 	backends[0].Stop()
 	wantAddrs = []resolver.Address{
-		endpoints[0].Addresses[1],
-		endpoints[1].Addresses[0],
+		endpoints[0].Address(1),
+		endpoints[1].Address(0),
 	}
 	if err := checkRoundRobinRPCs(ctx, testServiceClient, wantAddrs); err != nil {
 		t.Fatalf("error in expected round robin: %v", err)
@@ -639,7 +639,7 @@ func (s) TestLeastRequestEndpoints_MultipleAddresses(t *testing.T) {
 		Endpoints:     endpoints,
 		ServiceConfig: sc,
 	})
-	newAddress := endpoints[2].Addresses[0]
+	newAddress := endpoints[2].Address(0)
 	// Poll for only endpoint 3 to show up. This requires a polling loop because
 	// picker update with all three endpoints doesn't take into effect
 	// immediately, needs the third pickfirst to become READY.
@@ -669,9 +669,9 @@ func (s) TestLeastRequestEndpoints_MultipleAddresses(t *testing.T) {
 	// cause it to search all three endpoints for fewest outstanding requests on
 	// each iteration.
 	wantAddrCount := map[string]int{
-		endpoints[0].Addresses[1].Addr(): 1,
-		endpoints[1].Addresses[0].Addr(): 1,
-		endpoints[2].Addresses[0].Addr(): 1,
+		endpoints[0].Address(1).Addr(): 1,
+		endpoints[1].Address(0).Addr(): 1,
+		endpoints[2].Address(0).Addr(): 1,
 	}
 	gotAddrCount := make(map[string]int)
 	for i := 0; i < len(endpoints); i++ {
@@ -701,8 +701,8 @@ func (s) TestLeastRequestEndpoints_MultipleAddresses(t *testing.T) {
 		0, 1, 2, 2, 1, 0,
 	}
 	wantAddrs = []resolver.Address{
-		endpoints[1].Addresses[1],
-		endpoints[2].Addresses[1],
+		endpoints[1].Address(1),
+		endpoints[2].Address(1),
 	}
 	if err := checkRoundRobinRPCs(ctx, testServiceClient, wantAddrs); err != nil {
 		t.Fatalf("error in expected round robin: %v", err)

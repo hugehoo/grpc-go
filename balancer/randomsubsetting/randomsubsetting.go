@@ -154,7 +154,7 @@ func (b *subsettingBalancer) calculateSubset(endpoints []resolver.Endpoint) []re
 	// Empty endpoints cannot be hashed and are ignored by child policies.
 	// Remove them here so they do not count toward the requested subset size.
 	isEmpty := func(endpoint resolver.Endpoint) bool {
-		return len(endpoint.Addresses) == 0
+		return endpoint.AddressCount() == 0
 	}
 	if slices.ContainsFunc(endpoints, isEmpty) {
 		endpoints = slices.DeleteFunc(slices.Clone(endpoints), isEmpty)
@@ -177,7 +177,7 @@ func (b *subsettingBalancer) calculateSubset(endpoints []resolver.Endpoint) []re
 		//
 		// Note that we only hash the first address of the endpoint, as per A68.
 		b.hashDigest.ResetWithSeed(b.hashSeed)
-		b.hashDigest.WriteString(endpoint.Addresses[0].String())
+		b.hashDigest.WriteString(endpoint.Address(0).String())
 		hashedEndpoints[i] = endpointWithHash{
 			hash: b.hashDigest.Sum64(),
 			ep:   endpoint,

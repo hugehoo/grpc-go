@@ -691,7 +691,7 @@ func setTestAttrAddr(addr resolver.Address, content string) resolver.Address {
 }
 
 func setTestAttrEndpoint(endpoint resolver.Endpoint, content string) resolver.Endpoint {
-	endpoint.Attributes = endpoint.Attributes.WithValue(testKey, testAttribute{content})
+	endpoint = endpoint.WithAttributes(endpoint.Attributes().WithValue(testKey, testAttribute{content}))
 	return endpoint
 }
 

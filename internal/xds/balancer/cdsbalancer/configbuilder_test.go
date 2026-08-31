@@ -65,7 +65,7 @@ var (
 		cmp.Transformer("SortEndpoints", func(in []resolver.Endpoint) []resolver.Endpoint {
 			out := append([]resolver.Endpoint(nil), in...) // Copy input to avoid mutating it
 			sort.Slice(out, func(i, j int) bool {
-				return out[i].Addresses[0].Addr() < out[j].Addresses[0].Addr()
+				return out[i].Address(0).Addr() < out[j].Address(0).Addr()
 			})
 			return out
 		}),
@@ -304,10 +304,13 @@ func (s) TestBuildPriorityConfig(t *testing.T) {
 }
 
 func testEndpointForDNS(endpoints []resolver.Endpoint, localityWeight uint32, path []string) resolver.Endpoint {
-	retEndpoint := resolver.Endpoint{}
+	var addresses []resolver.Address
 	for _, e := range endpoints {
-		retEndpoint.Addresses = append(retEndpoint.Addresses, e.Addresses...)
+		for addr := range e.Addresses() {
+			addresses = append(addresses, addr)
+		}
 	}
+	retEndpoint := resolver.NewEndpoint(addresses...)
 	retEndpoint = hierarchy.SetInEndpoint(retEndpoint, path)
 	retEndpoint = wrrlocality.SetAddrInfo(retEndpoint, wrrlocality.AddrInfo{LocalityWeight: localityWeight})
 	return retEndpoint
@@ -1379,7 +1382,7 @@ func (s) TestPriorityLocalitiesToClusterImpl_HTTP11Proxy(t *testing.T) {
 			}
 
 			for idx, addr := range tt.wantConnectAddr {
-				ep := retEndpoints[idx].Addresses[0]
+				ep := retEndpoints[idx].Address(0)
 				opts, ok := proxyattributes.Get(ep)
 				if !ok {
 					t.Fatalf("Expected proxyattributes to be set")

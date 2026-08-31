@@ -69,7 +69,7 @@ func (s) TestEndpointWithersOwnAddressSlice(t *testing.T) {
 	original := NewEndpoint(addresses...).WithAttributes(originalAttrs)
 
 	addresses[0] = NewAddress("changed")
-	if got, want := original.Addresses, []Address{NewAddress("one"), NewAddress("two")}; !slices.EqualFunc(got, want, Address.Equal) {
+	if got, want := slices.Collect(original.Addresses()), []Address{NewAddress("one"), NewAddress("two")}; !slices.EqualFunc(got, want, Address.Equal) {
 		t.Fatalf("NewEndpoint() retained the caller's slice: got %v, want %v", got, want)
 	}
 
@@ -78,17 +78,17 @@ func (s) TestEndpointWithersOwnAddressSlice(t *testing.T) {
 	updatedAddresses[0] = NewAddress("changed-again")
 	updated = updated.WithAddress(1, NewAddress("five"))
 
-	if got, want := original.Addresses, []Address{NewAddress("one"), NewAddress("two")}; !slices.EqualFunc(got, want, Address.Equal) {
+	if got, want := slices.Collect(original.Addresses()), []Address{NewAddress("one"), NewAddress("two")}; !slices.EqualFunc(got, want, Address.Equal) {
 		t.Fatalf("original Endpoint changed: got %v, want %v", got, want)
 	}
-	if original.Attributes != originalAttrs {
-		t.Fatalf("original Endpoint attributes changed: got %v, want %v", original.Attributes, originalAttrs)
+	if original.Attributes() != originalAttrs {
+		t.Fatalf("original Endpoint attributes changed: got %v, want %v", original.Attributes(), originalAttrs)
 	}
-	if got, want := updated.Addresses, []Address{NewAddress("three"), NewAddress("five")}; !slices.EqualFunc(got, want, Address.Equal) {
+	if got, want := slices.Collect(updated.Addresses()), []Address{NewAddress("three"), NewAddress("five")}; !slices.EqualFunc(got, want, Address.Equal) {
 		t.Fatalf("updated Endpoint addresses = %v, want %v", got, want)
 	}
-	if updated.Attributes != newAttrs {
-		t.Fatalf("updated Endpoint attributes = %v, want %v", updated.Attributes, newAttrs)
+	if updated.Attributes() != newAttrs {
+		t.Fatalf("updated Endpoint attributes = %v, want %v", updated.Attributes(), newAttrs)
 	}
 	if got, want := updated.AddressCount(), 2; got != want {
 		t.Fatalf("updated.AddressCount() = %d, want %d", got, want)

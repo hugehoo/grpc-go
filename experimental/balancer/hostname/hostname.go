@@ -35,13 +35,13 @@ func Set(endpoint resolver.Endpoint, hostname string) resolver.Endpoint {
 	if hostname == "" {
 		return endpoint
 	}
-	endpoint.Attributes = endpoint.Attributes.WithValue(hostnameKey{}, hostname)
+	endpoint = endpoint.WithAttributes(endpoint.Attributes().WithValue(hostnameKey{}, hostname))
 	return endpoint
 }
 
 // FromEndpoint returns the hostname attribute of endpoint. If this
 // attribute is not set, it returns the empty string.
 func FromEndpoint(endpoint resolver.Endpoint) string {
-	h, _ := endpoint.Attributes.Value(hostnameKey{}).(string)
+	h, _ := endpoint.Attributes().Value(hostnameKey{}).(string)
 	return h
 }

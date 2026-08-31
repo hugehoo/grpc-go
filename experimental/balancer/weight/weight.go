@@ -46,7 +46,7 @@ func (a EndpointInfo) Equal(o any) bool {
 // Set returns a copy of endpoint in which the Attributes field is
 // updated with EndpointInfo.
 func Set(endpoint resolver.Endpoint, epInfo EndpointInfo) resolver.Endpoint {
-	endpoint.Attributes = endpoint.Attributes.WithValue(attributeKey{}, epInfo)
+	endpoint = endpoint.WithAttributes(endpoint.Attributes().WithValue(attributeKey{}, epInfo))
 	return endpoint
 }
 
@@ -54,7 +54,7 @@ func Set(endpoint resolver.Endpoint, epInfo EndpointInfo) resolver.Endpoint {
 // field of an endpoint. It returns an empty EndpointInfo if attribute
 // is not found.
 func FromEndpoint(endpoint resolver.Endpoint) EndpointInfo {
-	v := endpoint.Attributes.Value(attributeKey{})
+	v := endpoint.Attributes().Value(attributeKey{})
 	ei, _ := v.(EndpointInfo)
 	return ei
 }

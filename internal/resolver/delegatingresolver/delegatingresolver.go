@@ -205,7 +205,7 @@ func needsProxyResolver(state *resolver.State) bool {
 		}
 	}
 	for _, endpoint := range state.Endpoints {
-		for _, addr := range endpoint.Addresses {
+		for addr := range endpoint.Addresses() {
 			if !skipProxy(addr) {
 				return true
 			}
@@ -321,7 +321,7 @@ func (r *delegatingResolver) updateClientConnStateLocked() error {
 	var endpoints []resolver.Endpoint
 	for _, endpt := range (*r.targetResolverState).Endpoints {
 		var addrs []resolver.Address
-		for _, targetAddr := range endpt.Addresses {
+		for targetAddr := range endpt.Addresses() {
 			// Avoid proxy when network is not tcp.
 			if skipProxy(targetAddr) {
 				addrs = append(addrs, targetAddr)
@@ -363,7 +363,9 @@ func (r *delegatingResolver) updateProxyResolverState(state resolver.State) erro
 		// uses "dns" resolution.
 		r.proxyAddrs = make([]resolver.Address, 0, len(state.Endpoints))
 		for _, endpoint := range state.Endpoints {
-			r.proxyAddrs = append(r.proxyAddrs, endpoint.Addresses...)
+			for addr := range endpoint.Addresses() {
+				r.proxyAddrs = append(r.proxyAddrs, addr)
+			}
 		}
 	} else if state.Addresses != nil {
 		r.proxyAddrs = state.Addresses
