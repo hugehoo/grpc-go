@@ -290,10 +290,7 @@ func priorityLocalitiesToClusterImpl(localities []xdsresource.Locality, priority
 				continue
 			}
 
-			// Create a copy of endpoint.ResolverEndpoint to avoid a race between
-			// the xDS Client (which owns this shared object in its cache) and the
-			// Cluster Resolver (which is trying to modify attributes).
-			resolverEndpoint := endpoint.ResolverEndpoint.WithAddresses(slices.Collect(endpoint.ResolverEndpoint.Addresses())...)
+			resolverEndpoint := endpoint.ResolverEndpoint
 
 			if clusterUpdate.IsHTTP11ProxyEnabled {
 				var proxyAddrStr string

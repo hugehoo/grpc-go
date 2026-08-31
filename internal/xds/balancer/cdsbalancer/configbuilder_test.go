@@ -1394,3 +1394,80 @@ func (s) TestPriorityLocalitiesToClusterImpl_HTTP11Proxy(t *testing.T) {
 		})
 	}
 }
+
+func (s) TestPriorityLocalitiesToClusterImplSharedEndpoint(t *testing.T) {
+	inputAttributes := attributes.New("input", "unchanged")
+	inputAddresses := []resolver.Address{
+		resolver.NewAddress("10.0.0.5:443"),
+		resolver.NewAddress("10.0.0.6:443"),
+	}
+	sharedEndpoint := resolver.NewEndpoint(inputAddresses...).WithAttributes(inputAttributes)
+	localities := []xdsresource.Locality{{
+		Endpoints: []xdsresource.Endpoint{{
+			ResolverEndpoint: sharedEndpoint,
+			HealthStatus:     xdsresource.EndpointHealthStatusHealthy,
+			Weight:           1,
+		}},
+		ID:     clients.Locality{SubZone: "subzone-1"},
+		Weight: 1,
+		Metadata: map[string]any{
+			"envoy.http11_proxy_transport_socket.proxy_address": xdsresource.ProxyAddressMetadataValue{
+				Address: "192.168.1.1:8080",
+			},
+		},
+	}}
+	clusterUpdate := xdsresource.ClusterUpdate{
+		ClusterName:          "test-cluster",
+		IsHTTP11ProxyEnabled: true,
+	}
+
+	const goroutines = 20
+	errs := make(chan error, goroutines)
+	for i := range goroutines {
+		go func() {
+			priorityName := fmt.Sprintf("priority-%d", i)
+			_, endpoints, err := priorityLocalitiesToClusterImpl(localities, priorityName, clusterUpdate, nil)
+			if err != nil {
+				errs <- err
+				return
+			}
+			if len(endpoints) != 1 {
+				errs <- fmt.Errorf("priorityLocalitiesToClusterImpl() returned %d endpoints, want 1", len(endpoints))
+				return
+			}
+			endpoint := endpoints[0]
+			if got, want := endpoint.AddressCount(), len(inputAddresses); got != want {
+				errs <- fmt.Errorf("output AddressCount() = %d, want %d", got, want)
+				return
+			}
+			for index, inputAddress := range inputAddresses {
+				address := endpoint.Address(index)
+				if got, want := address.Addr(), "192.168.1.1:8080"; got != want {
+					errs <- fmt.Errorf("output Address(%d).Addr() = %q, want %q", index, got, want)
+					return
+				}
+				opts, ok := proxyattributes.Get(address)
+				if !ok || opts.ConnectAddr != inputAddress.Addr() {
+					errs <- fmt.Errorf("output Address(%d) proxy options = (%v, %v), want ConnectAddr %q", index, opts, ok, inputAddress.Addr())
+					return
+				}
+			}
+			path := hierarchy.FromEndpoint(endpoint)
+			if len(path) == 0 || path[0] != priorityName {
+				errs <- fmt.Errorf("output hierarchy path = %v, want prefix %q", path, priorityName)
+				return
+			}
+			errs <- nil
+		}()
+	}
+	for range goroutines {
+		if err := <-errs; err != nil {
+			t.Error(err)
+		}
+	}
+
+	wantInput := resolver.NewEndpoint(inputAddresses...).WithAttributes(inputAttributes)
+	if !sharedEndpoint.Equal(wantInput) {
+		t.Errorf("shared input endpoint changed: got %v, want %v", sharedEndpoint, wantInput)
+	}
+}
