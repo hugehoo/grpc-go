@@ -342,6 +342,34 @@ func (s) TestEndpointMap_All(t *testing.T) {
 	}
 }
 
+func (s) TestEndpointMap_KeyIsolation(t *testing.T) {
+	addresses := []Address{NewAddress("one"), NewAddress("two")}
+	endpoint := NewEndpoint(addresses...)
+	em := NewEndpointMap[int]()
+	em.Set(endpoint, 1)
+
+	addresses[0] = NewAddress("caller-update")
+	collected := make([]Address, 0, endpoint.AddressCount())
+	for address := range endpoint.Addresses() {
+		collected = append(collected, address)
+	}
+	collected[1] = NewAddress("iterator-update")
+
+	wantKey := NewEndpoint(NewAddress("one"), NewAddress("two"))
+	if got, ok := em.Get(wantKey); !ok || got != 1 {
+		t.Fatalf("em.Get(%v) = (%v, %v), want (1, true)", wantKey, got, ok)
+	}
+	keys := em.Keys()
+	if len(keys) != 1 || !keys[0].Equal(wantKey) {
+		t.Fatalf("em.Keys() = %v, want [%v]", keys, wantKey)
+	}
+
+	keys[0] = keys[0].WithAddress(0, NewAddress("key-update"))
+	if got, ok := em.Get(wantKey); !ok || got != 1 {
+		t.Fatalf("em.Get(%v) after modifying returned key = (%v, %v), want (1, true)", wantKey, got, ok)
+	}
+}
+
 // BenchmarkEndpointMap benchmarks map operations that are expected to run
 // faster than O(n). This test doesn't run O(n) operations including listing
 // keys and values.
