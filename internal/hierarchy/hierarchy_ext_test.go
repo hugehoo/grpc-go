@@ -90,19 +90,19 @@ func TestGroup(t *testing.T) {
 		{
 			name: "all with hierarchy",
 			eps: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("a0")}}, []string{"a"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("a1")}}, []string{"a"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("b0")}}, []string{"b"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("b1")}}, []string{"b"}),
+				hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("a0")}...), []string{"a"}),
+				hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("a1")}...), []string{"a"}),
+				hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("b0")}...), []string{"b"}),
+				hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("b1")}...), []string{"b"}),
 			},
 			want: map[string][]resolver.Endpoint{
 				"a": {
-					hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("a0")}}, nil),
-					hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("a1")}}, nil),
+					hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("a0")}...), nil),
+					hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("a1")}...), nil),
 				},
 				"b": {
-					hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("b0")}}, nil),
-					hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("b1")}}, nil),
+					hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("b0")}...), nil),
+					hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("b1")}...), nil),
 				},
 			},
 		},
@@ -110,15 +110,15 @@ func TestGroup(t *testing.T) {
 			// Endpoints without hierarchy are ignored.
 			name: "without hierarchy",
 			eps: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("a0")}}, []string{"a"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("a1")}}, []string{"a"}),
-				{Addresses: []resolver.Address{resolver.NewAddress("b0")}, Attributes: nil},
-				{Addresses: []resolver.Address{resolver.NewAddress("b1")}, Attributes: nil},
+				hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("a0")}...), []string{"a"}),
+				hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("a1")}...), []string{"a"}),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("b0")}...).WithAttributes(nil),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("b1")}...).WithAttributes(nil),
 			},
 			want: map[string][]resolver.Endpoint{
 				"a": {
-					hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("a0")}}, nil),
-					hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("a1")}}, nil),
+					hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("a0")}...), nil),
+					hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("a1")}...), nil),
 				},
 			},
 		},
@@ -152,7 +152,7 @@ func TestGroupE2E(t *testing.T) {
 			path2 := append([]string(nil), path1...)
 			path2 = append(path2, wt)
 			for _, addr := range addrs {
-				a := hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(addr)}}, path2)
+				a := hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(addr)}...), path2)
 				epsWithHierarchy = append(epsWithHierarchy, a)
 			}
 		}

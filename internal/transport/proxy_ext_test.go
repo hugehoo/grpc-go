@@ -244,7 +244,7 @@ func (s) TestNewClientWithProxyAndCustomResolver(t *testing.T) {
 	// Create and update a custom resolver for target URI.
 	targetResolver := manual.NewBuilderWithScheme("test")
 	resolver.Register(targetResolver)
-	targetResolver.InitialState(resolver.State{Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}}}})
+	targetResolver.InitialState(resolver.State{Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backend.Address)}...)}})
 
 	// Dial to the proxy server.
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
