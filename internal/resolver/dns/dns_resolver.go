@@ -127,7 +127,7 @@ func (b *dnsBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts 
 		addr := []resolver.Address{resolver.NewAddress(ipAddr + ":" + port)}
 		cc.UpdateState(resolver.State{
 			Addresses: addr,
-			Endpoints: []resolver.Endpoint{{Addresses: addr}},
+			Endpoints: []resolver.Endpoint{resolver.NewEndpoint(addr...)},
 		})
 		return deadResolver{}, nil
 	}
@@ -347,7 +347,7 @@ func (d *dnsResolver) lookup() (*resolver.State, error) {
 
 	eps := make([]resolver.Endpoint, 0, len(addrs))
 	for _, addr := range addrs {
-		eps = append(eps, resolver.Endpoint{Addresses: []resolver.Address{addr}})
+		eps = append(eps, resolver.NewEndpoint([]resolver.Address{addr}...))
 	}
 
 	state := resolver.State{

@@ -145,7 +145,7 @@ func New(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOpti
 	if target.URL.Scheme == "dns" && !targetResolutionEnabled {
 		r.targetResolverState = &resolver.State{
 			Addresses: []resolver.Address{resolver.NewAddress(addr)},
-			Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress(addr)}}},
+			Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(addr)}...)},
 		}
 		r.updateTargetResolverState(*r.targetResolverState)
 		return r, nil
@@ -334,7 +334,7 @@ func (r *delegatingResolver) updateClientConnStateLocked() error {
 				}))
 			}
 		}
-		endpoints = append(endpoints, resolver.Endpoint{Addresses: addrs})
+		endpoints = append(endpoints, resolver.NewEndpoint(addrs...))
 	}
 	// Use the targetResolverState for its service config and attributes
 	// contents. The state update is only sent after both the target and proxy

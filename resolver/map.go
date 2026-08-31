@@ -224,7 +224,7 @@ func (em *EndpointMap[T]) Get(e Endpoint) (value T, ok bool) {
 func (em *EndpointMap[T]) Set(e Endpoint, value T) {
 	en := encodeEndpoint(e)
 	em.endpoints[en] = endpointData[T]{
-		decodedKey: Endpoint{Addresses: e.Addresses},
+		decodedKey: NewEndpoint(e.Addresses...),
 		value:      value,
 	}
 }
