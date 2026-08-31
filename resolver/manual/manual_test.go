@@ -32,7 +32,7 @@ func TestResolver(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	r.InitialState(resolver.State{
 		Addresses: []resolver.Address{
-			{Addr: "address"},
+			resolver.NewAddress("address"),
 		},
 	})
 
@@ -56,7 +56,7 @@ func TestResolver(t *testing.T) {
 		defer cc.Close()
 		cc.Connect()
 		r.UpdateState(resolver.State{Addresses: []resolver.Address{
-			{Addr: "ok"},
+			resolver.NewAddress("ok"),
 		}})
 		r.CC().ReportError(errors.New("example"))
 	})

@@ -31,24 +31,24 @@ import (
 // addr1, since the only difference is BalancerAttributes, which are not
 // compared.
 var (
-	addr1 = Address{Addr: "a1", Attributes: attributes.New("a1", 3), ServerName: "s1"}
-	addr2 = Address{Addr: "a2", Attributes: attributes.New("a1", 3), ServerName: "s1"}
-	addr3 = Address{Addr: "a1", Attributes: attributes.New("a2", 3), ServerName: "s1"}
-	addr4 = Address{Addr: "a1", Attributes: attributes.New("a1", 2), ServerName: "s1"}
-	addr5 = Address{Addr: "a1", Attributes: attributes.New("a1", "3"), ServerName: "s1"}
-	addr6 = Address{Addr: "a1", Attributes: attributes.New("a1", 3), ServerName: "s2"}
-	addr7 = Address{Addr: "a1", Attributes: attributes.New("a1", 3), ServerName: "s1", BalancerAttributes: attributes.New("xx", 3)}
+	addr1 = NewAddress("a1").WithAttributes(attributes.New("a1", 3)).WithServerName("s1")
+	addr2 = NewAddress("a2").WithAttributes(attributes.New("a1", 3)).WithServerName("s1")
+	addr3 = NewAddress("a1").WithAttributes(attributes.New("a2", 3)).WithServerName("s1")
+	addr4 = NewAddress("a1").WithAttributes(attributes.New("a1", 2)).WithServerName("s1")
+	addr5 = NewAddress("a1").WithAttributes(attributes.New("a1", "3")).WithServerName("s1")
+	addr6 = NewAddress("a1").WithAttributes(attributes.New("a1", 3)).WithServerName("s2")
+	addr7 = NewAddress("a1").WithAttributes(attributes.New("a1", 3)).WithServerName("s1").WithBalancerAttributes(attributes.New("xx", 3))
 
-	endpoint1   = Endpoint{Addresses: []Address{{Addr: "addr1"}}}
-	endpoint2   = Endpoint{Addresses: []Address{{Addr: "addr2"}}}
-	endpoint3   = Endpoint{Addresses: []Address{{Addr: "addr3"}}}
-	endpoint4   = Endpoint{Addresses: []Address{{Addr: "addr4"}}}
-	endpoint5   = Endpoint{Addresses: []Address{{Addr: "addr5"}}}
-	endpoint6   = Endpoint{Addresses: []Address{{Addr: "addr6"}}}
-	endpoint7   = Endpoint{Addresses: []Address{{Addr: "addr7"}}}
-	endpoint12  = Endpoint{Addresses: []Address{{Addr: "addr1"}, {Addr: "addr2"}}}
-	endpoint21  = Endpoint{Addresses: []Address{{Addr: "addr2"}, {Addr: "addr1"}}}
-	endpoint123 = Endpoint{Addresses: []Address{{Addr: "addr1"}, {Addr: "addr2"}, {Addr: "addr3"}}}
+	endpoint1   = Endpoint{Addresses: []Address{NewAddress("addr1")}}
+	endpoint2   = Endpoint{Addresses: []Address{NewAddress("addr2")}}
+	endpoint3   = Endpoint{Addresses: []Address{NewAddress("addr3")}}
+	endpoint4   = Endpoint{Addresses: []Address{NewAddress("addr4")}}
+	endpoint5   = Endpoint{Addresses: []Address{NewAddress("addr5")}}
+	endpoint6   = Endpoint{Addresses: []Address{NewAddress("addr6")}}
+	endpoint7   = Endpoint{Addresses: []Address{NewAddress("addr7")}}
+	endpoint12  = Endpoint{Addresses: []Address{NewAddress("addr1"), NewAddress("addr2")}}
+	endpoint21  = Endpoint{Addresses: []Address{NewAddress("addr2"), NewAddress("addr1")}}
+	endpoint123 = Endpoint{Addresses: []Address{NewAddress("addr1"), NewAddress("addr2"), NewAddress("addr3")}}
 )
 
 func (s) TestAddressMap_Length(t *testing.T) {
@@ -349,17 +349,17 @@ func BenchmarkEndpointMap(b *testing.B) {
 	em := NewEndpointMap[any]()
 	for i := range b.N {
 		em.Set(Endpoint{
-			Addresses: []Address{{Addr: fmt.Sprintf("%d.%d.%d.%d", i, i, i, i)}},
+			Addresses: []Address{NewAddress(fmt.Sprintf("%d.%d.%d.%d", i, i, i, i))},
 		}, i)
 	}
 	for i := range b.N {
 		em.Get(Endpoint{
-			Addresses: []Address{{Addr: fmt.Sprintf("%d.%d.%d.%d", i, i, i, i)}},
+			Addresses: []Address{NewAddress(fmt.Sprintf("%d.%d.%d.%d", i, i, i, i))},
 		})
 	}
 	for i := range b.N {
 		em.Delete(Endpoint{
-			Addresses: []Address{{Addr: fmt.Sprintf("%d.%d.%d.%d", i, i, i, i)}},
+			Addresses: []Address{NewAddress(fmt.Sprintf("%d.%d.%d.%d", i, i, i, i))},
 		})
 	}
 }

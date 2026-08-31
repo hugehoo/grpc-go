@@ -54,22 +54,10 @@ func (s) TestAddressWithers(t *testing.T) {
 		WithBalancerAttributes(newBalancerAttrs).
 		WithMetadata(newMetadata)
 
-	if got, want := original, (Address{
-		Addr:               "original-address",
-		ServerName:         "original-server-name",
-		Attributes:         originalAttrs,
-		BalancerAttributes: originalBalancerAttrs,
-		Metadata:           originalMetadata,
-	}); !got.Equal(want) {
+	if got, want := original, (NewAddress("original-address").WithServerName("original-server-name").WithAttributes(originalAttrs).WithBalancerAttributes(originalBalancerAttrs).WithMetadata(originalMetadata)); !got.Equal(want) {
 		t.Fatalf("original Address changed: got %v, want %v", got, want)
 	}
-	if got, want := updated, (Address{
-		Addr:               "new-address",
-		ServerName:         "new-server-name",
-		Attributes:         newAttrs,
-		BalancerAttributes: newBalancerAttrs,
-		Metadata:           newMetadata,
-	}); !got.Equal(want) {
+	if got, want := updated, (NewAddress("new-address").WithServerName("new-server-name").WithAttributes(newAttrs).WithBalancerAttributes(newBalancerAttrs).WithMetadata(newMetadata)); !got.Equal(want) {
 		t.Fatalf("updated Address = %v, want %v", got, want)
 	}
 }
@@ -107,10 +95,10 @@ func (s) TestEndpointWithersOwnAddressSlice(t *testing.T) {
 // TestValidateEndpoints tests different scenarios of resolver addresses being
 // validated by the ValidateEndpoint helper.
 func (s) TestValidateEndpoints(t *testing.T) {
-	addr1 := Address{Addr: "addr1"}
-	addr2 := Address{Addr: "addr2"}
-	addr3 := Address{Addr: "addr3"}
-	addr4 := Address{Addr: "addr4"}
+	addr1 := NewAddress("addr1")
+	addr2 := NewAddress("addr2")
+	addr3 := NewAddress("addr3")
+	addr4 := NewAddress("addr4")
 	tests := []struct {
 		name      string
 		endpoints []Endpoint

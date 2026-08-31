@@ -64,7 +64,7 @@ func (s) TestResolverBalancerInteraction(t *testing.T) {
 	rb.BuildCallback = func(_ resolver.Target, cc resolver.ClientConn, _ resolver.BuildOptions) {
 		sc := cc.ParseServiceConfig(`{"loadBalancingConfig": [{"` + name + `":{}}]}`)
 		cc.UpdateState(resolver.State{
-			Addresses:     []resolver.Address{{Addr: "test"}},
+			Addresses:     []resolver.Address{resolver.NewAddress("test")},
 			ServiceConfig: sc,
 		})
 	}
@@ -182,7 +182,7 @@ func (s) TestEnterIdleDuringResolverUpdateState(t *testing.T) {
 		ctx, cancel = context.WithCancel(context.Background())
 		go func() {
 			for ctx.Err() == nil {
-				cc.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: "test"}}})
+				cc.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress("test")}})
 			}
 		}()
 	}
@@ -233,7 +233,7 @@ func (s) TestEnterIdleDuringBalancerUpdateState(t *testing.T) {
 
 	rb := manual.NewBuilderWithScheme(name)
 	rb.BuildCallback = func(_ resolver.Target, cc resolver.ClientConn, _ resolver.BuildOptions) {
-		cc.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: "test"}}})
+		cc.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress("test")}})
 	}
 	resolver.Register(rb)
 
@@ -269,7 +269,7 @@ func (s) TestEnterIdleDuringBalancerNewSubConn(t *testing.T) {
 	bf := stub.BalancerFuncs{
 		UpdateClientConnState: func(bd *stub.BalancerData, _ balancer.ClientConnState) error {
 			go func() {
-				bd.ClientConn.NewSubConn([]resolver.Address{{Addr: "test"}}, balancer.NewSubConnOptions{})
+				bd.ClientConn.NewSubConn([]resolver.Address{resolver.NewAddress("test")}, balancer.NewSubConnOptions{})
 			}()
 			return nil
 		},
@@ -278,7 +278,7 @@ func (s) TestEnterIdleDuringBalancerNewSubConn(t *testing.T) {
 
 	rb := manual.NewBuilderWithScheme(name)
 	rb.BuildCallback = func(_ resolver.Target, cc resolver.ClientConn, _ resolver.BuildOptions) {
-		cc.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: "test"}}})
+		cc.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress("test")}})
 	}
 	resolver.Register(rb)
 
