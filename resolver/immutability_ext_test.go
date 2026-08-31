@@ -174,19 +174,33 @@ func TestEndpointAddressIterator(t *testing.T) {
 func TestEndpointDoesNotShareConstructorInput(t *testing.T) {
 	addresses := []resolver.Address{resolver.NewAddress("one")}
 	endpoint := resolver.NewEndpoint(addresses...)
+	ready := make(chan struct{})
+	start := make(chan struct{})
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
+		close(ready)
+		<-start
 		for range 1000 {
 			addresses[0] = resolver.NewAddress("caller-update")
 		}
 	}()
+	<-ready
+	close(start)
+	var firstUnexpected string
 	for range 1000 {
 		if got, want := endpoint.Address(0).Addr(), "one"; got != want {
-			t.Fatalf("endpoint.Address(0).Addr() = %q, want %q", got, want)
+			firstUnexpected = got
+			break
 		}
 	}
 	<-done
+	if firstUnexpected != "" {
+		t.Errorf("endpoint.Address(0).Addr() during caller mutation = %q, want %q", firstUnexpected, "one")
+	}
+	if got, want := endpoint.Address(0).Addr(), "one"; got != want {
+		t.Errorf("endpoint.Address(0).Addr() after caller mutation = %q, want %q", got, want)
+	}
 }
 
 func TestEndpointZeroValue(t *testing.T) {

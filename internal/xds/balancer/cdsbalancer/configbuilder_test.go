@@ -79,6 +79,20 @@ var (
 	}
 )
 
+type childConfigCapturingBalancer struct {
+	updateCh chan balancer.ClientConnState
+}
+
+func (b *childConfigCapturingBalancer) UpdateClientConnState(state balancer.ClientConnState) error {
+	b.updateCh <- state
+	return nil
+}
+
+func (*childConfigCapturingBalancer) ResolverError(error)                                        {}
+func (*childConfigCapturingBalancer) UpdateSubConnState(balancer.SubConn, balancer.SubConnState) {}
+func (*childConfigCapturingBalancer) Close()                                                     {}
+func (*childConfigCapturingBalancer) ExitIdle()                                                  {}
+
 // makeLocalityID creates a clients.Locality with Zone set to
 // "test-zone-{idx}".
 func makeLocalityID(idx int) clients.Locality {
@@ -1442,6 +1456,105 @@ func (s) TestPriorityLocalitiesToClusterImplSharedEndpoint(t *testing.T) {
 	}
 
 	wantInput := resolver.NewEndpoint(inputAddresses...).WithAttributes(inputAttributes)
+	if !sharedEndpoint.Equal(wantInput) {
+		t.Errorf("shared input endpoint changed: got %v, want %v", sharedEndpoint, wantInput)
+	}
+}
+
+func (s) TestUpdateChildConfigSharedEndpoint(t *testing.T) {
+	addressAttributes := attributes.New("address", "unchanged")
+	endpointAttributes := attributes.New("endpoint", "unchanged")
+	sharedEndpoint := resolver.NewEndpoint(
+		resolver.NewAddress("10.0.0.5:443").WithBalancerAttributes(addressAttributes),
+	).WithAttributes(endpointAttributes)
+
+	const balancerCount = 2
+	balancers := make([]*cdsBalancer, 0, balancerCount)
+	updateChs := make([]chan balancer.ClientConnState, 0, balancerCount)
+	for i := range balancerCount {
+		b, ok := bb{}.Build(testutils.NewBalancerClientConn(t), balancer.BuildOptions{}).(*cdsBalancer)
+		if !ok {
+			t.Fatalf("bb.Build() returned type %T, want *cdsBalancer", b)
+		}
+		updateCh := make(chan balancer.ClientConnState, 1)
+		b.childLB = &childConfigCapturingBalancer{updateCh: updateCh}
+		b.xdsLBPolicy = iserviceconfig.BalancerConfig{Name: roundrobin.Name}
+		b.priorities = []*priorityConfig{{
+			clusterConfig: &xdsresource.ClusterConfig{
+				Cluster: &xdsresource.ClusterUpdate{
+					ClusterName: fmt.Sprintf("cluster-%d", i),
+					ClusterType: xdsresource.ClusterTypeEDS,
+				},
+				EndpointConfig: &xdsresource.EndpointConfig{
+					EDSUpdate: &xdsresource.EndpointsUpdate{
+						Localities: []xdsresource.Locality{{
+							Endpoints: []xdsresource.Endpoint{{
+								ResolverEndpoint: sharedEndpoint,
+								HealthStatus:     xdsresource.EndpointHealthStatusHealthy,
+								Weight:           1,
+							}},
+							ID:     makeLocalityID(i),
+							Weight: 1,
+						}},
+					},
+				},
+			},
+			outlierDetection: noopODCfg,
+			childNameGen:     newNameGenerator(uint64(i)),
+		}}
+		balancers = append(balancers, b)
+		updateChs = append(updateChs, updateCh)
+	}
+
+	start := make(chan struct{})
+	errs := make(chan error, balancerCount)
+	for _, b := range balancers {
+		go func(b *cdsBalancer) {
+			<-start
+			errs <- b.updateChildConfig()
+		}(b)
+	}
+	close(start)
+	var updateErr error
+	for range balancerCount {
+		if err := <-errs; err != nil && updateErr == nil {
+			updateErr = err
+		}
+	}
+	if updateErr != nil {
+		t.Fatalf("updateChildConfig() failed: %v", updateErr)
+	}
+
+	outputs := make([]resolver.Endpoint, 0, balancerCount)
+	for i, updateCh := range updateChs {
+		state := <-updateCh
+		if got := len(state.ResolverState.Endpoints); got != 1 {
+			t.Fatalf("child %d received %d endpoints, want 1", i, got)
+		}
+		endpoint := state.ResolverState.Endpoints[0]
+		if got := endpoint.AddressCount(); got != 1 {
+			t.Fatalf("child %d endpoint has %d addresses, want 1", i, got)
+		}
+		if got, want := endpoint.Address(0).Addr(), "10.0.0.5:443"; got != want {
+			t.Errorf("child %d endpoint address = %q, want %q", i, got, want)
+		}
+		if got := endpoint.Attributes().Value("endpoint"); got != "unchanged" {
+			t.Errorf("child %d endpoint attribute = %v, want %q", i, got, "unchanged")
+		}
+		outputs = append(outputs, endpoint)
+	}
+	if outputs[0].Attributes().Equal(outputs[1].Attributes()) {
+		t.Fatal("test setup produced equal endpoint attributes for both children")
+	}
+	for i, endpoint := range outputs {
+		if got, want := endpoint.Address(0).BalancerAttributes(), endpoint.Attributes(); !got.Equal(want) {
+			t.Errorf("child %d address BalancerAttributes = %v, want endpoint attributes %v", i, got, want)
+		}
+	}
+
+	wantInput := resolver.NewEndpoint(
+		resolver.NewAddress("10.0.0.5:443").WithBalancerAttributes(addressAttributes),
+	).WithAttributes(endpointAttributes)
 	if !sharedEndpoint.Equal(wantInput) {
 		t.Errorf("shared input endpoint changed: got %v, want %v", sharedEndpoint, wantInput)
 	}
