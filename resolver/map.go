@@ -58,7 +58,7 @@ type AddressMapV2[T any] struct {
 }
 
 func toMapKey(addr *Address) Address {
-	return Address{Addr: addr.Addr, ServerName: addr.ServerName}
+	return NewAddress(addr.Addr).WithServerName(addr.ServerName)
 }
 
 type addressMapEntryList[T any] []*addressMapEntry[T]

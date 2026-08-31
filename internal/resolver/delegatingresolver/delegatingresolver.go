@@ -144,8 +144,8 @@ func New(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOpti
 	// bypass the target resolver and store the unresolved target address.
 	if target.URL.Scheme == "dns" && !targetResolutionEnabled {
 		r.targetResolverState = &resolver.State{
-			Addresses: []resolver.Address{{Addr: addr}},
-			Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{{Addr: addr}}}},
+			Addresses: []resolver.Address{resolver.NewAddress(addr)},
+			Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress(addr)}}},
 		}
 		r.updateTargetResolverState(*r.targetResolverState)
 		return r, nil
@@ -301,7 +301,7 @@ func (r *delegatingResolver) updateClientConnStateLocked() error {
 	if len(r.proxyAddrs) == 1 {
 		proxyAddr = r.proxyAddrs[0]
 	} else {
-		proxyAddr = resolver.Address{Addr: r.proxyURL.Host}
+		proxyAddr = resolver.NewAddress(r.proxyURL.Host)
 	}
 	var addresses []resolver.Address
 	for _, targetAddr := range (*r.targetResolverState).Addresses {

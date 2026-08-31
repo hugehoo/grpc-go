@@ -52,7 +52,7 @@ type passthroughResolver struct {
 }
 
 func (r *passthroughResolver) start() {
-	r.cc.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: r.target.Endpoint()}}})
+	r.cc.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(r.target.Endpoint())}})
 }
 
 func (*passthroughResolver) ResolveNow(resolver.ResolveNowOptions) {}

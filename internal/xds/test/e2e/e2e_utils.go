@@ -162,7 +162,7 @@ func MakeXDSConfig(servicename, routeConfigName, clusterName, edsServiceName, ad
 								},
 									Endpoints: []xdsresource.Endpoint{
 										{
-											ResolverEndpoint: resolver.Endpoint{Addresses: []resolver.Address{{Addr: addr}}},
+											ResolverEndpoint: resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(addr)}},
 											HealthStatus:     xdsresource.EndpointHealthStatusUnknown,
 											Weight:           1,
 										},

@@ -111,7 +111,7 @@ func (b *bal) UpdateClientConnState(c balancer.ClientConnState) error {
 		b.bf.UpdateClientConnState(cfg)
 	}
 	return b.Balancer.UpdateClientConnState(balancer.ClientConnState{
-		ResolverState: resolver.State{Addresses: []resolver.Address{{Addr: cfg.Backend}}},
+		ResolverState: resolver.State{Addresses: []resolver.Address{resolver.NewAddress(cfg.Backend)}},
 	})
 }
 

@@ -124,7 +124,7 @@ func (b *dnsBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts 
 
 	// IP address.
 	if ipAddr, err := formatIP(host); err == nil {
-		addr := []resolver.Address{{Addr: ipAddr + ":" + port}}
+		addr := []resolver.Address{resolver.NewAddress(ipAddr + ":" + port)}
 		cc.UpdateState(resolver.State{
 			Addresses: addr,
 			Endpoints: []resolver.Endpoint{{Addresses: addr}},
@@ -269,7 +269,7 @@ func (d *dnsResolver) lookupSRV(ctx context.Context) ([]resolver.Address, error)
 				return nil, fmt.Errorf("dns: error parsing A record IP address %v: %v", a, err)
 			}
 			addr := ip + ":" + strconv.Itoa(int(s.Port))
-			newAddrs = append(newAddrs, resolver.Address{Addr: addr, ServerName: s.Target})
+			newAddrs = append(newAddrs, resolver.NewAddress(addr).WithServerName(s.Target))
 		}
 	}
 	return newAddrs, nil
@@ -331,7 +331,7 @@ func (d *dnsResolver) lookupHost(ctx context.Context) ([]resolver.Address, error
 			return nil, fmt.Errorf("dns: error parsing A record IP address %v: %v", a, err)
 		}
 		addr := ip + ":" + d.port
-		newAddrs = append(newAddrs, resolver.Address{Addr: addr})
+		newAddrs = append(newAddrs, resolver.NewAddress(addr))
 	}
 	return newAddrs, nil
 }

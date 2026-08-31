@@ -89,7 +89,7 @@ func (lb *lbBalancer) processServerList(l *lbpb.ServerList) {
 		} else {
 			ipStr = fmt.Sprintf("? %x", s.IpAddress)
 		}
-		addr := imetadata.Set(resolver.Address{Addr: net.JoinHostPort(ipStr, fmt.Sprintf("%d", s.Port))}, md)
+		addr := imetadata.Set(resolver.NewAddress(net.JoinHostPort(ipStr, fmt.Sprintf("%d", s.Port))), md)
 		if lb.logger.V(2) {
 			lb.logger.Infof("Server list entry:|%d|, ipStr:|%s|, port:|%d|, load balancer token:|%v|", i, ipStr, s.Port, s.LoadBalanceToken)
 		}

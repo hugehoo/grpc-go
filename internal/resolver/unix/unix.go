@@ -47,7 +47,7 @@ func (b *builder) Build(target resolver.Target, cc resolver.ClientConn, _ resolv
 	if endpoint == "" {
 		endpoint = target.URL.Opaque
 	}
-	addr := resolver.Address{Addr: endpoint}
+	addr := resolver.NewAddress(endpoint)
 	if b.scheme == unixAbstractScheme {
 		// We can not prepend \0 as c++ gRPC does, as in Golang '@' is used to signify we do
 		// not want trailing \0 in address.

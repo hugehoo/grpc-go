@@ -232,7 +232,7 @@ func (ss *StubServer) StartClient(dopts ...grpc.DialOption) error {
 	cc.Connect()
 	ss.CC = cc
 	if ss.R != nil {
-		ss.R.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: ss.Address}}})
+		ss.R.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(ss.Address)}})
 	}
 	if err := waitForReady(cc); err != nil {
 		cc.Close()
@@ -248,7 +248,7 @@ func (ss *StubServer) StartClient(dopts ...grpc.DialOption) error {
 // NewServiceConfig applies sc to ss.Client using the resolver (if present).
 func (ss *StubServer) NewServiceConfig(sc string) {
 	if ss.R != nil {
-		ss.R.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: ss.Address}}, ServiceConfig: parseCfg(ss.R, sc)})
+		ss.R.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(ss.Address)}, ServiceConfig: parseCfg(ss.R, sc)})
 	}
 }
 

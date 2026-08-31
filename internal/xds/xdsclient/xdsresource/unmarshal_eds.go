@@ -129,7 +129,7 @@ func parseEndpoints(lbEndpoints []*v3endpointpb.LbEndpoint, uniqueEndpointAddrs 
 
 		address := []resolver.Address{}
 		for _, a := range addrs {
-			address = append(address, resolver.Address{Addr: a})
+			address = append(address, resolver.NewAddress(a))
 			if uniqueEndpointAddrs[a] {
 				return nil, fmt.Errorf("duplicate endpoint with the same address %s", a)
 			}
