@@ -64,7 +64,7 @@ func (s) TestHostnameToAndFromEndpoint(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			endpoint := resolver.Endpoint{Attributes: test.inputAttributes}
+			endpoint := resolver.NewEndpoint().WithAttributes(test.inputAttributes)
 			endpoint = hostname.Set(endpoint, test.inputHostname)
 			gotHostname := hostname.FromEndpoint(endpoint)
 			if gotHostname != test.wantHostname {

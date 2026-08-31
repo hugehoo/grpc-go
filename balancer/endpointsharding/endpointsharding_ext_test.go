@@ -144,8 +144,8 @@ func (s) TestEndpointShardingBasic(t *testing.T) {
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(json)
 	mr.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{resolver.NewAddress(backend1.Address)}},
-			{Addresses: []resolver.Address{resolver.NewAddress(backend2.Address)}},
+			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backend1.Address)}...),
+			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backend2.Address)}...),
 		},
 		ServiceConfig: sc,
 	})
@@ -237,8 +237,8 @@ func (s) TestEndpointShardingReconnectDisabled(t *testing.T) {
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(json)
 	mr.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{resolver.NewAddress(backend1.Address), resolver.NewAddress(backend2.Address)}},
-			{Addresses: []resolver.Address{resolver.NewAddress(backend3.Address)}},
+			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backend1.Address), resolver.NewAddress(backend2.Address)}...),
+			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backend3.Address)}...),
 		},
 		ServiceConfig: sc,
 	})
@@ -321,7 +321,7 @@ func (s) TestEndpointShardingExitIdle(t *testing.T) {
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(json)
 	mr.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}},
+			resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(backend.Address)}...),
 		},
 		ServiceConfig: sc,
 	})

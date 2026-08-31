@@ -451,8 +451,8 @@ func (s) TestPickFirst_ShuffleAddressList(t *testing.T) {
 	// Push an update with both addresses and shuffling disabled.  We should
 	// connect to backend 0.
 	r.UpdateState(resolver.State{Endpoints: []resolver.Endpoint{
-		{Addresses: []resolver.Address{addrs[0]}},
-		{Addresses: []resolver.Address{addrs[1]}},
+		resolver.NewEndpoint([]resolver.Address{addrs[0]}...),
+		resolver.NewEndpoint([]resolver.Address{addrs[1]}...),
 	}})
 	if err := pickfirst.CheckRPCsToBackend(ctx, cc, addrs[0]); err != nil {
 		t.Fatal(err)
@@ -463,8 +463,8 @@ func (s) TestPickFirst_ShuffleAddressList(t *testing.T) {
 	shufState := resolver.State{
 		ServiceConfig: parseServiceConfig(t, r, serviceConfig),
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{addrs[0]}},
-			{Addresses: []resolver.Address{addrs[1]}},
+			resolver.NewEndpoint([]resolver.Address{addrs[0]}...),
+			resolver.NewEndpoint([]resolver.Address{addrs[1]}...),
 		},
 	}
 	r.UpdateState(shufState)
@@ -591,11 +591,11 @@ func (s) TestPickFirst_ShuffleAddressList_WeightedShuffling(t *testing.T) {
 	defer cancel()
 
 	// Create endpoints for the above backends with increasing weights.
-	ep1 := resolver.Endpoint{Addresses: []resolver.Address{addrs[0]}}
+	ep1 := resolver.NewEndpoint([]resolver.Address{addrs[0]}...)
 	ep1 = weight.Set(ep1, weight.EndpointInfo{Weight: 357913941}) // Normalized weight of 1/6
-	ep2 := resolver.Endpoint{Addresses: []resolver.Address{addrs[1]}}
+	ep2 := resolver.NewEndpoint([]resolver.Address{addrs[1]}...)
 	ep2 = weight.Set(ep2, weight.EndpointInfo{Weight: 715827882}) // Normalized weight of 2/6
-	ep3 := resolver.Endpoint{Addresses: []resolver.Address{addrs[2]}}
+	ep3 := resolver.NewEndpoint([]resolver.Address{addrs[2]}...)
 	ep3 = weight.Set(ep3, weight.EndpointInfo{Weight: 1073741824}) // Normalized weight of 3/6
 
 	// Push an update with all addresses and shuffling disabled. We should
@@ -2242,16 +2242,16 @@ func (s) TestPickFirstLeaf_InterleavingIPV4Preferred(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1111")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("2.2.2.2:2")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("3.3.3.3:3")}},
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1:1111")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("2.2.2.2:2")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("3.3.3.3:3")}...),
 				// IPv4-mapped IPv6 address, considered as an IPv4 for
 				// interleaving.
-				{Addresses: []resolver.Address{resolver.NewAddress("[::FFFF:192.168.0.1]:2222")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:8080")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("[fe80::1%eth0]:3333")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("grpc.io:80")}}, // not an IP.
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[::FFFF:192.168.0.1]:2222")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:8080")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[fe80::1%eth0]:3333")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("grpc.io:80")}...), // not an IP.
 			},
 		},
 	}
@@ -2288,15 +2288,15 @@ func (s) TestPickFirstLeaf_InterleavingIPv6Preferred(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}}, // duplicate, should be ignored.
-				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1111")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("2.2.2.2:2")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("3.3.3.3:3")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("[::FFFF:192.168.0.1]:2222")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:2222")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("[fe80::1%eth0]:3333")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("grpc.io:80")}}, // not an IP.
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}...), // duplicate, should be ignored.
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1:1111")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("2.2.2.2:2")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("3.3.3.3:3")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[::FFFF:192.168.0.1]:2222")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:2222")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[fe80::1%eth0]:3333")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("grpc.io:80")}...), // not an IP.
 			},
 		},
 	}
@@ -2333,15 +2333,15 @@ func (s) TestPickFirstLeaf_InterleavingUnknownPreferred(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{resolver.NewAddress("grpc.io:80")}}, // not an IP.
-				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1111")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("2.2.2.2:2")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("3.3.3.3:3")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("[::FFFF:192.168.0.1]:2222")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:8080")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("[fe80::1%eth0]:3333")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("example.com:80")}}, // not an IP.
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("grpc.io:80")}...), // not an IP.
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1:1111")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("2.2.2.2:2")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("3.3.3.3:3")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[::FFFF:192.168.0.1]:2222")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[0001:0001:0001:0001:0001:0001:0001:0001]:8080")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[0002:0002:0002:0002:0002:0002:0002:0002]:8080")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("[fe80::1%eth0]:3333")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("example.com:80")}...), // not an IP.
 			},
 		},
 	}
@@ -2656,7 +2656,7 @@ func (s) TestPickFirstLeaf_Reconnection(t *testing.T) {
 	ccState := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1")}},
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1:1")}...),
 			},
 		},
 	}
@@ -2711,7 +2711,7 @@ func (s) TestPickFirstLeaf_Reconnection(t *testing.T) {
 	ccState = balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{resolver.NewAddress("2.2.2.2:2")}},
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("2.2.2.2:2")}...),
 			},
 		},
 	}

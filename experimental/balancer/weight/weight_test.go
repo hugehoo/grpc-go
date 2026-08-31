@@ -71,7 +71,7 @@ func (s) TestEndpointInfoToAndFromAttributes(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			endpoint := resolver.Endpoint{Attributes: test.inputAttributes}
+			endpoint := resolver.NewEndpoint().WithAttributes(test.inputAttributes)
 			endpoint = weight.Set(endpoint, test.inputEndpointInfo)
 			gotEndpointInfo := weight.FromEndpoint(endpoint)
 			if !cmp.Equal(gotEndpointInfo, test.wantEndpointInfo) {

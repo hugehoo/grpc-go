@@ -44,7 +44,7 @@ func init() {
 }
 
 func testEndpoint(addr string, endpointWeight uint32) resolver.Endpoint {
-	ep := resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(addr)}}
+	ep := resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(addr)}...)
 	return weight.Set(ep, weight.EndpointInfo{Weight: endpointWeight})
 }
 
