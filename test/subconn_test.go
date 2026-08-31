@@ -119,7 +119,7 @@ func (s) TestSubConnEmpty(t *testing.T) {
 	testutils.AwaitState(ctx, t, ss.CC, connectivity.TransientFailure)
 
 	t.Log("Re-adding addresses to resolver and SubConn")
-	ss.R.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: ss.Address}}})
+	ss.R.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(ss.Address)}})
 	if _, err := ss.Client.EmptyCall(ctx, &testpb.Empty{}); err != nil {
 		t.Fatalf("EmptyCall failed: %v", err)
 	}

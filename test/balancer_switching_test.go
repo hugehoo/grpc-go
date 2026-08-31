@@ -60,7 +60,7 @@ const (
 func stubBackendsToResolverAddrs(backends []*stubserver.StubServer) []resolver.Address {
 	addrs := make([]resolver.Address, len(backends))
 	for i, backend := range backends {
-		addrs[i] = resolver.Address{Addr: backend.Address}
+		addrs[i] = resolver.NewAddress(backend.Address)
 	}
 	return addrs
 }
@@ -188,7 +188,7 @@ func (s) TestBalancerSwitch_grpclbToPickFirst(t *testing.T) {
 	// backend address.
 	grpclbConfig := parseServiceConfig(t, r, grpclbServiceConfig)
 	state := resolver.State{ServiceConfig: grpclbConfig}
-	r.UpdateState(grpclbstate.Set(state, &grpclbstate.State{BalancerAddresses: []resolver.Address{{Addr: lbServer.Address()}}}))
+	r.UpdateState(grpclbstate.Set(state, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress(lbServer.Address())}}))
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()
 	client := testgrpc.NewTestServiceClient(cc)
@@ -199,7 +199,7 @@ func (s) TestBalancerSwitch_grpclbToPickFirst(t *testing.T) {
 	// Push a resolver update containing a non-existent grpclb server address.
 	// This should not lead to a balancer switch.
 	const nonExistentServer = "non-existent-grpclb-server-address"
-	r.UpdateState(grpclbstate.Set(state, &grpclbstate.State{BalancerAddresses: []resolver.Address{{Addr: nonExistentServer}}}))
+	r.UpdateState(grpclbstate.Set(state, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress(nonExistentServer)}}))
 	if err := rrutil.CheckRoundRobinRPCs(ctx, client, addrs[:1]); err != nil {
 		t.Fatal(err)
 	}
@@ -246,7 +246,7 @@ func (s) TestBalancerSwitch_pickFirstToGRPCLB(t *testing.T) {
 	// switch to the "grpclb" balancer, which returns a single backend address.
 	grpclbConfig := parseServiceConfig(t, r, grpclbServiceConfig)
 	state := resolver.State{ServiceConfig: grpclbConfig}
-	r.UpdateState(grpclbstate.Set(state, &grpclbstate.State{BalancerAddresses: []resolver.Address{{Addr: lbServer.Address()}}}))
+	r.UpdateState(grpclbstate.Set(state, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress(lbServer.Address())}}))
 	client := testgrpc.NewTestServiceClient(cc)
 	if err := rrutil.CheckRoundRobinRPCs(ctx, client, addrs[:1]); err != nil {
 		t.Fatal(err)
@@ -254,7 +254,7 @@ func (s) TestBalancerSwitch_pickFirstToGRPCLB(t *testing.T) {
 
 	// Push a resolver update containing a non-existent grpclb server address.
 	// This should not lead to a balancer switch.
-	r.UpdateState(grpclbstate.Set(state, &grpclbstate.State{BalancerAddresses: []resolver.Address{{Addr: "nonExistentServer"}}}))
+	r.UpdateState(grpclbstate.Set(state, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress("nonExistentServer")}}))
 	if err := rrutil.CheckRoundRobinRPCs(ctx, client, addrs[:1]); err != nil {
 		t.Fatal(err)
 	}
@@ -312,7 +312,7 @@ func (s) TestBalancerSwitch_RoundRobinToGRPCLB(t *testing.T) {
 	// backend address.
 	grpclbConfig := parseServiceConfig(t, r, grpclbServiceConfig)
 	state := resolver.State{ServiceConfig: grpclbConfig}
-	r.UpdateState(grpclbstate.Set(state, &grpclbstate.State{BalancerAddresses: []resolver.Address{{Addr: lbServer.Address()}}}))
+	r.UpdateState(grpclbstate.Set(state, &grpclbstate.State{BalancerAddresses: []resolver.Address{resolver.NewAddress(lbServer.Address())}}))
 	if err := rrutil.CheckRoundRobinRPCs(ctx, client, addrs[:1]); err != nil {
 		t.Fatal(err)
 	}
@@ -352,7 +352,7 @@ func (s) TestBalancerSwitch_grpclbNotRegistered(t *testing.T) {
 	// fallback to the default LB policy which is pick_first. The ClientConn is
 	// also expected to filter out the grpclb address when sending the addresses
 	// list for pick_first.
-	grpclbAddr := []resolver.Address{{Addr: "non-existent-grpclb-server-address"}}
+	grpclbAddr := []resolver.Address{resolver.NewAddress("non-existent-grpclb-server-address")}
 	grpclbConfig := parseServiceConfig(t, r, `{"loadBalancingPolicy": "grpclb"}`)
 	state := resolver.State{ServiceConfig: grpclbConfig, Addresses: addrs}
 	r.UpdateState(grpclbstate.Set(state, &grpclbstate.State{BalancerAddresses: grpclbAddr}))
@@ -408,7 +408,7 @@ func (s) TestBalancerSwitch_OldBalancerCallsShutdownInClose(t *testing.T) {
 	// Push a resolver update specifying our stub balancer as the LB policy.
 	scpr := parseServiceConfig(t, r, fmt.Sprintf(`{"loadBalancingPolicy": "%v"}`, t.Name()))
 	r.UpdateState(resolver.State{
-		Addresses:     []resolver.Address{{Addr: "dummy-address"}},
+		Addresses:     []resolver.Address{resolver.NewAddress("dummy-address")},
 		ServiceConfig: scpr,
 	})
 
@@ -432,7 +432,7 @@ func (s) TestBalancerSwitch_OldBalancerCallsShutdownInClose(t *testing.T) {
 	done := make(chan struct{})
 	go func() {
 		r.UpdateState(resolver.State{
-			Addresses:     []resolver.Address{{Addr: "dummy-address"}},
+			Addresses:     []resolver.Address{resolver.NewAddress("dummy-address")},
 			ServiceConfig: parseServiceConfig(t, r, pickFirstServiceConfig),
 		})
 		close(done)

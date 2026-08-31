@@ -202,7 +202,7 @@ func (s) TestResolverUpdate_InvalidServiceConfigAfterGoodUpdate(t *testing.T) {
 	defer cc.Close()
 	cc.Connect()
 	// Push a resolver update and verify that our balancer receives the update.
-	addrs := []resolver.Address{{Addr: backend.Address}}
+	addrs := []resolver.Address{resolver.NewAddress(backend.Address)}
 	const lbCfg = "wrapping balancer LB policy config"
 	goodSC := r.CC().ParseServiceConfig(fmt.Sprintf(`
 {

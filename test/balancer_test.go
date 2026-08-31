@@ -452,7 +452,7 @@ func (s) TestAddressAttributesInNewSubConn(t *testing.T) {
 	}
 	t.Log("Made an RPC which was expected to fail...")
 
-	state := resolver.State{Addresses: []resolver.Address{{Addr: lis.Addr().String()}}}
+	state := resolver.State{Addresses: []resolver.Address{resolver.NewAddress(lis.Addr().String())}}
 	r.UpdateState(state)
 	t.Logf("Pushing resolver state update: %v through the manual resolver", state)
 
@@ -574,7 +574,7 @@ func (s) TestServersSwap(t *testing.T) {
 
 	// Initialize client
 	r := manual.NewBuilderWithScheme("whatever")
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: addr1}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(addr1)}})
 	cc, err := grpc.NewClient(r.Scheme()+":///", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithResolvers(r))
 	if err != nil {
 		t.Fatalf("Error creating client: %v", err)
@@ -588,7 +588,7 @@ func (s) TestServersSwap(t *testing.T) {
 	}
 
 	// Update resolver to report only the second server
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: addr2}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(addr2)}})
 
 	// Loop until new RPCs talk to server two.
 	for i := 0; i < 2000; i++ {
@@ -656,7 +656,7 @@ func (s) TestWaitForReady(t *testing.T) {
 	}
 
 	// Resolve the server.  The WFR RPC should unblock and use it.
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: lis.Addr().String()}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(lis.Addr().String())}})
 
 	if err := <-errChan; err != nil {
 		t.Fatal(err.Error())
@@ -761,7 +761,7 @@ func (s) TestAuthorityInBuildOptions(t *testing.T) {
 
 			r := manual.NewBuilderWithScheme("whatever")
 			t.Logf("Registered manual resolver with scheme %s...", r.Scheme())
-			r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: lis.Addr().String()}}})
+			r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(lis.Addr().String())}})
 
 			dopts := append([]grpc.DialOption{
 				grpc.WithResolvers(r),
@@ -873,7 +873,7 @@ func (s) TestMetadataInPickResult(t *testing.T) {
 
 	t.Log("Creating ClientConn to test backend...")
 	r := manual.NewBuilderWithScheme("whatever")
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: ss.Address}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(ss.Address)}})
 	dopts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithResolvers(r),
@@ -964,7 +964,7 @@ func (s) TestInvalidMetadataInPickResult(t *testing.T) {
 	})
 
 	r := manual.NewBuilderWithScheme("whatever")
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: ss.Address}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(ss.Address)}})
 	cc, err := grpc.NewClient(r.Scheme()+":///test.server",
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithResolvers(r),
@@ -1029,7 +1029,7 @@ func testAddressMetadataValidation(t *testing.T, addrMD metadata.MD, wantErr str
 	defer ss.Stop()
 
 	r := manual.NewBuilderWithScheme("whatever")
-	addr := imetadata.Set(resolver.Address{Addr: ss.Address}, addrMD)
+	addr := imetadata.Set(resolver.NewAddress(ss.Address), addrMD)
 	r.InitialState(resolver.State{Addresses: []resolver.Address{addr}})
 	cc, err := grpc.NewClient(r.Scheme()+":///test.server",
 		grpc.WithTransportCredentials(insecure.NewCredentials()),

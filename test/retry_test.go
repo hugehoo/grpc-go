@@ -1029,7 +1029,7 @@ func (s) TestAuthorityOverrideNotReusedAcrossAttempts(t *testing.T) {
 	defer ss.Stop()
 
 	r := manual.NewBuilderWithScheme("whatever")
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: ss.Address}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(ss.Address)}})
 
 	sc := fmt.Sprintf(`{
 		"loadBalancingConfig": [{%q: {}}],

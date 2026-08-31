@@ -349,8 +349,8 @@ func (s) TestStateTransitions_TriesAllAddrsBeforeTransientFailure(t *testing.T) 
 
 	rb := manual.NewBuilderWithScheme("whatever")
 	rb.InitialState(resolver.State{Addresses: []resolver.Address{
-		{Addr: lis1.Addr().String()},
-		{Addr: lis2.Addr().String()},
+		resolver.NewAddress(lis1.Addr().String()),
+		resolver.NewAddress(lis2.Addr().String()),
 	}})
 
 	dopts := []grpc.DialOption{
@@ -452,8 +452,8 @@ func (s) TestStateTransitions_MultipleAddrsEntersReady(t *testing.T) {
 
 	rb := manual.NewBuilderWithScheme("whatever")
 	rb.InitialState(resolver.State{Addresses: []resolver.Address{
-		{Addr: lis1.Addr().String()},
-		{Addr: lis2.Addr().String()},
+		resolver.NewAddress(lis1.Addr().String()),
+		resolver.NewAddress(lis2.Addr().String()),
 	}})
 	cc, err := grpc.NewClient("whatever:///this-gets-overwritten", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithResolvers(rb))
 	if err != nil {
@@ -701,7 +701,7 @@ func (s) TestStateTransitions_ResolverBuildFailure(t *testing.T) {
 			mr := manual.NewBuilderWithScheme("whatever" + tt.name)
 			backend := stubserver.StartTestService(t, nil)
 			defer backend.Stop()
-			mr.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: backend.Address}}})
+			mr.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(backend.Address)}})
 
 			dopts := []grpc.DialOption{
 				grpc.WithTransportCredentials(insecure.NewCredentials()),

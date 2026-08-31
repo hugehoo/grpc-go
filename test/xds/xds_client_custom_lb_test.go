@@ -258,7 +258,7 @@ func (s) TestWrrLocality(t *testing.T) {
 			var addrDistWant []resolver.Address
 			for _, addrAndCount := range test.addressDistributionWant {
 				for i := 0; i < addrAndCount.count; i++ {
-					addrDistWant = append(addrDistWant, resolver.Address{Addr: addrAndCount.addr})
+					addrDistWant = append(addrDistWant, resolver.NewAddress(addrAndCount.addr))
 				}
 			}
 			if err := roundrobin.CheckWeightedRoundRobinRPCs(ctx, t, client, addrDistWant); err != nil {

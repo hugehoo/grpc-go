@@ -68,7 +68,7 @@ func (s) TestConfigSelectorStatusCodes(t *testing.T) {
 			defer ss.Stop()
 
 			state := iresolver.SetConfigSelector(resolver.State{
-				Addresses:     []resolver.Address{{Addr: ss.Address}},
+				Addresses:     []resolver.Address{resolver.NewAddress(ss.Address)},
 				ServiceConfig: parseServiceConfig(t, ss.R, "{}"),
 			}, funcConfigSelector{
 				f: func(iresolver.RPCInfo) (*iresolver.RPCConfig, error) {

@@ -106,7 +106,7 @@ func (s) TestCZGetChannel(t *testing.T) {
 	te := newTest(t, e)
 	te.startServer(&testServer{security: e.security})
 	r := manual.NewBuilderWithScheme("whatever")
-	addrs := []resolver.Address{{Addr: te.srvAddr}}
+	addrs := []resolver.Address{resolver.NewAddress(te.srvAddr)}
 	r.InitialState(resolver.State{Addresses: addrs})
 	te.resolverScheme = r.Scheme()
 	te.clientConn(grpc.WithResolvers(r))
@@ -137,7 +137,7 @@ func (s) TestCZGetSubChannel(t *testing.T) {
 	te := newTest(t, e)
 	te.startServer(&testServer{security: e.security})
 	r := manual.NewBuilderWithScheme("whatever")
-	addrs := []resolver.Address{{Addr: te.srvAddr}}
+	addrs := []resolver.Address{resolver.NewAddress(te.srvAddr)}
 	r.InitialState(resolver.State{Addresses: addrs})
 	te.resolverScheme = r.Scheme()
 	te.clientConn(grpc.WithResolvers(r))
@@ -323,7 +323,7 @@ func (s) TestCZNestedChannelRegistrationAndDeletion(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	te.resolverScheme = r.Scheme()
 	te.clientConn(grpc.WithResolvers(r))
-	resolvedAddrs := []resolver.Address{{Addr: "127.0.0.1:0", ServerName: "grpclb.server"}}
+	resolvedAddrs := []resolver.Address{resolver.NewAddress("127.0.0.1:0").WithServerName("grpclb.server")}
 	grpclbConfig := parseServiceConfig(t, r, `{"loadBalancingPolicy": "grpclb"}`)
 	r.UpdateState(grpclbstate.Set(resolver.State{ServiceConfig: grpclbConfig}, &grpclbstate.State{BalancerAddresses: resolvedAddrs}))
 	defer te.tearDown()
@@ -342,7 +342,7 @@ func (s) TestCZNestedChannelRegistrationAndDeletion(t *testing.T) {
 	}
 
 	r.UpdateState(resolver.State{
-		Addresses:     []resolver.Address{{Addr: "127.0.0.1:0"}},
+		Addresses:     []resolver.Address{resolver.NewAddress("127.0.0.1:0")},
 		ServiceConfig: parseServiceConfig(t, r, `{"loadBalancingPolicy": "round_robin"}`),
 	})
 
@@ -369,7 +369,7 @@ func (s) TestCZClientSubChannelSocketRegistrationAndDeletion(t *testing.T) {
 	te.startServers(&testServer{security: e.security}, num)
 	r := manual.NewBuilderWithScheme("whatever")
 	for _, a := range te.srvAddrs {
-		svrAddrs = append(svrAddrs, resolver.Address{Addr: a})
+		svrAddrs = append(svrAddrs, resolver.NewAddress(a))
 	}
 	r.InitialState(resolver.State{Addresses: svrAddrs})
 	te.resolverScheme = r.Scheme()
@@ -608,7 +608,7 @@ func (s) TestCZChannelMetrics(t *testing.T) {
 	te.startServers(&testServer{security: e.security}, num)
 	r := manual.NewBuilderWithScheme("whatever")
 	for _, a := range te.srvAddrs {
-		svrAddrs = append(svrAddrs, resolver.Address{Addr: a})
+		svrAddrs = append(svrAddrs, resolver.NewAddress(a))
 	}
 	r.InitialState(resolver.State{Addresses: svrAddrs})
 	te.resolverScheme = r.Scheme()
@@ -1504,7 +1504,7 @@ func (s) TestCZChannelTraceCreationDeletion(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	te.resolverScheme = r.Scheme()
 	te.clientConn(grpc.WithResolvers(r))
-	resolvedAddrs := []resolver.Address{{Addr: "127.0.0.1:0", ServerName: "grpclb.server"}}
+	resolvedAddrs := []resolver.Address{resolver.NewAddress("127.0.0.1:0").WithServerName("grpclb.server")}
 	grpclbConfig := parseServiceConfig(t, r, `{"loadBalancingPolicy": "grpclb"}`)
 	r.UpdateState(grpclbstate.Set(resolver.State{ServiceConfig: grpclbConfig}, &grpclbstate.State{BalancerAddresses: resolvedAddrs}))
 	defer te.tearDown()
@@ -1546,7 +1546,7 @@ func (s) TestCZChannelTraceCreationDeletion(t *testing.T) {
 	}
 
 	r.UpdateState(resolver.State{
-		Addresses:     []resolver.Address{{Addr: "127.0.0.1:0"}},
+		Addresses:     []resolver.Address{resolver.NewAddress("127.0.0.1:0")},
 		ServiceConfig: parseServiceConfig(t, r, `{"loadBalancingPolicy": "round_robin"}`),
 	})
 
@@ -1586,7 +1586,7 @@ func (s) TestCZSubChannelTraceCreationDeletion(t *testing.T) {
 	te := newTest(t, e)
 	te.startServer(&testServer{security: e.security})
 	r := manual.NewBuilderWithScheme("whatever")
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: te.srvAddr}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(te.srvAddr)}})
 	te.resolverScheme = r.Scheme()
 	te.clientConn(grpc.WithResolvers(r))
 	defer te.tearDown()
@@ -1634,7 +1634,7 @@ func (s) TestCZSubChannelTraceCreationDeletion(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()
 	testutils.AwaitState(ctx, t, te.cc, connectivity.Ready)
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: "fake address"}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress("fake address")}})
 	testutils.AwaitNotState(ctx, t, te.cc, connectivity.Ready)
 
 	if err := verifyResultWithDelay(func() (bool, error) {
@@ -1675,7 +1675,7 @@ func (s) TestCZChannelAddressResolutionChange(t *testing.T) {
 	te := newTest(t, e)
 	te.startServer(&testServer{security: e.security})
 	r := manual.NewBuilderWithScheme("whatever")
-	addrs := []resolver.Address{{Addr: te.srvAddr}}
+	addrs := []resolver.Address{resolver.NewAddress(te.srvAddr)}
 	r.InitialState(resolver.State{Addresses: addrs})
 	te.resolverScheme = r.Scheme()
 	te.clientConn(grpc.WithResolvers(r))
@@ -1785,7 +1785,7 @@ func (s) TestCZSubChannelPickedNewAddress(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	var svrAddrs []resolver.Address
 	for _, a := range te.srvAddrs {
-		svrAddrs = append(svrAddrs, resolver.Address{Addr: a})
+		svrAddrs = append(svrAddrs, resolver.NewAddress(a))
 	}
 	r.InitialState(resolver.State{Addresses: svrAddrs})
 	te.resolverScheme = r.Scheme()
@@ -1854,7 +1854,7 @@ func (s) TestCZSubChannelConnectivityState(t *testing.T) {
 	te := newTest(t, e)
 	te.startServer(&testServer{security: e.security})
 	r := manual.NewBuilderWithScheme("whatever")
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: te.srvAddr}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(te.srvAddr)}})
 	te.resolverScheme = r.Scheme()
 	cc := te.clientConn(grpc.WithResolvers(r))
 	defer te.tearDown()
@@ -1911,7 +1911,7 @@ func (s) TestCZSubChannelConnectivityState(t *testing.T) {
 			return false, fmt.Errorf("transient failure has not happened on SubChannel yet")
 		}
 		transient = 0
-		r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: "fake address"}}})
+		r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress("fake address")}})
 		t.Log("SubChannel trace events seen so far...")
 		for _, e := range trace.Events {
 			t.Log(e.Desc)
@@ -1953,7 +1953,7 @@ func (s) TestCZChannelConnectivityState(t *testing.T) {
 	te := newTest(t, e)
 	te.startServer(&testServer{security: e.security})
 	r := manual.NewBuilderWithScheme("whatever")
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: te.srvAddr}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(te.srvAddr)}})
 	te.resolverScheme = r.Scheme()
 	cc := te.clientConn(grpc.WithResolvers(r))
 	defer te.tearDown()
@@ -2014,7 +2014,7 @@ func (s) TestCZTraceOverwriteChannelDeletion(t *testing.T) {
 	r := manual.NewBuilderWithScheme("whatever")
 	te.resolverScheme = r.Scheme()
 	te.clientConn(grpc.WithResolvers(r))
-	resolvedAddrs := []resolver.Address{{Addr: "127.0.0.1:0", ServerName: "grpclb.server"}}
+	resolvedAddrs := []resolver.Address{resolver.NewAddress("127.0.0.1:0").WithServerName("grpclb.server")}
 	grpclbConfig := parseServiceConfig(t, r, `{"loadBalancingPolicy": "grpclb"}`)
 	r.UpdateState(grpclbstate.Set(resolver.State{ServiceConfig: grpclbConfig}, &grpclbstate.State{BalancerAddresses: resolvedAddrs}))
 	defer te.tearDown()
@@ -2037,7 +2037,7 @@ func (s) TestCZTraceOverwriteChannelDeletion(t *testing.T) {
 	}
 
 	r.UpdateState(resolver.State{
-		Addresses:     []resolver.Address{{Addr: "127.0.0.1:0"}},
+		Addresses:     []resolver.Address{resolver.NewAddress("127.0.0.1:0")},
 		ServiceConfig: parseServiceConfig(t, r, `{"loadBalancingPolicy": "round_robin"}`),
 	})
 
@@ -2059,7 +2059,7 @@ func (s) TestCZTraceOverwriteChannelDeletion(t *testing.T) {
 	// If nested channel deletion is last trace event before the next validation, it will fail, as the top channel will hold a reference to it.
 	// This line forces a trace event on the top channel in that case.
 	r.UpdateState(resolver.State{
-		Addresses:     []resolver.Address{{Addr: "127.0.0.1:0"}},
+		Addresses:     []resolver.Address{resolver.NewAddress("127.0.0.1:0")},
 		ServiceConfig: parseServiceConfig(t, r, `{"loadBalancingPolicy": "round_robin"}`),
 	})
 
@@ -2082,7 +2082,7 @@ func (s) TestCZTraceOverwriteSubChannelDeletion(t *testing.T) {
 	defer channelz.ResetMaxTraceEntryToDefault()
 	te.startServer(&testServer{security: e.security})
 	r := manual.NewBuilderWithScheme("whatever")
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: te.srvAddr}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(te.srvAddr)}})
 	te.resolverScheme = r.Scheme()
 	te.clientConn(grpc.WithResolvers(r))
 	defer te.tearDown()
@@ -2109,7 +2109,7 @@ func (s) TestCZTraceOverwriteSubChannelDeletion(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()
 	testutils.AwaitState(ctx, t, te.cc, connectivity.Ready)
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: "fake address"}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress("fake address")}})
 	testutils.AwaitNotState(ctx, t, te.cc, connectivity.Ready)
 
 	// verify that the subchannel no longer exist due to trace referencing it got overwritten.
@@ -2129,7 +2129,7 @@ func (s) TestCZTraceTopChannelDeletionTraceClear(t *testing.T) {
 	te := newTest(t, e)
 	te.startServer(&testServer{security: e.security})
 	r := manual.NewBuilderWithScheme("whatever")
-	r.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: te.srvAddr}}})
+	r.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(te.srvAddr)}})
 	te.resolverScheme = r.Scheme()
 	te.clientConn(grpc.WithResolvers(r))
 	var subConn int64

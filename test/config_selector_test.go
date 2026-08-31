@@ -146,7 +146,7 @@ func (s) TestConfigSelector(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			var gotInfo *iresolver.RPCInfo
 			state := iresolver.SetConfigSelector(resolver.State{
-				Addresses:     []resolver.Address{{Addr: ss.Address}},
+				Addresses:     []resolver.Address{resolver.NewAddress(ss.Address)},
 				ServiceConfig: parseServiceConfig(t, ss.R, "{}"),
 			}, funcConfigSelector{
 				f: func(i iresolver.RPCInfo) (*iresolver.RPCConfig, error) {

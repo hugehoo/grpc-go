@@ -46,7 +46,7 @@ func backendAddressesAndPorts(t *testing.T, servers []*stubserver.StubServer) ([
 	addrs := make([]resolver.Address, len(servers))
 	ports := make([]uint32, len(servers))
 	for i := 0; i < len(servers); i++ {
-		addrs[i] = resolver.Address{Addr: servers[i].Address}
+		addrs[i] = resolver.NewAddress(servers[i].Address)
 		ports[i] = testutils.ParsePort(t, servers[i].Address)
 	}
 	return addrs, ports

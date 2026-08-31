@@ -588,8 +588,8 @@ func (s) TestGoAwayThenClose(t *testing.T) {
 
 	r := manual.NewBuilderWithScheme("whatever")
 	r.InitialState(resolver.State{Addresses: []resolver.Address{
-		{Addr: lis1.Addr().String()},
-		{Addr: lis2.Addr().String()},
+		resolver.NewAddress(lis1.Addr().String()),
+		resolver.NewAddress(lis2.Addr().String()),
 	}})
 	cc, err := grpc.NewClient(r.Scheme()+":///", grpc.WithResolvers(r), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

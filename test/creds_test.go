@@ -525,7 +525,7 @@ func (s) TestCredsHandshakeAuthority(t *testing.T) {
 	}
 	defer cc.Close()
 	cc.Connect()
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: lis.Addr().String()}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(lis.Addr().String())}})
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()
@@ -558,7 +558,7 @@ func (s) TestCredsHandshakeServerNameAuthority(t *testing.T) {
 	}
 	defer cc.Close()
 	cc.Connect()
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: lis.Addr().String(), ServerName: testServerName}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(lis.Addr().String()).WithServerName(testServerName)}})
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()

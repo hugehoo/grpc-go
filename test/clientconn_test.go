@@ -130,7 +130,7 @@ func (s) TestClientConnRPC_WithoutNameResolutionDelay(t *testing.T) {
 	defer ss.Stop()
 
 	rb := manual.NewBuilderWithScheme("instant")
-	rb.InitialState(resolver.State{Addresses: []resolver.Address{{Addr: ss.Address}}})
+	rb.InitialState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(ss.Address)}})
 	cc := ss.CC
 	defer cc.Close()
 
@@ -183,7 +183,7 @@ func (s) TestClientConnRPC_WithNameResolutionDelay(t *testing.T) {
 	defer cc.Close()
 	go func() {
 		<-resolutionWait.Done()
-		rb.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: ss.Address}}})
+		rb.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(ss.Address)}})
 	}()
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()

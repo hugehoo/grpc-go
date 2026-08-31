@@ -64,7 +64,7 @@ func testRoundRobinBasic(ctx context.Context, t *testing.T, opts ...grpc.DialOpt
 		t.Cleanup(func() { backend.Stop() })
 
 		backends[i] = backend
-		addrs[i] = resolver.Address{Addr: backend.Address}
+		addrs[i] = resolver.NewAddress(backend.Address)
 		endpoints[i] = resolver.Endpoint{Addresses: []resolver.Address{addrs[i]}}
 	}
 
@@ -175,7 +175,7 @@ func (s) TestRoundRobin_NewAddressWhileBlocking(t *testing.T) {
 
 	// Send a resolver update with a valid backend to push the channel to Ready
 	// and unblock the above RPC.
-	r.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: backends[0].Address}}})
+	r.UpdateState(resolver.State{Addresses: []resolver.Address{resolver.NewAddress(backends[0].Address)}})
 
 	select {
 	case <-ctx.Done():
@@ -198,7 +198,7 @@ func (s) TestRoundRobin_OneServerDown(t *testing.T) {
 
 	addrs := make([]resolver.Address, len(backends)-1)
 	for i := 0; i < len(backends)-1; i++ {
-		addrs[i] = resolver.Address{Addr: backends[i].Address}
+		addrs[i] = resolver.NewAddress(backends[i].Address)
 	}
 	client := testgrpc.NewTestServiceClient(cc)
 	if err := rrutil.CheckRoundRobinRPCs(ctx, client, addrs); err != nil {
@@ -269,7 +269,7 @@ func (s) TestRoundRobin_UpdateAddressAttributes(t *testing.T) {
 		grpc.WithDefaultServiceConfig(rrServiceConfig),
 	}
 	// Set an initial resolver update with no address attributes.
-	addr := resolver.Address{Addr: backend.Address}
+	addr := resolver.NewAddress(backend.Address)
 	r.InitialState(resolver.State{Addresses: []resolver.Address{addr}})
 	cc, err := grpc.NewClient(r.Scheme()+":///test.server", dopts...)
 	if err != nil {

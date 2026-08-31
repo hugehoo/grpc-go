@@ -212,9 +212,9 @@ func (s) TestOutlierDetectionWithOutlier(t *testing.T) {
 	client := testgrpc.NewTestServiceClient(cc)
 
 	fullAddresses := []resolver.Address{
-		{Addr: backend1.Address},
-		{Addr: backend2.Address},
-		{Addr: backend3.Address},
+		resolver.NewAddress(backend1.Address),
+		resolver.NewAddress(backend2.Address),
+		resolver.NewAddress(backend3.Address),
 	}
 	// At first, due to no statistics on each of the backends, the 3
 	// upstreams should all be round robined across.
@@ -224,8 +224,8 @@ func (s) TestOutlierDetectionWithOutlier(t *testing.T) {
 
 	// The addresses which don't return errors.
 	okAddresses := []resolver.Address{
-		{Addr: backend1.Address},
-		{Addr: backend2.Address},
+		resolver.NewAddress(backend1.Address),
+		resolver.NewAddress(backend2.Address),
 	}
 	// After calling the three upstreams, one of them constantly error
 	// and should eventually be ejected for a period of time. This
@@ -298,9 +298,9 @@ func (s) TestOutlierDetectionXDSDefaultOn(t *testing.T) {
 	client := testgrpc.NewTestServiceClient(cc)
 
 	fullAddresses := []resolver.Address{
-		{Addr: backend1.Address},
-		{Addr: backend2.Address},
-		{Addr: backend3.Address},
+		resolver.NewAddress(backend1.Address),
+		resolver.NewAddress(backend2.Address),
+		resolver.NewAddress(backend3.Address),
 	}
 	// At first, due to no statistics on each of the backends, the 3
 	// upstreams should all be round robined across.
@@ -310,8 +310,8 @@ func (s) TestOutlierDetectionXDSDefaultOn(t *testing.T) {
 
 	// The addresses which don't return errors.
 	okAddresses := []resolver.Address{
-		{Addr: backend1.Address},
-		{Addr: backend2.Address},
+		resolver.NewAddress(backend1.Address),
+		resolver.NewAddress(backend2.Address),
 	}
 	// After calling the three upstreams, one of them constantly error
 	// and should eventually be ejected for a period of time. This
