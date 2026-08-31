@@ -276,6 +276,17 @@ func NewEndpoint(addresses ...Address) Endpoint {
 	return Endpoint{Addresses: slices.Clone(addresses)}
 }
 
+// AddressCount returns the number of addresses in e.
+func (e Endpoint) AddressCount() int {
+	return len(e.Addresses)
+}
+
+// Address returns the Address at index. It panics if index is outside the
+// address list.
+func (e Endpoint) Address(index int) Address {
+	return e.Addresses[index]
+}
+
 // WithAddresses returns a copy of e containing addresses. The returned
 // Endpoint owns its address list; subsequent changes to addresses do not
 // affect it.
@@ -296,6 +307,13 @@ func (e Endpoint) WithAddress(index int, addr Address) Endpoint {
 func (e Endpoint) WithAttributes(attrs *attributes.Attributes) Endpoint {
 	e.Attributes = attrs
 	return e
+}
+
+// Equal returns whether e and o contain the same ordered addresses and
+// attributes.
+func (e Endpoint) Equal(o Endpoint) bool {
+	return slices.EqualFunc(e.Addresses, o.Addresses, Address.Equal) &&
+		e.Attributes.Equal(o.Attributes)
 }
 
 // State contains the current Resolver state relevant to the ClientConn.

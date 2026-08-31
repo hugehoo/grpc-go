@@ -90,6 +90,15 @@ func (s) TestEndpointWithersOwnAddressSlice(t *testing.T) {
 	if updated.Attributes != newAttrs {
 		t.Fatalf("updated Endpoint attributes = %v, want %v", updated.Attributes, newAttrs)
 	}
+	if got, want := updated.AddressCount(), 2; got != want {
+		t.Fatalf("updated.AddressCount() = %d, want %d", got, want)
+	}
+	if got, want := updated.Address(1), NewAddress("five"); !got.Equal(want) {
+		t.Fatalf("updated.Address(1) = %v, want %v", got, want)
+	}
+	if !updated.Equal(NewEndpoint(NewAddress("three"), NewAddress("five")).WithAttributes(newAttrs)) {
+		t.Fatalf("updated.Equal(equivalent endpoint) = false, want true")
+	}
 }
 
 // TestValidateEndpoints tests different scenarios of resolver addresses being
