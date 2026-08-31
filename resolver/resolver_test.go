@@ -19,8 +19,10 @@
 package resolver
 
 import (
+	"slices"
 	"testing"
 
+	"google.golang.org/grpc/attributes"
 	"google.golang.org/grpc/internal/grpctest"
 )
 
@@ -30,6 +32,76 @@ type s struct {
 
 func Test(t *testing.T) {
 	grpctest.RunSubTests(t, s{})
+}
+
+func (s) TestAddressWithers(t *testing.T) {
+	originalAttrs := attributes.New("original", true)
+	newAttrs := attributes.New("new", true)
+	originalBalancerAttrs := attributes.New("original-balancer", true)
+	newBalancerAttrs := attributes.New("new-balancer", true)
+	originalMetadata := &struct{ value string }{"original"}
+	newMetadata := &struct{ value string }{"new"}
+
+	original := NewAddress("original-address").
+		WithServerName("original-server-name").
+		WithAttributes(originalAttrs).
+		WithBalancerAttributes(originalBalancerAttrs).
+		WithMetadata(originalMetadata)
+	updated := original.
+		WithAddr("new-address").
+		WithServerName("new-server-name").
+		WithAttributes(newAttrs).
+		WithBalancerAttributes(newBalancerAttrs).
+		WithMetadata(newMetadata)
+
+	if got, want := original, (Address{
+		Addr:               "original-address",
+		ServerName:         "original-server-name",
+		Attributes:         originalAttrs,
+		BalancerAttributes: originalBalancerAttrs,
+		Metadata:           originalMetadata,
+	}); !got.Equal(want) {
+		t.Fatalf("original Address changed: got %v, want %v", got, want)
+	}
+	if got, want := updated, (Address{
+		Addr:               "new-address",
+		ServerName:         "new-server-name",
+		Attributes:         newAttrs,
+		BalancerAttributes: newBalancerAttrs,
+		Metadata:           newMetadata,
+	}); !got.Equal(want) {
+		t.Fatalf("updated Address = %v, want %v", got, want)
+	}
+}
+
+func (s) TestEndpointWithersOwnAddressSlice(t *testing.T) {
+	addresses := []Address{NewAddress("one"), NewAddress("two")}
+	originalAttrs := attributes.New("original", true)
+	newAttrs := attributes.New("new", true)
+	original := NewEndpoint(addresses...).WithAttributes(originalAttrs)
+
+	addresses[0] = NewAddress("changed")
+	if got, want := original.Addresses, []Address{NewAddress("one"), NewAddress("two")}; !slices.EqualFunc(got, want, Address.Equal) {
+		t.Fatalf("NewEndpoint() retained the caller's slice: got %v, want %v", got, want)
+	}
+
+	updatedAddresses := []Address{NewAddress("three"), NewAddress("four")}
+	updated := original.WithAddresses(updatedAddresses...).WithAttributes(newAttrs)
+	updatedAddresses[0] = NewAddress("changed-again")
+	updated = updated.WithAddress(1, NewAddress("five"))
+
+	if got, want := original.Addresses, []Address{NewAddress("one"), NewAddress("two")}; !slices.EqualFunc(got, want, Address.Equal) {
+		t.Fatalf("original Endpoint changed: got %v, want %v", got, want)
+	}
+	if original.Attributes != originalAttrs {
+		t.Fatalf("original Endpoint attributes changed: got %v, want %v", original.Attributes, originalAttrs)
+	}
+	if got, want := updated.Addresses, []Address{NewAddress("three"), NewAddress("five")}; !slices.EqualFunc(got, want, Address.Equal) {
+		t.Fatalf("updated Endpoint addresses = %v, want %v", got, want)
+	}
+	if updated.Attributes != newAttrs {
+		t.Fatalf("updated Endpoint attributes = %v, want %v", updated.Attributes, newAttrs)
+	}
 }
 
 // TestValidateEndpoints tests different scenarios of resolver addresses being

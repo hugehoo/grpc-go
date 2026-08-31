@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"slices"
 	"strings"
 
 	"google.golang.org/grpc/attributes"
@@ -121,6 +122,47 @@ type Address struct {
 	Metadata any
 }
 
+// NewAddress returns an Address for addr.
+func NewAddress(addr string) Address {
+	return Address{Addr: addr}
+}
+
+// WithAddr returns a copy of a with Addr set to addr.
+func (a Address) WithAddr(addr string) Address {
+	a.Addr = addr
+	return a
+}
+
+// WithServerName returns a copy of a with ServerName set to serverName.
+func (a Address) WithServerName(serverName string) Address {
+	a.ServerName = serverName
+	return a
+}
+
+// WithAttributes returns a copy of a with Attributes set to attrs.
+func (a Address) WithAttributes(attrs *attributes.Attributes) Address {
+	a.Attributes = attrs
+	return a
+}
+
+// WithBalancerAttributes returns a copy of a with BalancerAttributes set to
+// attrs.
+//
+// Deprecated: when an Address is inside an Endpoint, BalancerAttributes should
+// not be used, and it will eventually be removed entirely.
+func (a Address) WithBalancerAttributes(attrs *attributes.Attributes) Address {
+	a.BalancerAttributes = attrs
+	return a
+}
+
+// WithMetadata returns a copy of a with Metadata set to metadata.
+//
+// Deprecated: use WithAttributes instead.
+func (a Address) WithMetadata(metadata any) Address {
+	a.Metadata = metadata
+	return a
+}
+
 // Equal returns whether a and o are identical.  Metadata is compared directly,
 // not with any recursive introspection.
 //
@@ -190,6 +232,34 @@ type Endpoint struct {
 	// Attributes contains arbitrary data about this endpoint intended for
 	// consumption by the LB policy.
 	Attributes *attributes.Attributes
+}
+
+// NewEndpoint returns an Endpoint containing addresses. The returned Endpoint
+// owns its address list; subsequent changes to addresses do not affect it.
+func NewEndpoint(addresses ...Address) Endpoint {
+	return Endpoint{Addresses: slices.Clone(addresses)}
+}
+
+// WithAddresses returns a copy of e containing addresses. The returned
+// Endpoint owns its address list; subsequent changes to addresses do not
+// affect it.
+func (e Endpoint) WithAddresses(addresses ...Address) Endpoint {
+	e.Addresses = slices.Clone(addresses)
+	return e
+}
+
+// WithAddress returns a copy of e with the Address at index replaced by addr.
+// It panics if index is outside the address list.
+func (e Endpoint) WithAddress(index int, addr Address) Endpoint {
+	e.Addresses = slices.Clone(e.Addresses)
+	e.Addresses[index] = addr
+	return e
+}
+
+// WithAttributes returns a copy of e with Attributes set to attrs.
+func (e Endpoint) WithAttributes(attrs *attributes.Attributes) Endpoint {
+	e.Attributes = attrs
+	return e
 }
 
 // State contains the current Resolver state relevant to the ClientConn.
