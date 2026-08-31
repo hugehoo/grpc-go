@@ -83,6 +83,22 @@ func TestSet(t *testing.T) {
 	}
 }
 
+func TestMetadataIsolation(t *testing.T) {
+	md := metadata.Pairs("key", "value")
+	addr := Set(resolver.Address{}, md)
+
+	md.Set("key", "caller-update")
+	got := Get(addr)
+	if want := metadata.Pairs("key", "value"); !cmp.Equal(got, want) {
+		t.Fatalf("Get() after mutating input = %v, want %v", got, want)
+	}
+
+	got.Set("key", "result-update")
+	if gotAgain, want := Get(addr), metadata.Pairs("key", "value"); !cmp.Equal(gotAgain, want) {
+		t.Fatalf("Get() after mutating prior result = %v, want %v", gotAgain, want)
+	}
+}
+
 func TestValidate(t *testing.T) {
 	for _, test := range []struct {
 		md   metadata.MD

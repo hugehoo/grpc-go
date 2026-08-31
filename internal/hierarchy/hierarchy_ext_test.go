@@ -81,6 +81,22 @@ func TestSetInEndpoint(t *testing.T) {
 	}
 }
 
+func TestEndpointPathIsolation(t *testing.T) {
+	path := []string{"a", "b"}
+	endpoint := hierarchy.SetInEndpoint(resolver.Endpoint{}, path)
+
+	path[0] = "caller-update"
+	got := hierarchy.FromEndpoint(endpoint)
+	if want := []string{"a", "b"}; !cmp.Equal(got, want) {
+		t.Fatalf("FromEndpoint() after mutating input = %v, want %v", got, want)
+	}
+
+	got[1] = "result-update"
+	if gotAgain, want := hierarchy.FromEndpoint(endpoint), []string{"a", "b"}; !cmp.Equal(gotAgain, want) {
+		t.Fatalf("FromEndpoint() after mutating prior result = %v, want %v", gotAgain, want)
+	}
+}
+
 func TestGroup(t *testing.T) {
 	tests := []struct {
 		name string

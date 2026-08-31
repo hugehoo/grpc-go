@@ -64,7 +64,7 @@ func Get(addr resolver.Address) metadata.MD {
 		return nil
 	}
 	md, _ := attrs.Value(mdKey).(mdValue)
-	return metadata.MD(md)
+	return metadata.MD(md).Copy()
 }
 
 // Set sets (overrides) the metadata in addr.
@@ -72,7 +72,7 @@ func Get(addr resolver.Address) metadata.MD {
 // When a SubConn is created with this address, the RPCs sent on it will all
 // have this metadata.
 func Set(addr resolver.Address, md metadata.MD) resolver.Address {
-	addr = addr.WithAttributes(addr.Attributes().WithValue(mdKey, mdValue(md)))
+	addr = addr.WithAttributes(addr.Attributes().WithValue(mdKey, mdValue(md.Copy())))
 	return addr
 }
 

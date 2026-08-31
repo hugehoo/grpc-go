@@ -23,6 +23,8 @@
 package hierarchy
 
 import (
+	"slices"
+
 	"google.golang.org/grpc/resolver"
 )
 
@@ -51,12 +53,12 @@ func (p pathValue) Equal(o any) bool {
 // FromEndpoint returns the hierarchical path of endpoint.
 func FromEndpoint(endpoint resolver.Endpoint) []string {
 	path, _ := endpoint.Attributes().Value(pathKey).(pathValue)
-	return path
+	return slices.Clone(path)
 }
 
 // SetInEndpoint overrides the hierarchical path in endpoint with path.
 func SetInEndpoint(endpoint resolver.Endpoint, path []string) resolver.Endpoint {
-	endpoint = endpoint.WithAttributes(endpoint.Attributes().WithValue(pathKey, pathValue(path)))
+	endpoint = endpoint.WithAttributes(endpoint.Attributes().WithValue(pathKey, pathValue(slices.Clone(path))))
 	return endpoint
 }
 
