@@ -96,8 +96,8 @@ func (s) TestClusterPicks(t *testing.T) {
 	}
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[0]}}, []string{"cds:cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[1]}}, []string{"cds:cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[0]}...), []string{"cds:cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[1]}...), []string{"cds:cluster_2"}),
 		}},
 		BalancerConfig: config1,
 	}); err != nil {
@@ -173,8 +173,8 @@ func (s) TestConfigUpdateAddCluster(t *testing.T) {
 	}
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[0]}}, []string{"cds:cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[1]}}, []string{"cds:cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[0]}...), []string{"cds:cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[1]}...), []string{"cds:cluster_2"}),
 		}},
 		BalancerConfig: config1,
 	}); err != nil {
@@ -239,9 +239,9 @@ func (s) TestConfigUpdateAddCluster(t *testing.T) {
 	wantAddrs = append(wantAddrs, resolver.NewAddress(testBackendAddrStrs[2]).WithBalancerAttributes(nil))
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[0]}}, []string{"cds:cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[1]}}, []string{"cds:cluster_2"}),
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[2]}}, []string{"cds:cluster_3"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[0]}...), []string{"cds:cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[1]}...), []string{"cds:cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[2]}...), []string{"cds:cluster_3"}),
 		}},
 		BalancerConfig: config2,
 	}); err != nil {
@@ -326,8 +326,8 @@ func (s) TestRoutingConfigUpdateDeleteAll(t *testing.T) {
 	}
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[0]}}, []string{"cds:cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[1]}}, []string{"cds:cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[0]}...), []string{"cds:cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[1]}...), []string{"cds:cluster_2"}),
 		}},
 		BalancerConfig: config1,
 	}); err != nil {
@@ -409,8 +409,8 @@ func (s) TestRoutingConfigUpdateDeleteAll(t *testing.T) {
 	// Resend the previous config with clusters
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[0]}}, []string{"cds:cluster_1"}),
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[1]}}, []string{"cds:cluster_2"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[0]}...), []string{"cds:cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[1]}...), []string{"cds:cluster_2"}),
 		}},
 		BalancerConfig: config1,
 	}); err != nil {
@@ -565,7 +565,7 @@ func (s) TestInitialIdle(t *testing.T) {
 	}
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[0]}}, []string{"cds:cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[0]}...), []string{"cds:cluster_1"}),
 		}},
 		BalancerConfig: config1,
 	}); err != nil {
@@ -614,7 +614,7 @@ func (s) TestClusterGracefulSwitch(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to parse round_robin config: %v", err)
 	}
-	rrEndpoint := hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("rr-backend")}}, []string{"csp:cluster"})
+	rrEndpoint := hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("rr-backend")}...), []string{"csp:cluster"})
 	ccs := balancer.ClientConnState{
 		ResolverState:  resolver.State{Endpoints: []resolver.Endpoint{rrEndpoint}},
 		BalancerConfig: rrConfig,
@@ -659,7 +659,7 @@ func (s) TestClusterGracefulSwitch(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to parse pick_first config: %v", err)
 	}
-	pfEndpoint := hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("pf-backend")}}, []string{"csp:cluster"})
+	pfEndpoint := hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("pf-backend")}...), []string{"csp:cluster"})
 	ccs = balancer.ClientConnState{
 		ResolverState:  resolver.State{Endpoints: []resolver.Endpoint{pfEndpoint}},
 		BalancerConfig: pfConfig,
@@ -761,7 +761,7 @@ func (s) TestUpdateStatePauses(t *testing.T) {
 	}
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
-			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[0]}}, []string{"cds:cluster_1"}),
+			hierarchy.SetInEndpoint(resolver.NewEndpoint([]resolver.Address{wantAddrs[0]}...), []string{"cds:cluster_1"}),
 		}},
 		BalancerConfig: config1,
 	}); err != nil {

@@ -72,7 +72,7 @@ func buildResolverEndpoint(addr []string, host string) resolver.Endpoint {
 	for _, a := range addr {
 		address = append(address, resolver.NewAddress(a))
 	}
-	resolverEndpoint := resolver.Endpoint{Addresses: address}
+	resolverEndpoint := resolver.NewEndpoint(address...)
 	resolverEndpoint = hostname.Set(resolverEndpoint, host)
 	return resolverEndpoint
 }

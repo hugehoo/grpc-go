@@ -979,7 +979,7 @@ func (s) TestReResolutionAfterTransientFailure(t *testing.T) {
 		}
 	}
 	dnsR.UpdateState(resolver.State{
-		Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", host, port))}}},
+		Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", host, port))}...)},
 	})
 
 	if err := mgmtServer.Update(ctx, updateOpts); err != nil {

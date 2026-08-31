@@ -1095,10 +1095,8 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 				Localities: []xdsresource.Locality{
 					{
 						Endpoints: []xdsresource.Endpoint{{
-							ResolverEndpoint: resolver.Endpoint{
-								Addresses: []resolver.Address{resolver.NewAddress("addr1:314")},
-							},
-							Weight: 1,
+							ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr1:314")}...),
+							Weight:           1,
 						}},
 						ID:       clients.Locality{SubZone: "locality-1"},
 						Priority: 1,
@@ -1106,10 +1104,8 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 					},
 					{
 						Endpoints: []xdsresource.Endpoint{{
-							ResolverEndpoint: resolver.Endpoint{
-								Addresses: []resolver.Address{resolver.NewAddress("addr2:159")},
-							},
-							Weight: 1,
+							ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr2:159")}...),
+							Weight:           1,
 						}},
 						ID:       clients.Locality{SubZone: "locality-2"},
 						Priority: 0,
@@ -1139,10 +1135,8 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 				Localities: []xdsresource.Locality{
 					{
 						Endpoints: []xdsresource.Endpoint{{
-							ResolverEndpoint: resolver.Endpoint{
-								Addresses: []resolver.Address{resolver.NewAddress("addr1:314")},
-							},
-							Weight: 1,
+							ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr1:314")}...),
+							Weight:           1,
 						}},
 						ID:       clients.Locality{SubZone: "locality-1"},
 						Priority: 1,
@@ -1150,10 +1144,8 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 					},
 					{
 						Endpoints: []xdsresource.Endpoint{{
-							ResolverEndpoint: resolver.Endpoint{
-								Addresses: []resolver.Address{resolver.NewAddress("addr2:159")},
-							},
-							Weight: 1,
+							ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("addr2:159")}...),
+							Weight:           1,
 						}},
 						ID:       clients.Locality{SubZone: "locality-2"},
 						Priority: 0,

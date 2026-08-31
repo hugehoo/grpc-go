@@ -1278,7 +1278,7 @@ func (s) TestAggregateCluster_Fallback_EDS_ResourceNotFound(t *testing.T) {
 func addrsToEndpoints(addrs []resolver.Address) []resolver.Endpoint {
 	endpoints := make([]resolver.Endpoint, len(addrs))
 	for i, addr := range addrs {
-		endpoints[i] = resolver.Endpoint{Addresses: []resolver.Address{addr}}
+		endpoints[i] = resolver.NewEndpoint([]resolver.Address{addr}...)
 	}
 	return endpoints
 }

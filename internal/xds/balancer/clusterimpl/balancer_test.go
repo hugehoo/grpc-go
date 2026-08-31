@@ -48,7 +48,7 @@ const (
 )
 
 var (
-	testBackendEndpoints = []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress("1.1.1.1:1")}}}
+	testBackendEndpoints = []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("1.1.1.1:1")}...)}
 )
 
 type s struct {
@@ -210,7 +210,7 @@ func (s) TestClusterNameInAddressAttributes(t *testing.T) {
 
 	const testClusterName2 = "test-cluster-2"
 	var addr2 = resolver.NewAddress("2.2.2.2")
-	state2 := xdsclient.SetClient(resolver.State{Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{addr2}}}}, xdsC)
+	state2 := xdsclient.SetClient(resolver.State{Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{addr2}...)}}, xdsC)
 	state2 = xdsresource.SetXDSConfig(state2, &xdsresource.XDSConfig{
 		Clusters: map[string]*xdsresource.ClusterResult{
 			testClusterName2: {

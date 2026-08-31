@@ -295,10 +295,8 @@ func (s) TestFederation_EndpointsResourceContextParamOrder(t *testing.T) {
 			Localities: []xdsresource.Locality{
 				{
 					Endpoints: []xdsresource.Endpoint{{
-						ResolverEndpoint: resolver.Endpoint{
-							Addresses: []resolver.Address{resolver.NewAddress("localhost:666")},
-						},
-						Weight: 1,
+						ResolverEndpoint: resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("localhost:666")}...),
+						Weight:           1,
 					}},
 					Weight: 1,
 					ID: clients.Locality{

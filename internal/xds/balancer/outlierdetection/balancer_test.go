@@ -475,7 +475,7 @@ func (s) TestEjectUnejectSuccessRate(t *testing.T) {
 			defer cleanup()
 			endpoints := make([]resolver.Endpoint, test.numberOfConns)
 			for i := range test.numberOfConns {
-				endpoints[i] = resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("address%d", i+1))}}
+				endpoints[i] = resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(fmt.Sprintf("address%d", i+1))}...)
 			}
 			od.UpdateClientConnState(balancer.ClientConnState{
 				ResolverState: resolver.State{
@@ -731,9 +731,9 @@ func (s) TestEjectFailureRate(t *testing.T) {
 	od.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{resolver.NewAddress("address1")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("address2")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("address3")}},
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("address1")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("address2")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("address3")}...),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -881,9 +881,9 @@ func (s) TestEjectFailureRate(t *testing.T) {
 		od.UpdateClientConnState(balancer.ClientConnState{
 			ResolverState: resolver.State{
 				Endpoints: []resolver.Endpoint{
-					{Addresses: []resolver.Address{resolver.NewAddress("address1")}},
-					{Addresses: []resolver.Address{resolver.NewAddress("address2")}},
-					{Addresses: []resolver.Address{resolver.NewAddress("address3")}},
+					resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("address1")}...),
+					resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("address2")}...),
+					resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("address3")}...),
 				},
 			},
 			BalancerConfig: &LBConfig{
@@ -946,9 +946,9 @@ func (s) TestConcurrentOperations(t *testing.T) {
 	od.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{resolver.NewAddress("address1")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("address2")}},
-				{Addresses: []resolver.Address{resolver.NewAddress("address3")}},
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("address1")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("address2")}...),
+				resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("address3")}...),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1081,7 +1081,7 @@ func (s) TestConcurrentOperations(t *testing.T) {
 	// balancer.Balancer API guarantee of synchronous calls.
 	od.UpdateClientConnState(balancer.ClientConnState{ // This will delete addresses and flip to no op
 		ResolverState: resolver.State{
-			Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress("address1")}}},
+			Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress("address1")}...)},
 		},
 		BalancerConfig: &LBConfig{
 			Interval: math.MaxInt64,
@@ -1174,18 +1174,14 @@ func (s) TestMultipleAddressesPerEndpoint(t *testing.T) {
 	stub.Register(t.Name(), bf)
 	r := manual.NewBuilderWithScheme("whatever")
 	endpoints := []resolver.Endpoint{
-		{
-			Addresses: []resolver.Address{
-				resolver.NewAddress(unhealthyBackend.Address),
-				resolver.NewAddress(healthyBackends[0].Address),
-			},
-		},
-		{
-			Addresses: []resolver.Address{
-				resolver.NewAddress(healthyBackends[1].Address),
-				resolver.NewAddress(healthyBackends[2].Address),
-			},
-		},
+		resolver.NewEndpoint([]resolver.Address{
+			resolver.NewAddress(unhealthyBackend.Address),
+			resolver.NewAddress(healthyBackends[0].Address),
+		}...),
+		resolver.NewEndpoint([]resolver.Address{
+			resolver.NewAddress(healthyBackends[1].Address),
+			resolver.NewAddress(healthyBackends[2].Address),
+		}...),
 	}
 
 	r.InitialState(resolver.State{
@@ -1350,18 +1346,14 @@ func (s) TestEjectionStateResetsWhenEndpointAddressesChange(t *testing.T) {
 	stub.Register(t.Name(), bf)
 	r := manual.NewBuilderWithScheme("whatever")
 	endpoints := []resolver.Endpoint{
-		{
-			Addresses: []resolver.Address{
-				resolver.NewAddress(unhealthyBackend.Address),
-				resolver.NewAddress(healthyBackends[0].Address),
-			},
-		},
-		{
-			Addresses: []resolver.Address{
-				resolver.NewAddress(healthyBackends[1].Address),
-				resolver.NewAddress(healthyBackends[2].Address),
-			},
-		},
+		resolver.NewEndpoint([]resolver.Address{
+			resolver.NewAddress(unhealthyBackend.Address),
+			resolver.NewAddress(healthyBackends[0].Address),
+		}...),
+		resolver.NewEndpoint([]resolver.Address{
+			resolver.NewAddress(healthyBackends[1].Address),
+			resolver.NewAddress(healthyBackends[2].Address),
+		}...),
 	}
 
 	r.InitialState(resolver.State{
@@ -1420,7 +1412,7 @@ func (s) TestEjectionStateResetsWhenEndpointAddressesChange(t *testing.T) {
 	// endpoint a new endpoint for outlier detection, resetting its ejection
 	// status.
 	r.UpdateState(resolver.State{Endpoints: []resolver.Endpoint{
-		{Addresses: []resolver.Address{endpoints[0].Addresses[1]}},
+		resolver.NewEndpoint([]resolver.Address{endpoints[0].Addresses[1]}...),
 		endpoints[1],
 	}})
 	od.intervalTimerAlgorithm()
@@ -1457,7 +1449,7 @@ func (s) TestSubConnShutdownRemovesFromEndpointMap(t *testing.T) {
 	defer cleanup()
 
 	addr := "address1"
-	ep := resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(addr)}}
+	ep := resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(addr)}...)
 	od.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{ep},

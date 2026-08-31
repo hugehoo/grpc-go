@@ -78,11 +78,10 @@ func (s) TestLogicalDNS_MultipleEndpoints(t *testing.T) {
 
 	// For LOGICAL_DNS, this updates the SINGLE endpoint to have 2 IPs.
 	dnsR.InitialState(resolver.State{
-		Endpoints: []resolver.Endpoint{{
-			Addresses: []resolver.Address{
-				resolver.NewAddress(server1.Address),
-				resolver.NewAddress(server2.Address),
-			}}},
+		Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{
+			resolver.NewAddress(server1.Address),
+			resolver.NewAddress(server2.Address),
+		}...)},
 	})
 
 	const (
