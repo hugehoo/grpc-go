@@ -179,7 +179,7 @@ func (s) TestEDSWatch(t *testing.T) {
 						{
 							Endpoints: []xdsresource.Endpoint{{
 								ResolverEndpoint: resolver.Endpoint{
-									Addresses: []resolver.Address{{Addr: fmt.Sprintf("%s:%d", edsHost1, edsPort1)}},
+									Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))},
 								},
 								Weight: 1,
 							}},
@@ -207,7 +207,7 @@ func (s) TestEDSWatch(t *testing.T) {
 						{
 							Endpoints: []xdsresource.Endpoint{{
 								ResolverEndpoint: resolver.Endpoint{
-									Addresses: []resolver.Address{{Addr: fmt.Sprintf("%s:%d", edsHost1, edsPort1)}},
+									Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))},
 								},
 								Weight: 1,
 							}},
@@ -351,7 +351,7 @@ func (s) TestEDSWatch_TwoWatchesForSameResourceName(t *testing.T) {
 						{
 							Endpoints: []xdsresource.Endpoint{{
 								ResolverEndpoint: resolver.Endpoint{
-									Addresses: []resolver.Address{{Addr: fmt.Sprintf("%s:%d", edsHost1, edsPort1)}},
+									Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))},
 								},
 								Weight: 1,
 							}},
@@ -372,7 +372,7 @@ func (s) TestEDSWatch_TwoWatchesForSameResourceName(t *testing.T) {
 						{
 							Endpoints: []xdsresource.Endpoint{{
 								ResolverEndpoint: resolver.Endpoint{
-									Addresses: []resolver.Address{{Addr: fmt.Sprintf("%s:%d", edsHost2, edsPort2)}},
+									Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost2, edsPort2))},
 								},
 								Weight: 1,
 							}},
@@ -399,7 +399,7 @@ func (s) TestEDSWatch_TwoWatchesForSameResourceName(t *testing.T) {
 						{
 							Endpoints: []xdsresource.Endpoint{{
 								ResolverEndpoint: resolver.Endpoint{
-									Addresses: []resolver.Address{{Addr: fmt.Sprintf("%s:%d", edsHost1, edsPort1)}},
+									Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))},
 								},
 								Weight: 1,
 							}},
@@ -420,7 +420,7 @@ func (s) TestEDSWatch_TwoWatchesForSameResourceName(t *testing.T) {
 						{
 							Endpoints: []xdsresource.Endpoint{{
 								ResolverEndpoint: resolver.Endpoint{
-									Addresses: []resolver.Address{{Addr: fmt.Sprintf("%s:%d", edsHost2, edsPort2)}},
+									Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost2, edsPort2))},
 								},
 								Weight: 1,
 							}},
@@ -623,7 +623,7 @@ func (s) TestEDSWatch_ThreeWatchesForDifferentResourceNames(t *testing.T) {
 				{
 					Endpoints: []xdsresource.Endpoint{{
 						ResolverEndpoint: resolver.Endpoint{
-							Addresses: []resolver.Address{{Addr: fmt.Sprintf("%s:%d", edsHost1, edsPort1)}},
+							Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))},
 						},
 						Weight: 1,
 					}},
@@ -719,7 +719,7 @@ func (s) TestEDSWatch_ResourceCaching(t *testing.T) {
 				{
 					Endpoints: []xdsresource.Endpoint{{
 						ResolverEndpoint: resolver.Endpoint{
-							Addresses: []resolver.Address{{Addr: fmt.Sprintf("%s:%d", edsHost1, edsPort1)}},
+							Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))},
 						},
 						Weight: 1,
 					}},
@@ -856,7 +856,7 @@ func (s) TestEDSWatch_ValidResponseCancelsExpiryTimerBehavior(t *testing.T) {
 				{
 					Endpoints: []xdsresource.Endpoint{{
 						ResolverEndpoint: resolver.Endpoint{
-							Addresses: []resolver.Address{{Addr: fmt.Sprintf("%s:%d", edsHost1, edsPort1)}},
+							Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))},
 						},
 						Weight: 1,
 					}},
@@ -1024,7 +1024,7 @@ func (s) TestEDSWatch_PartialValid(t *testing.T) {
 				{
 					Endpoints: []xdsresource.Endpoint{{
 						ResolverEndpoint: resolver.Endpoint{
-							Addresses: []resolver.Address{{Addr: fmt.Sprintf("%s:%d", edsHost1, edsPort1)}},
+							Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("%s:%d", edsHost1, edsPort1))},
 						},
 						Weight: 1,
 					}},

@@ -865,7 +865,7 @@ func (s) TestAggregateCluster_BadEDSFromError_GoodToBadDNS(t *testing.T) {
 
 	// Ensure that RPCs start getting routed to the first backend since the
 	// child policy for a LOGICAL_DNS cluster is pick_first by default.
-	pickfirst.CheckRPCsToBackend(ctx, cc, resolver.Address{Addr: server.Address})
+	pickfirst.CheckRPCsToBackend(ctx, cc, resolver.NewAddress(server.Address))
 }
 
 // TestAggregateCluster_BadDNS_GoodEDS tests the case where the top-level

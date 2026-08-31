@@ -106,8 +106,8 @@ func testPriorityHighPriorityReady(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -140,9 +140,9 @@ func testPriorityHighPriorityReady(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[2]}}}, []string{"child-2"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}}, []string{"child-2"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -174,8 +174,8 @@ func testPriorityHighPriorityReady(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -231,8 +231,8 @@ func testPrioritySwitchPriority(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -288,9 +288,9 @@ func testPrioritySwitchPriority(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[2]}}}, []string{"child-2"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}}, []string{"child-2"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -345,8 +345,8 @@ func testPrioritySwitchPriority(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -414,8 +414,8 @@ func (s) TestPriority_HighPriorityToConnectingFromReady(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -496,8 +496,8 @@ func (s) TestPriority_HigherDownWhileAddingLower(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -552,9 +552,9 @@ func (s) TestPriority_HigherDownWhileAddingLower(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[2]}}}, []string{"child-2"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}}, []string{"child-2"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -604,9 +604,9 @@ func (s) TestPriority_HigherReadyCloseAllLower(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[2]}}}, []string{"child-2"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}}, []string{"child-2"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -691,8 +691,8 @@ func (s) TestPriority_InitTimeout(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -767,8 +767,8 @@ func testPriorityRemovesAllPriorities(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -832,8 +832,8 @@ func testPriorityRemovesAllPriorities(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[2]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[3]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[3])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -883,7 +883,7 @@ func testPriorityRemovesAllPriorities(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[2]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -952,8 +952,8 @@ func (s) TestPriority_HighPriorityNoEndpoints(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -986,7 +986,7 @@ func (s) TestPriority_HighPriorityNoEndpoints(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1052,7 +1052,7 @@ func testPriorityFirstPriorityUnavailable(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1132,8 +1132,8 @@ func testPriorityMoveChildToHigherPriority(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1167,8 +1167,8 @@ func testPriorityMoveChildToHigherPriority(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1234,8 +1234,8 @@ func testPriorityMoveReadyChildToHigherPriority(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1281,8 +1281,8 @@ func testPriorityMoveReadyChildToHigherPriority(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1335,8 +1335,8 @@ func testPriorityRemoveReadyLowestChild(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1384,7 +1384,7 @@ func testPriorityRemoveReadyLowestChild(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1442,7 +1442,7 @@ func (s) TestPriority_RemoveOnlyReadyChild_CachingEnabled(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1495,7 +1495,7 @@ func (s) TestPriority_RemoveOnlyReadyChild_CachingEnabled(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1542,7 +1542,7 @@ func (s) TestPriority_RemoveOnlyReadyChild_CachingDisabled(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1598,7 +1598,7 @@ func (s) TestPriority_RemoveOnlyReadyChild_CachingDisabled(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1643,7 +1643,7 @@ func (s) TestPriority_ChildPolicyChange(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1676,7 +1676,7 @@ func (s) TestPriority_ChildPolicyChange(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1748,7 +1748,7 @@ func (s) TestPriority_ChildPolicyUpdatePickerInline(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1792,7 +1792,7 @@ func (s) TestPriority_IgnoreReresolutionRequest(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1832,7 +1832,7 @@ func (s) TestPriority_IgnoreReresolutionRequest(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -1889,8 +1889,8 @@ func (s) TestPriority_IgnoreReresolutionRequestTwoChildren(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -2010,8 +2010,8 @@ func (s) TestPriority_HighPriorityInitIdle(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -2076,7 +2076,7 @@ func (s) TestPriority_AddLowPriorityWhenHighIsInIdle(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -2105,8 +2105,8 @@ func (s) TestPriority_AddLowPriorityWhenHighIsInIdle(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -2157,8 +2157,8 @@ func (s) TestPriority_HighPriorityUpdatesWhenLowInUse(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -2215,8 +2215,8 @@ func (s) TestPriority_HighPriorityUpdatesWhenLowInUse(t *testing.T) {
 	if err := pb.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[2]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[3]}}}, []string{"child-1"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[2])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[3])}}, []string{"child-1"}),
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -2289,8 +2289,8 @@ func (s) TestPriority_InitTimerNotRestarted_OnConnectingToConnecting(t *testing.
 	ccs := balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[0]}}}, []string{"child-0"}),
-				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: testBackendAddrStrs[1]}}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[0])}}, []string{"child-0"}),
+				hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(testBackendAddrStrs[1])}}, []string{"child-0"}),
 			},
 		},
 		BalancerConfig: &LBConfig{

@@ -91,8 +91,8 @@ func (s) TestClusterPicks(t *testing.T) {
 
 	// Send the config, and an address with hierarchy path ["cluster_1"].
 	wantAddrs := []resolver.Address{
-		{Addr: testBackendAddrStrs[0], BalancerAttributes: nil},
-		{Addr: testBackendAddrStrs[1], BalancerAttributes: nil},
+		resolver.NewAddress(testBackendAddrStrs[0]).WithBalancerAttributes(nil),
+		resolver.NewAddress(testBackendAddrStrs[1]).WithBalancerAttributes(nil),
 	}
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
@@ -168,8 +168,8 @@ func (s) TestConfigUpdateAddCluster(t *testing.T) {
 
 	// Send the config, and an address with hierarchy path ["cluster_1"].
 	wantAddrs := []resolver.Address{
-		{Addr: testBackendAddrStrs[0], BalancerAttributes: nil},
-		{Addr: testBackendAddrStrs[1], BalancerAttributes: nil},
+		resolver.NewAddress(testBackendAddrStrs[0]).WithBalancerAttributes(nil),
+		resolver.NewAddress(testBackendAddrStrs[1]).WithBalancerAttributes(nil),
 	}
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
@@ -236,7 +236,7 @@ func (s) TestConfigUpdateAddCluster(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to parse balancer config: %v", err)
 	}
-	wantAddrs = append(wantAddrs, resolver.Address{Addr: testBackendAddrStrs[2], BalancerAttributes: nil})
+	wantAddrs = append(wantAddrs, resolver.NewAddress(testBackendAddrStrs[2]).WithBalancerAttributes(nil))
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
 			hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{wantAddrs[0]}}, []string{"cds:cluster_1"}),
@@ -321,8 +321,8 @@ func (s) TestRoutingConfigUpdateDeleteAll(t *testing.T) {
 
 	// Send the config, and an address with hierarchy path ["cluster_1"].
 	wantAddrs := []resolver.Address{
-		{Addr: testBackendAddrStrs[0], BalancerAttributes: nil},
-		{Addr: testBackendAddrStrs[1], BalancerAttributes: nil},
+		resolver.NewAddress(testBackendAddrStrs[0]).WithBalancerAttributes(nil),
+		resolver.NewAddress(testBackendAddrStrs[1]).WithBalancerAttributes(nil),
 	}
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
@@ -561,7 +561,7 @@ func (s) TestInitialIdle(t *testing.T) {
 
 	// Send the config, and an address with hierarchy path ["cluster_1"].
 	wantAddrs := []resolver.Address{
-		{Addr: testBackendAddrStrs[0], BalancerAttributes: nil},
+		resolver.NewAddress(testBackendAddrStrs[0]).WithBalancerAttributes(nil),
 	}
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{
@@ -614,7 +614,7 @@ func (s) TestClusterGracefulSwitch(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to parse round_robin config: %v", err)
 	}
-	rrEndpoint := hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: "rr-backend"}}}, []string{"csp:cluster"})
+	rrEndpoint := hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("rr-backend")}}, []string{"csp:cluster"})
 	ccs := balancer.ClientConnState{
 		ResolverState:  resolver.State{Endpoints: []resolver.Endpoint{rrEndpoint}},
 		BalancerConfig: rrConfig,
@@ -659,7 +659,7 @@ func (s) TestClusterGracefulSwitch(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to parse pick_first config: %v", err)
 	}
-	pfEndpoint := hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{{Addr: "pf-backend"}}}, []string{"csp:cluster"})
+	pfEndpoint := hierarchy.SetInEndpoint(resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress("pf-backend")}}, []string{"csp:cluster"})
 	ccs = balancer.ClientConnState{
 		ResolverState:  resolver.State{Endpoints: []resolver.Endpoint{pfEndpoint}},
 		BalancerConfig: pfConfig,
@@ -757,7 +757,7 @@ func (s) TestUpdateStatePauses(t *testing.T) {
 
 	// Send the config, and an address with hierarchy path ["cluster_1"].
 	wantAddrs := []resolver.Address{
-		{Addr: testBackendAddrStrs[0], BalancerAttributes: nil},
+		resolver.NewAddress(testBackendAddrStrs[0]).WithBalancerAttributes(nil),
 	}
 	if err := bal.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{Endpoints: []resolver.Endpoint{

@@ -1096,7 +1096,7 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 					{
 						Endpoints: []xdsresource.Endpoint{{
 							ResolverEndpoint: resolver.Endpoint{
-								Addresses: []resolver.Address{{Addr: "addr1:314"}},
+								Addresses: []resolver.Address{resolver.NewAddress("addr1:314")},
 							},
 							Weight: 1,
 						}},
@@ -1107,7 +1107,7 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 					{
 						Endpoints: []xdsresource.Endpoint{{
 							ResolverEndpoint: resolver.Endpoint{
-								Addresses: []resolver.Address{{Addr: "addr2:159"}},
+								Addresses: []resolver.Address{resolver.NewAddress("addr2:159")},
 							},
 							Weight: 1,
 						}},
@@ -1140,7 +1140,7 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 					{
 						Endpoints: []xdsresource.Endpoint{{
 							ResolverEndpoint: resolver.Endpoint{
-								Addresses: []resolver.Address{{Addr: "addr1:314"}},
+								Addresses: []resolver.Address{resolver.NewAddress("addr1:314")},
 							},
 							Weight: 1,
 						}},
@@ -1151,7 +1151,7 @@ func (s) TestHandleEndpointsResponseFromManagementServer(t *testing.T) {
 					{
 						Endpoints: []xdsresource.Endpoint{{
 							ResolverEndpoint: resolver.Endpoint{
-								Addresses: []resolver.Address{{Addr: "addr2:159"}},
+								Addresses: []resolver.Address{resolver.NewAddress("addr2:159")},
 							},
 							Weight: 1,
 						}},

@@ -475,7 +475,7 @@ func (s) TestEjectUnejectSuccessRate(t *testing.T) {
 			defer cleanup()
 			endpoints := make([]resolver.Endpoint, test.numberOfConns)
 			for i := range test.numberOfConns {
-				endpoints[i] = resolver.Endpoint{Addresses: []resolver.Address{{Addr: fmt.Sprintf("address%d", i+1)}}}
+				endpoints[i] = resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(fmt.Sprintf("address%d", i+1))}}
 			}
 			od.UpdateClientConnState(balancer.ClientConnState{
 				ResolverState: resolver.State{
@@ -694,21 +694,21 @@ func (s) TestEjectFailureRate(t *testing.T) {
 			if scw1 != nil { // UpdateClientConnState was already called, no need to recreate SubConns.
 				return nil
 			}
-			scw1, err = bd.ClientConn.NewSubConn([]resolver.Address{{Addr: "address1"}}, balancer.NewSubConnOptions{
+			scw1, err = bd.ClientConn.NewSubConn([]resolver.Address{resolver.NewAddress("address1")}, balancer.NewSubConnOptions{
 				StateListener: func(balancer.SubConnState) {},
 			})
 			if err != nil {
 				t.Errorf("error in od.NewSubConn call: %v", err)
 			}
 			scw1.Connect()
-			scw2, err = bd.ClientConn.NewSubConn([]resolver.Address{{Addr: "address2"}}, balancer.NewSubConnOptions{
+			scw2, err = bd.ClientConn.NewSubConn([]resolver.Address{resolver.NewAddress("address2")}, balancer.NewSubConnOptions{
 				StateListener: func(balancer.SubConnState) {},
 			})
 			if err != nil {
 				t.Errorf("error in od.NewSubConn call: %v", err)
 			}
 			scw2.Connect()
-			scw3, err = bd.ClientConn.NewSubConn([]resolver.Address{{Addr: "address3"}}, balancer.NewSubConnOptions{
+			scw3, err = bd.ClientConn.NewSubConn([]resolver.Address{resolver.NewAddress("address3")}, balancer.NewSubConnOptions{
 				StateListener: func(scs balancer.SubConnState) {
 					if scs.ConnectivityState == connectivity.Ready {
 						close(connectivityCh)
@@ -731,9 +731,9 @@ func (s) TestEjectFailureRate(t *testing.T) {
 	od.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{{Addr: "address1"}}},
-				{Addresses: []resolver.Address{{Addr: "address2"}}},
-				{Addresses: []resolver.Address{{Addr: "address3"}}},
+				{Addresses: []resolver.Address{resolver.NewAddress("address1")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("address2")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("address3")}},
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -881,9 +881,9 @@ func (s) TestEjectFailureRate(t *testing.T) {
 		od.UpdateClientConnState(balancer.ClientConnState{
 			ResolverState: resolver.State{
 				Endpoints: []resolver.Endpoint{
-					{Addresses: []resolver.Address{{Addr: "address1"}}},
-					{Addresses: []resolver.Address{{Addr: "address2"}}},
-					{Addresses: []resolver.Address{{Addr: "address3"}}},
+					{Addresses: []resolver.Address{resolver.NewAddress("address1")}},
+					{Addresses: []resolver.Address{resolver.NewAddress("address2")}},
+					{Addresses: []resolver.Address{resolver.NewAddress("address3")}},
 				},
 			},
 			BalancerConfig: &LBConfig{
@@ -946,9 +946,9 @@ func (s) TestConcurrentOperations(t *testing.T) {
 	od.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{
-				{Addresses: []resolver.Address{{Addr: "address1"}}},
-				{Addresses: []resolver.Address{{Addr: "address2"}}},
-				{Addresses: []resolver.Address{{Addr: "address3"}}},
+				{Addresses: []resolver.Address{resolver.NewAddress("address1")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("address2")}},
+				{Addresses: []resolver.Address{resolver.NewAddress("address3")}},
 			},
 		},
 		BalancerConfig: &LBConfig{
@@ -977,7 +977,7 @@ func (s) TestConcurrentOperations(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTestTimeout)
 	defer cancel()
 
-	scw1, err := od.NewSubConn([]resolver.Address{{Addr: "address1"}}, balancer.NewSubConnOptions{})
+	scw1, err := od.NewSubConn([]resolver.Address{resolver.NewAddress("address1")}, balancer.NewSubConnOptions{})
 	if err != nil {
 		t.Fatalf("error in od.NewSubConn call: %v", err)
 	}
@@ -985,12 +985,12 @@ func (s) TestConcurrentOperations(t *testing.T) {
 		t.Fatalf("error in od.NewSubConn call: %v", err)
 	}
 
-	scw2, err := od.NewSubConn([]resolver.Address{{Addr: "address2"}}, balancer.NewSubConnOptions{})
+	scw2, err := od.NewSubConn([]resolver.Address{resolver.NewAddress("address2")}, balancer.NewSubConnOptions{})
 	if err != nil {
 		t.Fatalf("error in od.NewSubConn call: %v", err)
 	}
 
-	scw3, err := od.NewSubConn([]resolver.Address{{Addr: "address3"}}, balancer.NewSubConnOptions{})
+	scw3, err := od.NewSubConn([]resolver.Address{resolver.NewAddress("address3")}, balancer.NewSubConnOptions{})
 	if err != nil {
 		t.Fatalf("error in od.NewSubConn call: %v", err)
 	}
@@ -1068,7 +1068,7 @@ func (s) TestConcurrentOperations(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		od.NewSubConn([]resolver.Address{{Addr: "address4"}}, balancer.NewSubConnOptions{})
+		od.NewSubConn([]resolver.Address{resolver.NewAddress("address4")}, balancer.NewSubConnOptions{})
 	}()
 
 	wg.Add(1)
@@ -1081,7 +1081,7 @@ func (s) TestConcurrentOperations(t *testing.T) {
 	// balancer.Balancer API guarantee of synchronous calls.
 	od.UpdateClientConnState(balancer.ClientConnState{ // This will delete addresses and flip to no op
 		ResolverState: resolver.State{
-			Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{{Addr: "address1"}}}},
+			Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress("address1")}}},
 		},
 		BalancerConfig: &LBConfig{
 			Interval: math.MaxInt64,
@@ -1176,14 +1176,14 @@ func (s) TestMultipleAddressesPerEndpoint(t *testing.T) {
 	endpoints := []resolver.Endpoint{
 		{
 			Addresses: []resolver.Address{
-				{Addr: unhealthyBackend.Address},
-				{Addr: healthyBackends[0].Address},
+				resolver.NewAddress(unhealthyBackend.Address),
+				resolver.NewAddress(healthyBackends[0].Address),
 			},
 		},
 		{
 			Addresses: []resolver.Address{
-				{Addr: healthyBackends[1].Address},
-				{Addr: healthyBackends[2].Address},
+				resolver.NewAddress(healthyBackends[1].Address),
+				resolver.NewAddress(healthyBackends[2].Address),
 			},
 		},
 	}
@@ -1352,14 +1352,14 @@ func (s) TestEjectionStateResetsWhenEndpointAddressesChange(t *testing.T) {
 	endpoints := []resolver.Endpoint{
 		{
 			Addresses: []resolver.Address{
-				{Addr: unhealthyBackend.Address},
-				{Addr: healthyBackends[0].Address},
+				resolver.NewAddress(unhealthyBackend.Address),
+				resolver.NewAddress(healthyBackends[0].Address),
 			},
 		},
 		{
 			Addresses: []resolver.Address{
-				{Addr: healthyBackends[1].Address},
-				{Addr: healthyBackends[2].Address},
+				resolver.NewAddress(healthyBackends[1].Address),
+				resolver.NewAddress(healthyBackends[2].Address),
 			},
 		},
 	}
@@ -1457,7 +1457,7 @@ func (s) TestSubConnShutdownRemovesFromEndpointMap(t *testing.T) {
 	defer cleanup()
 
 	addr := "address1"
-	ep := resolver.Endpoint{Addresses: []resolver.Address{{Addr: addr}}}
+	ep := resolver.Endpoint{Addresses: []resolver.Address{resolver.NewAddress(addr)}}
 	od.UpdateClientConnState(balancer.ClientConnState{
 		ResolverState: resolver.State{
 			Endpoints: []resolver.Endpoint{ep},

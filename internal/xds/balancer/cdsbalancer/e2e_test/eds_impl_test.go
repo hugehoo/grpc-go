@@ -89,7 +89,7 @@ func backendAddressesAndPorts(t *testing.T, servers []*stubserver.StubServer) ([
 	addrs := make([]resolver.Address, len(servers))
 	ports := make([]uint32, len(servers))
 	for i := 0; i < len(servers); i++ {
-		addrs[i] = resolver.Address{Addr: servers[i].Address}
+		addrs[i] = resolver.NewAddress(servers[i].Address)
 		ports[i] = testutils.ParsePort(t, servers[i].Address)
 	}
 	return addrs, ports
@@ -839,7 +839,7 @@ func (s) TestEDS_BadUpdateWithPreviousGoodUpdate(t *testing.T) {
 
 	// Ensure RPCs are being roundrobined across the single backend.
 	client := testgrpc.NewTestServiceClient(cc)
-	if err := rrutil.CheckRoundRobinRPCs(ctx, client, []resolver.Address{{Addr: server.Address}}); err != nil {
+	if err := rrutil.CheckRoundRobinRPCs(ctx, client, []resolver.Address{resolver.NewAddress(server.Address)}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -854,7 +854,7 @@ func (s) TestEDS_BadUpdateWithPreviousGoodUpdate(t *testing.T) {
 
 	// Ensure that RPCs continue to succeed for the next second.
 	for end := time.Now().Add(time.Second); time.Now().Before(end); <-time.After(defaultTestShortTimeout) {
-		if err := rrutil.CheckRoundRobinRPCs(ctx, client, []resolver.Address{{Addr: server.Address}}); err != nil {
+		if err := rrutil.CheckRoundRobinRPCs(ctx, client, []resolver.Address{resolver.NewAddress(server.Address)}); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -1086,7 +1086,7 @@ func (s) TestEDS_EndpointWithMultipleAddresses(t *testing.T) {
 			cc.Connect()
 			defer cc.Close()
 			client := testgrpc.NewTestServiceClient(cc)
-			if err := rrutil.CheckRoundRobinRPCs(ctx, client, []resolver.Address{{Addr: lis1.Addr().String()}}); err != nil {
+			if err := rrutil.CheckRoundRobinRPCs(ctx, client, []resolver.Address{resolver.NewAddress(lis1.Addr().String())}); err != nil {
 				t.Fatal(err)
 			}
 

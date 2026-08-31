@@ -70,7 +70,7 @@ func disableA86(t *testing.T) {
 func buildResolverEndpoint(addr []string, host string) resolver.Endpoint {
 	address := []resolver.Address{}
 	for _, a := range addr {
-		address = append(address, resolver.Address{Addr: a})
+		address = append(address, resolver.NewAddress(a))
 	}
 	resolverEndpoint := resolver.Endpoint{Addresses: address}
 	resolverEndpoint = hostname.Set(resolverEndpoint, host)

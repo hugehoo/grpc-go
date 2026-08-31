@@ -80,8 +80,8 @@ func (s) TestLogicalDNS_MultipleEndpoints(t *testing.T) {
 	dnsR.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{{
 			Addresses: []resolver.Address{
-				{Addr: server1.Address},
-				{Addr: server2.Address},
+				resolver.NewAddress(server1.Address),
+				resolver.NewAddress(server2.Address),
 			}}},
 	})
 

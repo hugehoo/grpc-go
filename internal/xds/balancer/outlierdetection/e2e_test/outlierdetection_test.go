@@ -268,9 +268,9 @@ func (s) TestOutlierDetectionAlgorithmsE2E(t *testing.T) {
 			sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(test.odscJSON)
 			// The full list of addresses.
 			fullAddresses := []resolver.Address{
-				{Addr: addresses[0]},
-				{Addr: addresses[1]},
-				{Addr: addresses[2]},
+				resolver.NewAddress(addresses[0]),
+				resolver.NewAddress(addresses[1]),
+				resolver.NewAddress(addresses[2]),
 			}
 			mr.InitialState(resolver.State{
 				Addresses:     fullAddresses,
@@ -294,8 +294,8 @@ func (s) TestOutlierDetectionAlgorithmsE2E(t *testing.T) {
 
 			// The addresses which don't return errors.
 			okAddresses := []resolver.Address{
-				{Addr: addresses[0]},
-				{Addr: addresses[1]},
+				resolver.NewAddress(addresses[0]),
+				resolver.NewAddress(addresses[1]),
 			}
 			// After calling the three upstreams, one of them constantly error
 			// and should eventually be ejected for a period of time. This
@@ -346,9 +346,9 @@ func (s) TestNoopConfiguration(t *testing.T) {
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(noopODServiceConfigJSON)
 	// The full list of addresses.
 	fullAddresses := []resolver.Address{
-		{Addr: addresses[0]},
-		{Addr: addresses[1]},
-		{Addr: addresses[2]},
+		resolver.NewAddress(addresses[0]),
+		resolver.NewAddress(addresses[1]),
+		resolver.NewAddress(addresses[2]),
 	}
 	mr.InitialState(resolver.State{
 		Addresses:     fullAddresses,
@@ -413,8 +413,8 @@ func (s) TestNoopConfiguration(t *testing.T) {
 
 	// The addresses which don't return errors.
 	okAddresses := []resolver.Address{
-		{Addr: addresses[0]},
-		{Addr: addresses[1]},
+		resolver.NewAddress(addresses[0]),
+		resolver.NewAddress(addresses[1]),
 	}
 	// Now that the reconfigured balancer has data about the failing upstream,
 	// it should eject the upstream and only route across the two healthy
