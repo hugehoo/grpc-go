@@ -65,7 +65,7 @@ func testRoundRobinBasic(ctx context.Context, t *testing.T, opts ...grpc.DialOpt
 
 		backends[i] = backend
 		addrs[i] = resolver.NewAddress(backend.Address)
-		endpoints[i] = resolver.Endpoint{Addresses: []resolver.Address{addrs[i]}}
+		endpoints[i] = resolver.NewEndpoint([]resolver.Address{addrs[i]}...)
 	}
 
 	dopts := []grpc.DialOption{

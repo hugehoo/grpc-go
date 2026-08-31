@@ -785,7 +785,7 @@ func (s) TestClientSideXDS_AutoHostSNI_LogicalDNS(t *testing.T) {
 	resolver.Register(dnsR)
 	t.Cleanup(func() { resolver.Register(originalDNS) })
 
-	dnsR.UpdateState(resolver.State{Endpoints: []resolver.Endpoint{{Addresses: []resolver.Address{resolver.NewAddress(server.Address)}}}})
+	dnsR.UpdateState(resolver.State{Endpoints: []resolver.Endpoint{resolver.NewEndpoint([]resolver.Address{resolver.NewAddress(server.Address)}...)}})
 
 	// Configure client side xDS resources on the management server.
 	const serviceName = "my-service-client-side-xds"
