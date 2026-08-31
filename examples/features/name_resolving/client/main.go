@@ -123,7 +123,7 @@ func (r *exampleResolver) start() {
 	addrStrs := r.addrsStore[r.target.Endpoint()]
 	addrs := make([]resolver.Address, len(addrStrs))
 	for i, s := range addrStrs {
-		addrs[i] = resolver.Address{Addr: s}
+		addrs[i] = resolver.NewAddress("").WithAddr(s)
 	}
 	r.cc.UpdateState(resolver.State{Addresses: addrs})
 }

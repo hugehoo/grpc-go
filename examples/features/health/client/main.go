@@ -59,8 +59,8 @@ func main() {
 	r := manual.NewBuilderWithScheme("whatever")
 	r.InitialState(resolver.State{
 		Addresses: []resolver.Address{
-			{Addr: "localhost:50051"},
-			{Addr: "localhost:50052"},
+			resolver.NewAddress("").WithAddr("localhost:50051"),
+			resolver.NewAddress("").WithAddr("localhost:50052"),
 		},
 	})
 

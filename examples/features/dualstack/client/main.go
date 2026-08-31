@@ -58,16 +58,16 @@ func (*exampleResolver) Build(_ resolver.Target, cc resolver.ClientConn, _ resol
 		err := cc.UpdateState(resolver.State{
 			Endpoints: []resolver.Endpoint{
 				{Addresses: []resolver.Address{
-					{Addr: fmt.Sprintf("[::1]:%d", port1)},
-					{Addr: fmt.Sprintf("127.0.0.1:%d", port1)},
+					resolver.NewAddress("").WithAddr(fmt.Sprintf("[::1]:%d", port1)),
+					resolver.NewAddress("").WithAddr(fmt.Sprintf("127.0.0.1:%d", port1)),
 				}},
 				{Addresses: []resolver.Address{
-					{Addr: fmt.Sprintf("[::1]:%d", port2)},
-					{Addr: fmt.Sprintf("127.0.0.1:%d", port2)},
+					resolver.NewAddress("").WithAddr(fmt.Sprintf("[::1]:%d", port2)),
+					resolver.NewAddress("").WithAddr(fmt.Sprintf("127.0.0.1:%d", port2)),
 				}},
 				{Addresses: []resolver.Address{
-					{Addr: fmt.Sprintf("[::1]:%d", port3)},
-					{Addr: fmt.Sprintf("127.0.0.1:%d", port3)},
+					resolver.NewAddress("").WithAddr(fmt.Sprintf("[::1]:%d", port3)),
+					resolver.NewAddress("").WithAddr(fmt.Sprintf("127.0.0.1:%d", port3)),
 				}},
 			},
 		})

@@ -53,8 +53,8 @@ func main() {
 	sc := internal.ParseServiceConfig.(func(string) *serviceconfig.ParseResult)(json)
 	mr.InitialState(resolver.State{
 		Endpoints: []resolver.Endpoint{
-			{Addresses: []resolver.Address{{Addr: addr1}}},
-			{Addresses: []resolver.Address{{Addr: addr2}}},
+			{Addresses: []resolver.Address{resolver.NewAddress("").WithAddr(addr1)}},
+			{Addresses: []resolver.Address{resolver.NewAddress("").WithAddr(addr2)}},
 		},
 		ServiceConfig: sc,
 	})
